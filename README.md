@@ -8,8 +8,7 @@ auctions and contact the masters.
 This repository contains only the backend. The frontend (TypeScript + Three.js/Babylon.js) lives in a
 separate repository and consumes the REST API and WebSocket contract described below.
 
-Final project of the **Software Design Patterns** course. It implements **8 design patterns**;
-see [docs/PATTERNS.md](docs/PATTERNS.md).
+Final project of the Software Design Patterns course. It implements 8 design patterns.
 
 ## Stack
 

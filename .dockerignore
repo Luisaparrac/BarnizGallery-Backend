@@ -7,7 +7,6 @@ target/
 *.log
 .env
 HELP.md
-docs/
 README.md
 Dockerfile
 .dockerignore
