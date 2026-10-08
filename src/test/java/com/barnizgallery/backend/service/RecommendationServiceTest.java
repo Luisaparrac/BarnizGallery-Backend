@@ -15,9 +15,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.barnizgallery.backend.TestEntities;
-import com.barnizgallery.backend.dto.response.RecommendationResponse;
-import com.barnizgallery.backend.model.entity.Visitor;
-import com.barnizgallery.backend.model.enums.Language;
+import com.barnizgallery.backend.dto.RecommendationResponse;
+import com.barnizgallery.backend.entity.Visitor;
+import com.barnizgallery.backend.enums.Language;
 import com.barnizgallery.backend.patterns.facade.AiFacade;
 import com.barnizgallery.backend.patterns.strategy.RecommendationResult;
 import com.barnizgallery.backend.repository.RecommendationRepository;

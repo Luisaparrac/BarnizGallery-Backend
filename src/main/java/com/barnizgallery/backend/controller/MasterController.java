@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.barnizgallery.backend.dto.request.MasterRequest;
-import com.barnizgallery.backend.dto.response.MasterDetailResponse;
-import com.barnizgallery.backend.dto.response.MasterResponse;
+import com.barnizgallery.backend.dto.MasterDetailResponse;
+import com.barnizgallery.backend.dto.MasterRequest;
+import com.barnizgallery.backend.dto.MasterResponse;
 import com.barnizgallery.backend.service.MasterService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;

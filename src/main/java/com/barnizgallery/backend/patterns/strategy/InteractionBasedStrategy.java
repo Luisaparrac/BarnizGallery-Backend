@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
-import com.barnizgallery.backend.model.entity.Visitor;
+import com.barnizgallery.backend.entity.Visitor;
 import com.barnizgallery.backend.patterns.factorymethod.InteractionFactoryProvider;
 import com.barnizgallery.backend.repository.InteractionRepository;
 import com.barnizgallery.backend.repository.RoomInteraction;

@@ -17,11 +17,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.barnizgallery.backend.TestEntities;
-import com.barnizgallery.backend.dto.request.RoomRequest;
-import com.barnizgallery.backend.dto.response.RoomSummaryResponse;
+import com.barnizgallery.backend.dto.RoomRequest;
+import com.barnizgallery.backend.dto.RoomSummaryResponse;
+import com.barnizgallery.backend.entity.Master;
+import com.barnizgallery.backend.entity.Room;
 import com.barnizgallery.backend.exception.BusinessRuleException;
-import com.barnizgallery.backend.model.entity.Master;
-import com.barnizgallery.backend.model.entity.Room;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.RoomArtworkCount;
 import com.barnizgallery.backend.repository.RoomRepository;

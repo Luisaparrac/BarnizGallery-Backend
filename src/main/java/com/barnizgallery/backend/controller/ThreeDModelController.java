@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.barnizgallery.backend.dto.response.ThreeDModelResponse;
+import com.barnizgallery.backend.dto.ThreeDModelResponse;
 import com.barnizgallery.backend.service.ThreeDModelService;
 
 import io.swagger.v3.oas.annotations.Operation;

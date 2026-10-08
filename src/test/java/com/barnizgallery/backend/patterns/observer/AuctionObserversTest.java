@@ -21,12 +21,12 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 
 import com.barnizgallery.backend.TestEntities;
-import com.barnizgallery.backend.dto.response.BidResponse;
-import com.barnizgallery.backend.dto.response.VisitorNotification;
-import com.barnizgallery.backend.model.entity.Artwork;
-import com.barnizgallery.backend.model.entity.TasteProfile;
-import com.barnizgallery.backend.model.enums.ArtworkStatus;
-import com.barnizgallery.backend.model.enums.Language;
+import com.barnizgallery.backend.dto.BidResponse;
+import com.barnizgallery.backend.dto.VisitorNotification;
+import com.barnizgallery.backend.entity.Artwork;
+import com.barnizgallery.backend.entity.TasteProfile;
+import com.barnizgallery.backend.enums.ArtworkStatus;
+import com.barnizgallery.backend.enums.Language;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.TasteProfileRepository;
 

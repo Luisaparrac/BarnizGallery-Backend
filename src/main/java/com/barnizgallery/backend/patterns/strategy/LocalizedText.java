@@ -1,7 +1,7 @@
 package com.barnizgallery.backend.patterns.strategy;
 
-import com.barnizgallery.backend.model.entity.Visitor;
-import com.barnizgallery.backend.model.enums.Language;
+import com.barnizgallery.backend.entity.Visitor;
+import com.barnizgallery.backend.enums.Language;
 
 /**
  * Picks the Spanish or English text according to the visitor's preferred language.

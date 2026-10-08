@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import com.barnizgallery.backend.model.entity.Room;
+import com.barnizgallery.backend.entity.Room;
 
 /**
  * Spring Data repository for {@link Room}.

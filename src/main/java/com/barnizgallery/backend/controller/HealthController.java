@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.barnizgallery.backend.dto.response.HealthResponse;
+import com.barnizgallery.backend.dto.HealthResponse;
 import com.barnizgallery.backend.patterns.adapter.StorageService;
 import com.barnizgallery.backend.patterns.adapter.ThreeDModelGenerator;
 import com.barnizgallery.backend.patterns.facade.AiFacade;

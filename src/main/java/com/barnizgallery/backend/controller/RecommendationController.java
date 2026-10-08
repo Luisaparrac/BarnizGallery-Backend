@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.barnizgallery.backend.dto.response.RecommendationResponse;
+import com.barnizgallery.backend.dto.RecommendationResponse;
 import com.barnizgallery.backend.service.RecommendationService;
 
 import io.swagger.v3.oas.annotations.Operation;

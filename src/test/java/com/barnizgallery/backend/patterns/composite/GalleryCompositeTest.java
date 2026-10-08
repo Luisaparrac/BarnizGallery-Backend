@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 
-import com.barnizgallery.backend.dto.response.GalleryNodeResponse;
-import com.barnizgallery.backend.model.enums.ArtworkStatus;
+import com.barnizgallery.backend.dto.GalleryNodeResponse;
+import com.barnizgallery.backend.enums.ArtworkStatus;
 
 class GalleryCompositeTest {
 

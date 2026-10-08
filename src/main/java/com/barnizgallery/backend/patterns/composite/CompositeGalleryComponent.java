@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.barnizgallery.backend.dto.response.GalleryNodeResponse;
+import com.barnizgallery.backend.dto.GalleryNodeResponse;
 
 /**
  * <b>Composite pattern – Composite (shared base).</b>

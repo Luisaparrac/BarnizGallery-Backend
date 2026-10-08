@@ -2,14 +2,14 @@ package com.barnizgallery.backend.mapper;
 
 import java.util.List;
 
-import com.barnizgallery.backend.dto.request.ArtworkRequest;
-import com.barnizgallery.backend.dto.response.ArtworkDetailResponse;
-import com.barnizgallery.backend.dto.response.ArtworkSummaryResponse;
-import com.barnizgallery.backend.dto.response.AuctionResponse;
-import com.barnizgallery.backend.dto.response.PhotoResponse;
-import com.barnizgallery.backend.dto.response.ThreeDModelResponse;
-import com.barnizgallery.backend.model.entity.Artwork;
-import com.barnizgallery.backend.model.entity.Photo;
+import com.barnizgallery.backend.dto.ArtworkDetailResponse;
+import com.barnizgallery.backend.dto.ArtworkRequest;
+import com.barnizgallery.backend.dto.ArtworkSummaryResponse;
+import com.barnizgallery.backend.dto.AuctionResponse;
+import com.barnizgallery.backend.dto.PhotoResponse;
+import com.barnizgallery.backend.dto.ThreeDModelResponse;
+import com.barnizgallery.backend.entity.Artwork;
+import com.barnizgallery.backend.entity.Photo;
 
 /**
  * Converts between {@link Artwork} (and {@link Photo}) and their DTOs.

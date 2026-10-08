@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.barnizgallery.backend.model.entity.Visitor;
+import com.barnizgallery.backend.entity.Visitor;
 
 /**
  * Spring Data repository for {@link Visitor}.

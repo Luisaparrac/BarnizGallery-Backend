@@ -2,11 +2,11 @@ package com.barnizgallery.backend.patterns.factorymethod;
 
 import java.time.LocalDateTime;
 
+import com.barnizgallery.backend.entity.Artwork;
+import com.barnizgallery.backend.entity.Interaction;
+import com.barnizgallery.backend.entity.Visitor;
+import com.barnizgallery.backend.enums.InteractionAction;
 import com.barnizgallery.backend.exception.BusinessRuleException;
-import com.barnizgallery.backend.model.entity.Artwork;
-import com.barnizgallery.backend.model.entity.Interaction;
-import com.barnizgallery.backend.model.entity.Visitor;
-import com.barnizgallery.backend.model.enums.InteractionAction;
 
 /**
  * <b>Factory Method pattern – Creator (abstract).</b>

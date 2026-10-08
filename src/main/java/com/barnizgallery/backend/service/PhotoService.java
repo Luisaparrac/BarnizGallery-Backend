@@ -6,13 +6,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.barnizgallery.backend.dto.request.PhotoRequest;
-import com.barnizgallery.backend.dto.response.PhotoResponse;
+import com.barnizgallery.backend.dto.PhotoRequest;
+import com.barnizgallery.backend.dto.PhotoResponse;
+import com.barnizgallery.backend.entity.Artwork;
+import com.barnizgallery.backend.entity.Photo;
 import com.barnizgallery.backend.exception.FeatureDisabledException;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.mapper.ArtworkMapper;
-import com.barnizgallery.backend.model.entity.Artwork;
-import com.barnizgallery.backend.model.entity.Photo;
 import com.barnizgallery.backend.patterns.adapter.StorageService;
 import com.barnizgallery.backend.repository.PhotoRepository;
 

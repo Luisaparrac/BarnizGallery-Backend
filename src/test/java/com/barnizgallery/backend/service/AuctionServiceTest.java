@@ -20,15 +20,15 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import com.barnizgallery.backend.TestEntities;
-import com.barnizgallery.backend.dto.request.CreateAuctionRequest;
-import com.barnizgallery.backend.model.entity.Artwork;
-import com.barnizgallery.backend.model.entity.Auction;
-import com.barnizgallery.backend.model.enums.ArtworkStatus;
-import com.barnizgallery.backend.model.enums.AuctionStatus;
+import com.barnizgallery.backend.dto.CreateAuctionRequest;
+import com.barnizgallery.backend.entity.Artwork;
+import com.barnizgallery.backend.entity.Auction;
+import com.barnizgallery.backend.enums.ArtworkStatus;
+import com.barnizgallery.backend.enums.AuctionStatus;
 import com.barnizgallery.backend.patterns.facade.AiFacade;
 import com.barnizgallery.backend.patterns.observer.AuctionEvent;
-import com.barnizgallery.backend.patterns.observer.AuctionEventType;
 import com.barnizgallery.backend.patterns.observer.AuctionEventPublisher;
+import com.barnizgallery.backend.patterns.observer.AuctionEventType;
 import com.barnizgallery.backend.repository.AuctionRepository;
 import com.barnizgallery.backend.repository.BidRepository;
 

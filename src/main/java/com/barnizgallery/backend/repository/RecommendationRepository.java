@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
-import com.barnizgallery.backend.model.entity.Recommendation;
+import com.barnizgallery.backend.entity.Recommendation;
 
 /**
  * Spring Data repository for {@link Recommendation}.

@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.barnizgallery.backend.dto.response.GalleryNodeResponse;
+import com.barnizgallery.backend.dto.GalleryNodeResponse;
 import com.barnizgallery.backend.service.GalleryService;
 
 import io.swagger.v3.oas.annotations.Operation;

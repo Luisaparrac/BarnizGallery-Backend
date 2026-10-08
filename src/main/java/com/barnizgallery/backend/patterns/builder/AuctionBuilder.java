@@ -6,11 +6,11 @@ import java.time.LocalDateTime;
 import java.util.EnumSet;
 import java.util.Optional;
 
+import com.barnizgallery.backend.entity.Artwork;
+import com.barnizgallery.backend.entity.Auction;
+import com.barnizgallery.backend.enums.ArtworkStatus;
+import com.barnizgallery.backend.enums.AuctionStatus;
 import com.barnizgallery.backend.exception.BusinessRuleException;
-import com.barnizgallery.backend.model.entity.Artwork;
-import com.barnizgallery.backend.model.entity.Auction;
-import com.barnizgallery.backend.model.enums.ArtworkStatus;
-import com.barnizgallery.backend.model.enums.AuctionStatus;
 import com.barnizgallery.backend.patterns.facade.AiFacade;
 import com.barnizgallery.backend.repository.AuctionRepository;
 

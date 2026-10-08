@@ -1,7 +1,7 @@
 package com.barnizgallery.backend.mapper;
 
-import com.barnizgallery.backend.dto.response.ContactMessageResponse;
-import com.barnizgallery.backend.model.entity.ContactMessage;
+import com.barnizgallery.backend.dto.ContactMessageResponse;
+import com.barnizgallery.backend.entity.ContactMessage;
 
 /**
  * Converts {@link ContactMessage} to its DTO.

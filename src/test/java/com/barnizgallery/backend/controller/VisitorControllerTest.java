@@ -13,12 +13,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import com.barnizgallery.backend.dto.request.IdentifyVisitorRequest;
-import com.barnizgallery.backend.dto.response.IdentifyVisitorResponse;
-import com.barnizgallery.backend.dto.response.VisitorResponse;
+import com.barnizgallery.backend.dto.IdentifyVisitorRequest;
+import com.barnizgallery.backend.dto.IdentifyVisitorResponse;
+import com.barnizgallery.backend.dto.VisitorResponse;
+import com.barnizgallery.backend.enums.CameraMode;
+import com.barnizgallery.backend.enums.Language;
 import com.barnizgallery.backend.exception.GlobalExceptionHandler;
-import com.barnizgallery.backend.model.enums.CameraMode;
-import com.barnizgallery.backend.model.enums.Language;
 import com.barnizgallery.backend.service.VisitorService;
 
 /**

@@ -18,8 +18,8 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import com.barnizgallery.backend.dto.response.ErrorResponse;
-import com.barnizgallery.backend.dto.response.FieldErrorResponse;
+import com.barnizgallery.backend.dto.ErrorResponse;
+import com.barnizgallery.backend.dto.FieldErrorResponse;
 
 import jakarta.servlet.http.HttpServletRequest;
 

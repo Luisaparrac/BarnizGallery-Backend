@@ -16,10 +16,10 @@ import org.junit.jupiter.api.Test;
 
 import com.barnizgallery.backend.TestEntities;
 import com.barnizgallery.backend.config.AuctionProperties;
-import com.barnizgallery.backend.model.entity.Artwork;
-import com.barnizgallery.backend.model.entity.Auction;
-import com.barnizgallery.backend.model.enums.ArtworkStatus;
-import com.barnizgallery.backend.model.enums.AuctionStatus;
+import com.barnizgallery.backend.entity.Artwork;
+import com.barnizgallery.backend.entity.Auction;
+import com.barnizgallery.backend.enums.ArtworkStatus;
+import com.barnizgallery.backend.enums.AuctionStatus;
 import com.barnizgallery.backend.patterns.adapter.AiTextClient;
 import com.barnizgallery.backend.patterns.adapter.DisabledAiClient;
 import com.barnizgallery.backend.patterns.strategy.RecommendationStrategyResolver;

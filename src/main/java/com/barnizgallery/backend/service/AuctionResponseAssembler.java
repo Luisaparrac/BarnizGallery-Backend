@@ -9,11 +9,11 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 import com.barnizgallery.backend.config.AuctionProperties;
-import com.barnizgallery.backend.dto.response.AuctionResponse;
+import com.barnizgallery.backend.dto.AuctionResponse;
+import com.barnizgallery.backend.entity.Auction;
 import com.barnizgallery.backend.mapper.AuctionMapper;
-import com.barnizgallery.backend.model.entity.Auction;
-import com.barnizgallery.backend.repository.BidRepository;
 import com.barnizgallery.backend.repository.AuctionBidStats;
+import com.barnizgallery.backend.repository.BidRepository;
 
 /**
  * Builds {@link AuctionResponse} objects, adding the highest bid, the number of bids

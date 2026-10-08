@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.barnizgallery.backend.dto.request.BidRequest;
-import com.barnizgallery.backend.dto.request.CreateAuctionRequest;
-import com.barnizgallery.backend.dto.response.AuctionResponse;
-import com.barnizgallery.backend.dto.response.BidResponse;
-import com.barnizgallery.backend.model.enums.AuctionStatus;
+import com.barnizgallery.backend.dto.AuctionResponse;
+import com.barnizgallery.backend.dto.BidRequest;
+import com.barnizgallery.backend.dto.BidResponse;
+import com.barnizgallery.backend.dto.CreateAuctionRequest;
+import com.barnizgallery.backend.enums.AuctionStatus;
 import com.barnizgallery.backend.service.AuctionService;
 import com.barnizgallery.backend.service.BidService;
 

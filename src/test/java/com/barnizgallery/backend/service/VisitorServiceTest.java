@@ -18,17 +18,17 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.barnizgallery.backend.TestEntities;
-import com.barnizgallery.backend.dto.request.IdentifyVisitorRequest;
-import com.barnizgallery.backend.dto.request.TasteProfileRequest;
-import com.barnizgallery.backend.dto.request.VisitorPreferencesRequest;
-import com.barnizgallery.backend.dto.response.IdentifyVisitorResponse;
-import com.barnizgallery.backend.dto.response.TasteProfileResponse;
-import com.barnizgallery.backend.dto.response.VisitorResponse;
+import com.barnizgallery.backend.dto.IdentifyVisitorRequest;
+import com.barnizgallery.backend.dto.IdentifyVisitorResponse;
+import com.barnizgallery.backend.dto.TasteProfileRequest;
+import com.barnizgallery.backend.dto.TasteProfileResponse;
+import com.barnizgallery.backend.dto.VisitorPreferencesRequest;
+import com.barnizgallery.backend.dto.VisitorResponse;
+import com.barnizgallery.backend.entity.TasteProfile;
+import com.barnizgallery.backend.entity.Visitor;
+import com.barnizgallery.backend.enums.CameraMode;
+import com.barnizgallery.backend.enums.Language;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
-import com.barnizgallery.backend.model.entity.TasteProfile;
-import com.barnizgallery.backend.model.entity.Visitor;
-import com.barnizgallery.backend.model.enums.CameraMode;
-import com.barnizgallery.backend.model.enums.Language;
 import com.barnizgallery.backend.repository.TasteProfileRepository;
 import com.barnizgallery.backend.repository.VisitorRepository;
 

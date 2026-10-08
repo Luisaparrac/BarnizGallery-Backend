@@ -9,8 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 
-import com.barnizgallery.backend.model.entity.Auction;
-import com.barnizgallery.backend.model.enums.AuctionStatus;
+import com.barnizgallery.backend.entity.Auction;
+import com.barnizgallery.backend.enums.AuctionStatus;
 
 import jakarta.persistence.LockModeType;
 
@@ -45,7 +45,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Integer> {
 
     /** Scheduled auctions whose start date has arrived, or active ones whose end date has passed. */
     @Query("select a from Auction a join fetch a.artwork where "
-            + "(a.status = com.barnizgallery.backend.model.enums.AuctionStatus.SCHEDULED and a.startDate <= :now) "
-            + "or (a.status = com.barnizgallery.backend.model.enums.AuctionStatus.ACTIVE and a.endDate <= :now)")
+            + "(a.status = com.barnizgallery.backend.enums.AuctionStatus.SCHEDULED and a.startDate <= :now) "
+            + "or (a.status = com.barnizgallery.backend.enums.AuctionStatus.ACTIVE and a.endDate <= :now)")
     List<Auction> findDueForTransition(LocalDateTime now);
 }

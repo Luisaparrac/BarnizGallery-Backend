@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.barnizgallery.backend.dto.request.IdentifyVisitorRequest;
-import com.barnizgallery.backend.dto.request.TasteProfileRequest;
-import com.barnizgallery.backend.dto.request.VisitorPreferencesRequest;
-import com.barnizgallery.backend.dto.response.IdentifyVisitorResponse;
-import com.barnizgallery.backend.dto.response.TasteProfileResponse;
-import com.barnizgallery.backend.dto.response.VisitorResponse;
+import com.barnizgallery.backend.dto.IdentifyVisitorRequest;
+import com.barnizgallery.backend.dto.IdentifyVisitorResponse;
+import com.barnizgallery.backend.dto.TasteProfileRequest;
+import com.barnizgallery.backend.dto.TasteProfileResponse;
+import com.barnizgallery.backend.dto.VisitorPreferencesRequest;
+import com.barnizgallery.backend.dto.VisitorResponse;
 import com.barnizgallery.backend.service.VisitorService;
 
 import io.swagger.v3.oas.annotations.Operation;

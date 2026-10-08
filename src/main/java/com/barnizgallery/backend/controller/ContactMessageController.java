@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.barnizgallery.backend.dto.request.ContactMessageRequest;
-import com.barnizgallery.backend.dto.response.ContactMessageResponse;
+import com.barnizgallery.backend.dto.ContactMessageRequest;
+import com.barnizgallery.backend.dto.ContactMessageResponse;
 import com.barnizgallery.backend.service.ContactMessageService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;

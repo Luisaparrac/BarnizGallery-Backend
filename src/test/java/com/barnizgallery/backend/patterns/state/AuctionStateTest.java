@@ -12,12 +12,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import com.barnizgallery.backend.TestEntities;
-import com.barnizgallery.backend.dto.request.BidRequest;
+import com.barnizgallery.backend.dto.BidRequest;
+import com.barnizgallery.backend.entity.Artwork;
+import com.barnizgallery.backend.entity.Auction;
+import com.barnizgallery.backend.enums.ArtworkStatus;
+import com.barnizgallery.backend.enums.AuctionStatus;
 import com.barnizgallery.backend.exception.BusinessRuleException;
-import com.barnizgallery.backend.model.entity.Artwork;
-import com.barnizgallery.backend.model.entity.Auction;
-import com.barnizgallery.backend.model.enums.ArtworkStatus;
-import com.barnizgallery.backend.model.enums.AuctionStatus;
 
 class AuctionStateTest {
 

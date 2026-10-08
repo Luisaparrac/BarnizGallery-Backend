@@ -5,13 +5,13 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.barnizgallery.backend.dto.request.ContactMessageRequest;
-import com.barnizgallery.backend.dto.response.ContactMessageResponse;
+import com.barnizgallery.backend.dto.ContactMessageRequest;
+import com.barnizgallery.backend.dto.ContactMessageResponse;
+import com.barnizgallery.backend.entity.Artwork;
+import com.barnizgallery.backend.entity.ContactMessage;
+import com.barnizgallery.backend.entity.Master;
 import com.barnizgallery.backend.exception.BusinessRuleException;
 import com.barnizgallery.backend.mapper.ContactMessageMapper;
-import com.barnizgallery.backend.model.entity.Artwork;
-import com.barnizgallery.backend.model.entity.ContactMessage;
-import com.barnizgallery.backend.model.entity.Master;
 import com.barnizgallery.backend.repository.ContactMessageRepository;
 
 /**

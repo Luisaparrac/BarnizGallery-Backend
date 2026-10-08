@@ -5,8 +5,8 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.barnizgallery.backend.model.entity.ThreeDModel;
-import com.barnizgallery.backend.model.enums.GenerationStatus;
+import com.barnizgallery.backend.entity.ThreeDModel;
+import com.barnizgallery.backend.enums.GenerationStatus;
 
 /**
  * Spring Data repository for {@link ThreeDModel}.

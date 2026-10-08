@@ -2,7 +2,7 @@ package com.barnizgallery.backend.patterns.observer;
 
 import java.time.LocalDateTime;
 
-import com.barnizgallery.backend.dto.response.BidResponse;
+import com.barnizgallery.backend.dto.BidResponse;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**

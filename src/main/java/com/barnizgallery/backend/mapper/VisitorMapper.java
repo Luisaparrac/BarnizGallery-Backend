@@ -1,11 +1,11 @@
 package com.barnizgallery.backend.mapper;
 
-import com.barnizgallery.backend.dto.request.IdentifyVisitorRequest;
-import com.barnizgallery.backend.dto.request.TasteProfileRequest;
-import com.barnizgallery.backend.dto.response.TasteProfileResponse;
-import com.barnizgallery.backend.dto.response.VisitorResponse;
-import com.barnizgallery.backend.model.entity.TasteProfile;
-import com.barnizgallery.backend.model.entity.Visitor;
+import com.barnizgallery.backend.dto.IdentifyVisitorRequest;
+import com.barnizgallery.backend.dto.TasteProfileRequest;
+import com.barnizgallery.backend.dto.TasteProfileResponse;
+import com.barnizgallery.backend.dto.VisitorResponse;
+import com.barnizgallery.backend.entity.TasteProfile;
+import com.barnizgallery.backend.entity.Visitor;
 
 /**
  * Converts between {@link Visitor} / {@link TasteProfile} and their DTOs.

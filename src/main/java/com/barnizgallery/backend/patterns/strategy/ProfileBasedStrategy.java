@@ -12,9 +12,9 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import com.barnizgallery.backend.model.entity.Artwork;
-import com.barnizgallery.backend.model.entity.TasteProfile;
-import com.barnizgallery.backend.model.entity.Visitor;
+import com.barnizgallery.backend.entity.Artwork;
+import com.barnizgallery.backend.entity.TasteProfile;
+import com.barnizgallery.backend.entity.Visitor;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.TasteProfileRepository;
 

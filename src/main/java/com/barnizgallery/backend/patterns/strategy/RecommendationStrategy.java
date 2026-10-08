@@ -2,7 +2,7 @@ package com.barnizgallery.backend.patterns.strategy;
 
 import java.util.List;
 
-import com.barnizgallery.backend.model.entity.Visitor;
+import com.barnizgallery.backend.entity.Visitor;
 
 /**
  * <b>Strategy pattern – Strategy.</b>

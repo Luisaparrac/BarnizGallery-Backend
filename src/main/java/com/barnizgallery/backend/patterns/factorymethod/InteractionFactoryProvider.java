@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
-import com.barnizgallery.backend.model.enums.InteractionAction;
+import com.barnizgallery.backend.enums.InteractionAction;
 
 /**
  * Returns the {@link InteractionFactory} (ConcreteCreator) for each {@link InteractionAction}.

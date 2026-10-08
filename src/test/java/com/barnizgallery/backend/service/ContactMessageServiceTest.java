@@ -15,13 +15,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 
 import com.barnizgallery.backend.TestEntities;
-import com.barnizgallery.backend.dto.request.ContactMessageRequest;
-import com.barnizgallery.backend.dto.response.ContactMessageResponse;
+import com.barnizgallery.backend.dto.ContactMessageRequest;
+import com.barnizgallery.backend.dto.ContactMessageResponse;
+import com.barnizgallery.backend.entity.ContactMessage;
+import com.barnizgallery.backend.entity.Master;
+import com.barnizgallery.backend.enums.ArtworkStatus;
+import com.barnizgallery.backend.enums.Language;
 import com.barnizgallery.backend.exception.BusinessRuleException;
-import com.barnizgallery.backend.model.entity.ContactMessage;
-import com.barnizgallery.backend.model.entity.Master;
-import com.barnizgallery.backend.model.enums.ArtworkStatus;
-import com.barnizgallery.backend.model.enums.Language;
 import com.barnizgallery.backend.repository.ContactMessageRepository;
 
 @ExtendWith(MockitoExtension.class)

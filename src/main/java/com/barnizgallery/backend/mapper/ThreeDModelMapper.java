@@ -1,7 +1,7 @@
 package com.barnizgallery.backend.mapper;
 
-import com.barnizgallery.backend.dto.response.ThreeDModelResponse;
-import com.barnizgallery.backend.model.entity.ThreeDModel;
+import com.barnizgallery.backend.dto.ThreeDModelResponse;
+import com.barnizgallery.backend.entity.ThreeDModel;
 
 /**
  * Converts {@link ThreeDModel} to its DTO.

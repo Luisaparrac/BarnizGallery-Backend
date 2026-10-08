@@ -8,8 +8,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import com.barnizgallery.backend.config.Hyper3dProperties;
+import com.barnizgallery.backend.enums.GenerationStatus;
 import com.barnizgallery.backend.exception.FeatureDisabledException;
-import com.barnizgallery.backend.model.enums.GenerationStatus;
 
 /**
  * Tests of the adapter logic that does not need the network.

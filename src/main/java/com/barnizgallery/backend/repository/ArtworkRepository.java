@@ -5,8 +5,8 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import com.barnizgallery.backend.model.entity.Artwork;
-import com.barnizgallery.backend.model.enums.ArtworkStatus;
+import com.barnizgallery.backend.entity.Artwork;
+import com.barnizgallery.backend.enums.ArtworkStatus;
 
 /**
  * Spring Data repository for {@link Artwork}.

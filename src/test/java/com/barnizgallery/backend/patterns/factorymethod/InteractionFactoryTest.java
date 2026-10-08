@@ -12,13 +12,13 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import com.barnizgallery.backend.TestEntities;
+import com.barnizgallery.backend.entity.Artwork;
+import com.barnizgallery.backend.entity.Interaction;
+import com.barnizgallery.backend.entity.Visitor;
+import com.barnizgallery.backend.enums.ArtworkStatus;
+import com.barnizgallery.backend.enums.InteractionAction;
+import com.barnizgallery.backend.enums.Language;
 import com.barnizgallery.backend.exception.BusinessRuleException;
-import com.barnizgallery.backend.model.entity.Artwork;
-import com.barnizgallery.backend.model.entity.Interaction;
-import com.barnizgallery.backend.model.entity.Visitor;
-import com.barnizgallery.backend.model.enums.ArtworkStatus;
-import com.barnizgallery.backend.model.enums.InteractionAction;
-import com.barnizgallery.backend.model.enums.Language;
 
 class InteractionFactoryTest {
 

@@ -1,10 +1,10 @@
 package com.barnizgallery.backend.mapper;
 
-import com.barnizgallery.backend.dto.request.MasterRequest;
-import com.barnizgallery.backend.dto.response.MasterDetailResponse;
-import com.barnizgallery.backend.dto.response.MasterResponse;
-import com.barnizgallery.backend.dto.response.RoomSummaryResponse;
-import com.barnizgallery.backend.model.entity.Master;
+import com.barnizgallery.backend.dto.MasterDetailResponse;
+import com.barnizgallery.backend.dto.MasterRequest;
+import com.barnizgallery.backend.dto.MasterResponse;
+import com.barnizgallery.backend.dto.RoomSummaryResponse;
+import com.barnizgallery.backend.entity.Master;
 
 /**
  * Converts between {@link Master} and its DTOs.

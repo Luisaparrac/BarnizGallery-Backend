@@ -12,12 +12,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.barnizgallery.backend.entity.Artwork;
+import com.barnizgallery.backend.entity.Room;
+import com.barnizgallery.backend.entity.TasteProfile;
+import com.barnizgallery.backend.entity.Visitor;
+import com.barnizgallery.backend.enums.Language;
 import com.barnizgallery.backend.exception.FeatureDisabledException;
-import com.barnizgallery.backend.model.entity.Artwork;
-import com.barnizgallery.backend.model.entity.Room;
-import com.barnizgallery.backend.model.entity.TasteProfile;
-import com.barnizgallery.backend.model.entity.Visitor;
-import com.barnizgallery.backend.model.enums.Language;
 import com.barnizgallery.backend.patterns.adapter.AiTextClient;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.RoomRepository;

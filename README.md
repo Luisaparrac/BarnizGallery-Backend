@@ -39,8 +39,8 @@ HTTP / WebSocket
  PostgreSQL (Render)
 ```
 
-Other packages: `model/entity` (JPA entities), `model/enums` (English enums), `model/converter`
-(Spanish DB values ↔ English enums), `dto/request` and `dto/response` (records), `mapper/`,
+Other packages: `entity/` (JPA entities), `enums/` (English enums), `converter/`
+(Spanish DB values ↔ English enums), `dto/` (request and response records), `mapper/`,
 `exception/` (global JSON error handler) and `config/`.
 
 Important rules:

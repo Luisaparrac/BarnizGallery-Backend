@@ -2,12 +2,12 @@ package com.barnizgallery.backend.mapper;
 
 import java.util.List;
 
-import com.barnizgallery.backend.dto.request.RoomRequest;
-import com.barnizgallery.backend.dto.response.ArtworkSummaryResponse;
-import com.barnizgallery.backend.dto.response.RoomDetailResponse;
-import com.barnizgallery.backend.dto.response.RoomSummaryResponse;
-import com.barnizgallery.backend.model.entity.Master;
-import com.barnizgallery.backend.model.entity.Room;
+import com.barnizgallery.backend.dto.ArtworkSummaryResponse;
+import com.barnizgallery.backend.dto.RoomDetailResponse;
+import com.barnizgallery.backend.dto.RoomRequest;
+import com.barnizgallery.backend.dto.RoomSummaryResponse;
+import com.barnizgallery.backend.entity.Master;
+import com.barnizgallery.backend.entity.Room;
 
 /**
  * Converts between {@link Room} and its DTOs.

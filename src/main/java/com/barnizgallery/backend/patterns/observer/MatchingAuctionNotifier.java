@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Component;
 
-import com.barnizgallery.backend.dto.response.VisitorNotification;
-import com.barnizgallery.backend.model.entity.TasteProfile;
+import com.barnizgallery.backend.dto.VisitorNotification;
+import com.barnizgallery.backend.entity.TasteProfile;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.TasteProfileRepository;
 

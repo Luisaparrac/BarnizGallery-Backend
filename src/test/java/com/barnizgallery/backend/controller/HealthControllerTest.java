@@ -6,7 +6,7 @@ import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
 
-import com.barnizgallery.backend.dto.response.HealthResponse;
+import com.barnizgallery.backend.dto.HealthResponse;
 import com.barnizgallery.backend.patterns.adapter.DisabledStorageService;
 import com.barnizgallery.backend.patterns.adapter.ThreeDModelGenerator;
 import com.barnizgallery.backend.patterns.facade.AiFacade;

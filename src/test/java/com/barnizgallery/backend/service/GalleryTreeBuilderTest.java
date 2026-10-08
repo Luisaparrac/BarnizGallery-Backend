@@ -12,12 +12,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.barnizgallery.backend.TestEntities;
-import com.barnizgallery.backend.dto.response.GalleryNodeResponse;
-import com.barnizgallery.backend.model.entity.Artwork;
-import com.barnizgallery.backend.model.entity.Room;
-import com.barnizgallery.backend.model.entity.ThreeDModel;
-import com.barnizgallery.backend.model.enums.ArtworkStatus;
-import com.barnizgallery.backend.model.enums.GenerationStatus;
+import com.barnizgallery.backend.dto.GalleryNodeResponse;
+import com.barnizgallery.backend.entity.Artwork;
+import com.barnizgallery.backend.entity.Room;
+import com.barnizgallery.backend.entity.ThreeDModel;
+import com.barnizgallery.backend.enums.ArtworkStatus;
+import com.barnizgallery.backend.enums.GenerationStatus;
 import com.barnizgallery.backend.patterns.composite.GalleryComposite;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.PhotoRepository;

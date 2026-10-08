@@ -17,9 +17,9 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
 import com.barnizgallery.backend.config.Hyper3dProperties;
+import com.barnizgallery.backend.enums.GenerationStatus;
 import com.barnizgallery.backend.exception.BusinessRuleException;
 import com.barnizgallery.backend.exception.FeatureDisabledException;
-import com.barnizgallery.backend.model.enums.GenerationStatus;
 
 import tools.jackson.databind.JsonNode;
 

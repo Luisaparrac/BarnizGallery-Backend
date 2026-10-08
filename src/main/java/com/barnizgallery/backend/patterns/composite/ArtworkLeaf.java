@@ -1,7 +1,7 @@
 package com.barnizgallery.backend.patterns.composite;
 
-import com.barnizgallery.backend.dto.response.GalleryNodeResponse;
-import com.barnizgallery.backend.model.enums.ArtworkStatus;
+import com.barnizgallery.backend.dto.GalleryNodeResponse;
+import com.barnizgallery.backend.enums.ArtworkStatus;
 
 /**
  * <b>Composite pattern – Leaf.</b>

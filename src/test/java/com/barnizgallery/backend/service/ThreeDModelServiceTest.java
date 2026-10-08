@@ -20,13 +20,13 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 import com.barnizgallery.backend.TestEntities;
-import com.barnizgallery.backend.dto.response.ThreeDModelResponse;
+import com.barnizgallery.backend.dto.ThreeDModelResponse;
+import com.barnizgallery.backend.entity.Artwork;
+import com.barnizgallery.backend.entity.ThreeDModel;
+import com.barnizgallery.backend.enums.ArtworkStatus;
+import com.barnizgallery.backend.enums.GenerationStatus;
 import com.barnizgallery.backend.exception.BusinessRuleException;
 import com.barnizgallery.backend.exception.FeatureDisabledException;
-import com.barnizgallery.backend.model.entity.Artwork;
-import com.barnizgallery.backend.model.entity.ThreeDModel;
-import com.barnizgallery.backend.model.enums.ArtworkStatus;
-import com.barnizgallery.backend.model.enums.GenerationStatus;
 import com.barnizgallery.backend.patterns.adapter.GenerationTicket;
 import com.barnizgallery.backend.patterns.adapter.ThreeDModelGenerator;
 import com.barnizgallery.backend.repository.PhotoRepository;

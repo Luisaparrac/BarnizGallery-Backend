@@ -3,7 +3,7 @@ package com.barnizgallery.backend.patterns.adapter;
 import java.util.List;
 import java.util.Optional;
 
-import com.barnizgallery.backend.model.enums.GenerationStatus;
+import com.barnizgallery.backend.enums.GenerationStatus;
 
 /**
  * <b>Adapter pattern – Target.</b>

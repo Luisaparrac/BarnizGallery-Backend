@@ -14,9 +14,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.barnizgallery.backend.config.AuctionProperties;
-import com.barnizgallery.backend.model.entity.Artwork;
-import com.barnizgallery.backend.model.entity.Auction;
-import com.barnizgallery.backend.model.entity.Visitor;
+import com.barnizgallery.backend.entity.Artwork;
+import com.barnizgallery.backend.entity.Auction;
+import com.barnizgallery.backend.entity.Visitor;
 import com.barnizgallery.backend.patterns.adapter.AiTextClient;
 import com.barnizgallery.backend.patterns.strategy.RecommendationResult;
 import com.barnizgallery.backend.patterns.strategy.RecommendationStrategyResolver;

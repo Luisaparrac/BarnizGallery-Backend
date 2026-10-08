@@ -10,11 +10,11 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.barnizgallery.backend.dto.response.RecommendationResponse;
+import com.barnizgallery.backend.dto.RecommendationResponse;
+import com.barnizgallery.backend.entity.Recommendation;
+import com.barnizgallery.backend.entity.Room;
+import com.barnizgallery.backend.entity.Visitor;
 import com.barnizgallery.backend.mapper.InteractionMapper;
-import com.barnizgallery.backend.model.entity.Recommendation;
-import com.barnizgallery.backend.model.entity.Room;
-import com.barnizgallery.backend.model.entity.Visitor;
 import com.barnizgallery.backend.patterns.facade.AiFacade;
 import com.barnizgallery.backend.patterns.strategy.RecommendationResult;
 import com.barnizgallery.backend.repository.RecommendationRepository;

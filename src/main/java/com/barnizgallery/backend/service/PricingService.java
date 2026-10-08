@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.barnizgallery.backend.config.AuctionProperties;
-import com.barnizgallery.backend.dto.response.SuggestedPriceResponse;
+import com.barnizgallery.backend.dto.SuggestedPriceResponse;
+import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.exception.FeatureDisabledException;
-import com.barnizgallery.backend.model.entity.Artwork;
 import com.barnizgallery.backend.patterns.facade.AiFacade;
 
 /**

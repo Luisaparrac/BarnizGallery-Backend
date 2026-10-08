@@ -6,11 +6,11 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.barnizgallery.backend.model.entity.Artwork;
-import com.barnizgallery.backend.model.entity.Photo;
-import com.barnizgallery.backend.model.entity.Room;
-import com.barnizgallery.backend.model.entity.ThreeDModel;
-import com.barnizgallery.backend.model.enums.GenerationStatus;
+import com.barnizgallery.backend.entity.Artwork;
+import com.barnizgallery.backend.entity.Photo;
+import com.barnizgallery.backend.entity.Room;
+import com.barnizgallery.backend.entity.ThreeDModel;
+import com.barnizgallery.backend.enums.GenerationStatus;
 import com.barnizgallery.backend.patterns.composite.ArtworkLeaf;
 import com.barnizgallery.backend.patterns.composite.GalleryComposite;
 import com.barnizgallery.backend.patterns.composite.RoomComposite;

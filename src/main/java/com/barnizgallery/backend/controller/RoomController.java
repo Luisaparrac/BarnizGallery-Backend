@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.barnizgallery.backend.dto.request.RoomRequest;
-import com.barnizgallery.backend.dto.response.RoomDetailResponse;
-import com.barnizgallery.backend.dto.response.RoomSummaryResponse;
+import com.barnizgallery.backend.dto.RoomDetailResponse;
+import com.barnizgallery.backend.dto.RoomRequest;
+import com.barnizgallery.backend.dto.RoomSummaryResponse;
 import com.barnizgallery.backend.service.RoomService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;

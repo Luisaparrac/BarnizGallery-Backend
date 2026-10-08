@@ -2,8 +2,8 @@ package com.barnizgallery.backend.patterns.factorymethod;
 
 import org.springframework.stereotype.Component;
 
+import com.barnizgallery.backend.enums.InteractionAction;
 import com.barnizgallery.backend.exception.BusinessRuleException;
-import com.barnizgallery.backend.model.enums.InteractionAction;
 
 /**
  * <b>Factory Method pattern – ConcreteCreator.</b>

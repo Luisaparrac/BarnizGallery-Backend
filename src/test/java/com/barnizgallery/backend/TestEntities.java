@@ -4,16 +4,16 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.barnizgallery.backend.model.entity.Artwork;
-import com.barnizgallery.backend.model.entity.Auction;
-import com.barnizgallery.backend.model.entity.Master;
-import com.barnizgallery.backend.model.entity.Photo;
-import com.barnizgallery.backend.model.entity.Room;
-import com.barnizgallery.backend.model.entity.Visitor;
-import com.barnizgallery.backend.model.enums.ArtworkStatus;
-import com.barnizgallery.backend.model.enums.AuctionStatus;
-import com.barnizgallery.backend.model.enums.CameraMode;
-import com.barnizgallery.backend.model.enums.Language;
+import com.barnizgallery.backend.entity.Artwork;
+import com.barnizgallery.backend.entity.Auction;
+import com.barnizgallery.backend.entity.Master;
+import com.barnizgallery.backend.entity.Photo;
+import com.barnizgallery.backend.entity.Room;
+import com.barnizgallery.backend.entity.Visitor;
+import com.barnizgallery.backend.enums.ArtworkStatus;
+import com.barnizgallery.backend.enums.AuctionStatus;
+import com.barnizgallery.backend.enums.CameraMode;
+import com.barnizgallery.backend.enums.Language;
 
 /**
  * In-memory entities for unit tests. Nothing here is ever saved to a database.

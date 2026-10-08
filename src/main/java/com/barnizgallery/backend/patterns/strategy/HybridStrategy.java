@@ -10,7 +10,7 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import com.barnizgallery.backend.model.entity.Visitor;
+import com.barnizgallery.backend.entity.Visitor;
 import com.barnizgallery.backend.repository.InteractionRepository;
 
 /**

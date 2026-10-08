@@ -2,10 +2,10 @@ package com.barnizgallery.backend.mapper;
 
 import java.math.BigDecimal;
 
-import com.barnizgallery.backend.dto.response.AuctionResponse;
-import com.barnizgallery.backend.dto.response.BidResponse;
-import com.barnizgallery.backend.model.entity.Auction;
-import com.barnizgallery.backend.model.entity.Bid;
+import com.barnizgallery.backend.dto.AuctionResponse;
+import com.barnizgallery.backend.dto.BidResponse;
+import com.barnizgallery.backend.entity.Auction;
+import com.barnizgallery.backend.entity.Bid;
 
 /**
  * Converts {@link Auction} and {@link Bid} to their DTOs.

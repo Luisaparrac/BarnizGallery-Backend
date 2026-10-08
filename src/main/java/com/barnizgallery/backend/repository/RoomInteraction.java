@@ -1,6 +1,6 @@
 package com.barnizgallery.backend.repository;
 
-import com.barnizgallery.backend.model.enums.InteractionAction;
+import com.barnizgallery.backend.enums.InteractionAction;
 
 /**
  * Projection: one interaction reduced to what the recommendation algorithms need

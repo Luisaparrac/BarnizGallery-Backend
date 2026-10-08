@@ -16,12 +16,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
 
 import com.barnizgallery.backend.TestEntities;
-import com.barnizgallery.backend.dto.request.MasterRequest;
-import com.barnizgallery.backend.dto.response.MasterDetailResponse;
-import com.barnizgallery.backend.dto.response.MasterResponse;
+import com.barnizgallery.backend.dto.MasterDetailResponse;
+import com.barnizgallery.backend.dto.MasterRequest;
+import com.barnizgallery.backend.dto.MasterResponse;
+import com.barnizgallery.backend.entity.Master;
+import com.barnizgallery.backend.entity.Room;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
-import com.barnizgallery.backend.model.entity.Master;
-import com.barnizgallery.backend.model.entity.Room;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.MasterRepository;
 import com.barnizgallery.backend.repository.RoomRepository;

@@ -3,7 +3,7 @@ package com.barnizgallery.backend.patterns.observer;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Component;
 
-import com.barnizgallery.backend.dto.response.VisitorNotification;
+import com.barnizgallery.backend.dto.VisitorNotification;
 
 /**
  * <b>Observer pattern – ConcreteObserver.</b>

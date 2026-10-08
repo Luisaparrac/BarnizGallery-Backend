@@ -2,7 +2,7 @@ package com.barnizgallery.backend.patterns.observer;
 
 import org.springframework.stereotype.Component;
 
-import com.barnizgallery.backend.model.enums.InteractionAction;
+import com.barnizgallery.backend.enums.InteractionAction;
 import com.barnizgallery.backend.service.ArtworkService;
 import com.barnizgallery.backend.service.InteractionService;
 import com.barnizgallery.backend.service.VisitorService;

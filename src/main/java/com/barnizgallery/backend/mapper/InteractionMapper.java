@@ -1,9 +1,9 @@
 package com.barnizgallery.backend.mapper;
 
-import com.barnizgallery.backend.dto.response.InteractionResponse;
-import com.barnizgallery.backend.dto.response.RecommendationResponse;
-import com.barnizgallery.backend.model.entity.Interaction;
-import com.barnizgallery.backend.model.entity.Recommendation;
+import com.barnizgallery.backend.dto.InteractionResponse;
+import com.barnizgallery.backend.dto.RecommendationResponse;
+import com.barnizgallery.backend.entity.Interaction;
+import com.barnizgallery.backend.entity.Recommendation;
 
 /**
  * Converts {@link Interaction} and {@link Recommendation} to their DTOs.

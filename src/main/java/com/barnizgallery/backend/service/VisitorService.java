@@ -7,16 +7,16 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.barnizgallery.backend.dto.request.IdentifyVisitorRequest;
-import com.barnizgallery.backend.dto.request.TasteProfileRequest;
-import com.barnizgallery.backend.dto.request.VisitorPreferencesRequest;
-import com.barnizgallery.backend.dto.response.IdentifyVisitorResponse;
-import com.barnizgallery.backend.dto.response.TasteProfileResponse;
-import com.barnizgallery.backend.dto.response.VisitorResponse;
+import com.barnizgallery.backend.dto.IdentifyVisitorRequest;
+import com.barnizgallery.backend.dto.IdentifyVisitorResponse;
+import com.barnizgallery.backend.dto.TasteProfileRequest;
+import com.barnizgallery.backend.dto.TasteProfileResponse;
+import com.barnizgallery.backend.dto.VisitorPreferencesRequest;
+import com.barnizgallery.backend.dto.VisitorResponse;
+import com.barnizgallery.backend.entity.TasteProfile;
+import com.barnizgallery.backend.entity.Visitor;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.mapper.VisitorMapper;
-import com.barnizgallery.backend.model.entity.TasteProfile;
-import com.barnizgallery.backend.model.entity.Visitor;
 import com.barnizgallery.backend.repository.TasteProfileRepository;
 import com.barnizgallery.backend.repository.VisitorRepository;
 

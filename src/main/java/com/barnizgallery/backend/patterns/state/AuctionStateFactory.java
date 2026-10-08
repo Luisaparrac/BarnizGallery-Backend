@@ -3,7 +3,7 @@ package com.barnizgallery.backend.patterns.state;
 import java.util.EnumMap;
 import java.util.Map;
 
-import com.barnizgallery.backend.model.enums.AuctionStatus;
+import com.barnizgallery.backend.enums.AuctionStatus;
 
 /**
  * Returns the {@link AuctionState} object for a database status.

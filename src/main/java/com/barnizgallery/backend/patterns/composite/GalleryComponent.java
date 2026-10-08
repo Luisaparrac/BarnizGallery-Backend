@@ -1,6 +1,6 @@
 package com.barnizgallery.backend.patterns.composite;
 
-import com.barnizgallery.backend.dto.response.GalleryNodeResponse;
+import com.barnizgallery.backend.dto.GalleryNodeResponse;
 
 /**
  * <b>Composite pattern – Component.</b>

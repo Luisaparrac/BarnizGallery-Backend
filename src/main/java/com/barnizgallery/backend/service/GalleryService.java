@@ -3,7 +3,7 @@ package com.barnizgallery.backend.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.barnizgallery.backend.dto.response.GalleryNodeResponse;
+import com.barnizgallery.backend.dto.GalleryNodeResponse;
 
 /**
  * Exposes the whole gallery as a tree (Composite pattern).

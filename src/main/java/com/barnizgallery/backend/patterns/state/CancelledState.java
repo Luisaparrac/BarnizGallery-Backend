@@ -1,8 +1,8 @@
 package com.barnizgallery.backend.patterns.state;
 
-import com.barnizgallery.backend.dto.request.BidRequest;
+import com.barnizgallery.backend.dto.BidRequest;
+import com.barnizgallery.backend.enums.AuctionStatus;
 import com.barnizgallery.backend.exception.BusinessRuleException;
-import com.barnizgallery.backend.model.enums.AuctionStatus;
 
 /**
  * <b>State pattern – ConcreteState "cancelada".</b>
