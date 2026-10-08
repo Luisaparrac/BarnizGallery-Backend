@@ -15,7 +15,7 @@ Final project of the Software Design Patterns course. It implements 8 design pat
 | Topic | Choice |
 |---|---|
 | Language / build | Java 21, Maven Wrapper |
-| Framework | Spring Boot 4.1 (Web MVC, Data JPA, Validation, WebSocket, Actuator) |
+| Framework | Spring Boot 4.1 (Web MVC, Data JPA, Validation, WebSocket) |
 | Database | PostgreSQL 18 on Render (existing schema, `ddl-auto=validate`) |
 | API docs | springdoc-openapi – Swagger UI at `/swagger-ui.html` |
 | Real time | STOMP over WebSocket (SockJS fallback) at `/ws` |

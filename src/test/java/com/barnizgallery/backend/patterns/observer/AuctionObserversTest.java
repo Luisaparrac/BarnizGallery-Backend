@@ -53,19 +53,6 @@ class AuctionObserversTest {
     }
 
     @Test
-    void unsubscribedObserverIsNotNotified() {
-        List<AuctionEvent> received = new ArrayList<>();
-        AuctionObserver observer = received::add;
-        AuctionEventPublisher publisher = new AuctionEventPublisher(List.of(observer));
-
-        publisher.unsubscribe(observer);
-        publisher.publish(AuctionEvent.of(AuctionEventType.AUCTION_FINISHED, 1, 7));
-
-        assertThat(received).isEmpty();
-        assertThat(publisher.getObservers()).isEmpty();
-    }
-
-    @Test
     void aFailingObserverDoesNotStopTheOthers() {
         List<AuctionEvent> received = new ArrayList<>();
         AuctionObserver failing = event -> {

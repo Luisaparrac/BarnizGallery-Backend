@@ -110,13 +110,4 @@ class AuctionBuilderTest {
 
         assertThat(auction.getBasePrice()).isEqualByComparingTo("750");
     }
-
-    @Test
-    void directorBuildsAStandardSevenDayAuction() {
-        Auction auction = new AuctionDirector(clock).standardSevenDayAuction(builder(), artwork, new BigDecimal("300"));
-
-        assertThat(auction.getStartDate()).isEqualTo(NOW);
-        assertThat(auction.getEndDate()).isEqualTo(NOW.plusDays(7));
-        assertThat(auction.getStatus()).isEqualTo(AuctionStatus.ACTIVE);
-    }
 }

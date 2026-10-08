@@ -36,10 +36,6 @@ public class AuctionEventPublisher {
         }
     }
 
-    public void unsubscribe(AuctionObserver observer) {
-        observers.remove(observer);
-    }
-
     /** Notifies every observer. A failing observer is logged and does not stop the others. */
     public void publish(AuctionEvent event) {
         for (AuctionObserver observer : observers) {
@@ -50,9 +46,5 @@ public class AuctionEventPublisher {
                         event.type(), event.auctionId(), ex);
             }
         }
-    }
-
-    public List<AuctionObserver> getObservers() {
-        return List.copyOf(observers);
     }
 }
