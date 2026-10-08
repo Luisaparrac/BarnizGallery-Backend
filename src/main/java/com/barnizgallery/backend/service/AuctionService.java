@@ -17,6 +17,7 @@ import com.barnizgallery.backend.model.enums.AuctionStatus;
 import com.barnizgallery.backend.patterns.builder.AuctionBuilder;
 import com.barnizgallery.backend.patterns.facade.AiFacade;
 import com.barnizgallery.backend.patterns.observer.AuctionEvent;
+import com.barnizgallery.backend.patterns.observer.AuctionEventType;
 import com.barnizgallery.backend.patterns.observer.AuctionEventPublisher;
 import com.barnizgallery.backend.patterns.state.AuctionContext;
 import com.barnizgallery.backend.repository.AuctionRepository;
@@ -163,12 +164,14 @@ public class AuctionService {
 
     /** Translates a reached status into an Observer event. */
     private void publish(Auction auction, AuctionStatus reached) {
-        AuctionEvent.Type type = switch (reached) {
-            case ACTIVE -> AuctionEvent.Type.AUCTION_STARTED;
-            case FINISHED -> AuctionEvent.Type.AUCTION_FINISHED;
-            case CANCELLED -> AuctionEvent.Type.AUCTION_CANCELLED;
-            case SCHEDULED -> null;
-        };
+        AuctionEventType type = null;
+        if (reached == AuctionStatus.ACTIVE) {
+            type = AuctionEventType.AUCTION_STARTED;
+        } else if (reached == AuctionStatus.FINISHED) {
+            type = AuctionEventType.AUCTION_FINISHED;
+        } else if (reached == AuctionStatus.CANCELLED) {
+            type = AuctionEventType.AUCTION_CANCELLED;
+        }
         if (type != null) {
             eventPublisher.publish(AuctionEvent.of(type, auction.getAuctionId(), auction.getArtwork().getArtworkId()));
         }

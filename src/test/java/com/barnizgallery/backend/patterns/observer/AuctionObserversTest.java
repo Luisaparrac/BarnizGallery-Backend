@@ -47,7 +47,7 @@ class AuctionObserversTest {
         AuctionObserver second = received::add;
         AuctionEventPublisher publisher = new AuctionEventPublisher(List.of(first, second));
 
-        publisher.publish(AuctionEvent.of(AuctionEvent.Type.AUCTION_STARTED, 1, 7));
+        publisher.publish(AuctionEvent.of(AuctionEventType.AUCTION_STARTED, 1, 7));
 
         assertThat(received).hasSize(2);
     }
@@ -59,7 +59,7 @@ class AuctionObserversTest {
         AuctionEventPublisher publisher = new AuctionEventPublisher(List.of(observer));
 
         publisher.unsubscribe(observer);
-        publisher.publish(AuctionEvent.of(AuctionEvent.Type.AUCTION_FINISHED, 1, 7));
+        publisher.publish(AuctionEvent.of(AuctionEventType.AUCTION_FINISHED, 1, 7));
 
         assertThat(received).isEmpty();
         assertThat(publisher.getObservers()).isEmpty();
@@ -73,7 +73,7 @@ class AuctionObserversTest {
         };
         AuctionEventPublisher publisher = new AuctionEventPublisher(List.of(failing, received::add));
 
-        publisher.publish(AuctionEvent.of(AuctionEvent.Type.AUCTION_CANCELLED, 1, 7));
+        publisher.publish(AuctionEvent.of(AuctionEventType.AUCTION_CANCELLED, 1, 7));
 
         assertThat(received).hasSize(1);
     }
@@ -102,7 +102,7 @@ class AuctionObserversTest {
 
         notifier.onEvent(bidEvent(3, null));
         notifier.onEvent(bidEvent(3, 3));
-        notifier.onEvent(AuctionEvent.of(AuctionEvent.Type.AUCTION_STARTED, 1, 7));
+        notifier.onEvent(AuctionEvent.of(AuctionEventType.AUCTION_STARTED, 1, 7));
 
         verify(messaging, never()).convertAndSend(anyString(), any(Object.class));
     }
@@ -118,7 +118,7 @@ class AuctionObserversTest {
                 profile(3, "DORADO", "verde")));
 
         new MatchingAuctionNotifier(artworkRepository, tasteProfileRepository, messaging)
-                .onEvent(AuctionEvent.of(AuctionEvent.Type.AUCTION_STARTED, 1, 7));
+                .onEvent(AuctionEvent.of(AuctionEventType.AUCTION_STARTED, 1, 7));
 
         verify(messaging).convertAndSend(eq("/topic/visitors/1/notifications"), any(Object.class));
         verify(messaging).convertAndSend(eq("/topic/visitors/3/notifications"), any(Object.class));

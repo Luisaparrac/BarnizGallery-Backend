@@ -6,21 +6,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.barnizgallery.backend.model.entity.Interaction;
-import com.barnizgallery.backend.model.enums.InteractionAction;
 
 /**
  * Spring Data repository for {@link Interaction}.
  */
 public interface InteractionRepository extends JpaRepository<Interaction, Integer> {
-
-    /** One interaction reduced to what the recommendation algorithms need. */
-    interface RoomInteraction {
-        Integer getRoomId();
-
-        InteractionAction getAction();
-
-        Integer getDurationSeconds();
-    }
 
     /** History of a visitor, newest first. */
     @Query("select i from Interaction i where i.visitor.visitorId = :visitorId "

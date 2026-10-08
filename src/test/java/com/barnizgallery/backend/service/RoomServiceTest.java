@@ -23,7 +23,7 @@ import com.barnizgallery.backend.exception.BusinessRuleException;
 import com.barnizgallery.backend.model.entity.Master;
 import com.barnizgallery.backend.model.entity.Room;
 import com.barnizgallery.backend.repository.ArtworkRepository;
-import com.barnizgallery.backend.repository.ArtworkRepository.RoomArtworkCount;
+import com.barnizgallery.backend.repository.RoomArtworkCount;
 import com.barnizgallery.backend.repository.RoomRepository;
 
 @ExtendWith(MockitoExtension.class)

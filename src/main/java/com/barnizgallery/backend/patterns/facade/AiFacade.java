@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.barnizgallery.backend.config.AppProperties;
+import com.barnizgallery.backend.config.AuctionProperties;
 import com.barnizgallery.backend.model.entity.Artwork;
 import com.barnizgallery.backend.model.entity.Auction;
 import com.barnizgallery.backend.model.entity.Visitor;
@@ -48,14 +48,14 @@ public class AiFacade {
     private final RecommendationStrategyResolver strategyResolver;
     private final AiTextClient aiClient;
     private final BidRepository bidRepository;
-    private final AppProperties properties;
+    private final AuctionProperties auctionProperties;
 
     public AiFacade(RecommendationStrategyResolver strategyResolver, AiTextClient aiClient,
-            BidRepository bidRepository, AppProperties properties) {
+            BidRepository bidRepository, AuctionProperties auctionProperties) {
         this.strategyResolver = strategyResolver;
         this.aiClient = aiClient;
         this.bidRepository = bidRepository;
-        this.properties = properties;
+        this.auctionProperties = auctionProperties;
     }
 
     public boolean isAiEnabled() {
@@ -80,7 +80,7 @@ public class AiFacade {
         if (!aiClient.isEnabled()) {
             return Optional.empty();
         }
-        String prompt = "Currency: " + properties.auction().currency()
+        String prompt = "Currency: " + auctionProperties.currency()
                 + "\nTitle: " + artwork.getTitleEn() + " / " + artwork.getTitleEs()
                 + "\nTechnique: " + artwork.getTechnique()
                 + "\nDimensions: " + artwork.getDimensions()
@@ -103,20 +103,19 @@ public class AiFacade {
      * When AI is enabled it can also mark the bid as SUSPICIOUS (never reject it).
      */
     public BidAssessment assessBid(Auction auction, BigDecimal amount, Integer visitorId) {
-        AppProperties.Auction rules = properties.auction();
 
         long recentBids = bidRepository.countByVisitorVisitorIdAndBidDateAfter(visitorId,
                 LocalDateTime.now().minusSeconds(60));
-        if (recentBids >= rules.maxBidsPerMinute()) {
-            return BidAssessment.rejected("Too many bids: the limit is " + rules.maxBidsPerMinute()
+        if (recentBids >= auctionProperties.maxBidsPerMinute()) {
+            return BidAssessment.rejected("Too many bids: the limit is " + auctionProperties.maxBidsPerMinute()
                     + " bids per minute");
         }
 
         BigDecimal highest = bidRepository.findHighestAmount(auction.getAuctionId());
         BigDecimal reference = highest != null ? highest : auction.getBasePrice();
         if (reference != null && reference.signum() > 0
-                && amount.compareTo(reference.multiply(rules.suspiciousMultiplier())) > 0) {
-            return BidAssessment.suspicious("Amount " + amount + " is more than " + rules.suspiciousMultiplier()
+                && amount.compareTo(reference.multiply(auctionProperties.suspiciousMultiplier())) > 0) {
+            return BidAssessment.suspicious("Amount " + amount + " is more than " + auctionProperties.suspiciousMultiplier()
                     + " times the reference " + reference);
         }
 

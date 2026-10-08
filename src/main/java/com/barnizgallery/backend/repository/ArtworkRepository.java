@@ -13,13 +13,6 @@ import com.barnizgallery.backend.model.enums.ArtworkStatus;
  */
 public interface ArtworkRepository extends JpaRepository<Artwork, Integer> {
 
-    /** Number of artworks of one room. */
-    interface RoomArtworkCount {
-        Integer getRoomId();
-
-        long getArtworkCount();
-    }
-
     List<Artwork> findAllByOrderByArtworkIdAsc();
 
     List<Artwork> findByRoomRoomIdOrderByArtworkIdAsc(Integer roomId);

@@ -29,7 +29,7 @@ public class BidInteractionRecorder implements AuctionObserver {
 
     @Override
     public void onEvent(AuctionEvent event) {
-        if (event.type() != AuctionEvent.Type.BID_PLACED) {
+        if (event.type() != AuctionEventType.BID_PLACED) {
             return;
         }
         interactionService.save(visitorService.getVisitor(event.bid().visitorId()),

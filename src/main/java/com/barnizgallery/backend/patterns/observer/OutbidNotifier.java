@@ -22,7 +22,7 @@ public class OutbidNotifier implements AuctionObserver {
 
     @Override
     public void onEvent(AuctionEvent event) {
-        if (event.type() != AuctionEvent.Type.BID_PLACED || event.previousTopBidderId() == null) {
+        if (event.type() != AuctionEventType.BID_PLACED || event.previousTopBidderId() == null) {
             return;
         }
         if (event.previousTopBidderId().equals(event.bid().visitorId())) {

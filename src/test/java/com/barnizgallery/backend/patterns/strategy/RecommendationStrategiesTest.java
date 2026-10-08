@@ -31,7 +31,7 @@ import com.barnizgallery.backend.patterns.factorymethod.TouchInteractionFactory;
 import com.barnizgallery.backend.patterns.factorymethod.ViewInteractionFactory;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.InteractionRepository;
-import com.barnizgallery.backend.repository.InteractionRepository.RoomInteraction;
+import com.barnizgallery.backend.repository.RoomInteraction;
 import com.barnizgallery.backend.repository.RoomRepository;
 import com.barnizgallery.backend.repository.TasteProfileRepository;
 

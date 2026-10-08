@@ -14,7 +14,6 @@ import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 
 import com.barnizgallery.backend.TestEntities;
-import com.barnizgallery.backend.config.AppProperties;
+import com.barnizgallery.backend.config.AuctionProperties;
 import com.barnizgallery.backend.dto.request.BidRequest;
 import com.barnizgallery.backend.dto.response.AnomalyAlert;
 import com.barnizgallery.backend.dto.response.BidResponse;
@@ -39,6 +38,7 @@ import com.barnizgallery.backend.model.enums.Language;
 import com.barnizgallery.backend.patterns.facade.AiFacade;
 import com.barnizgallery.backend.patterns.facade.BidAssessment;
 import com.barnizgallery.backend.patterns.observer.AuctionEvent;
+import com.barnizgallery.backend.patterns.observer.AuctionEventType;
 import com.barnizgallery.backend.patterns.observer.AuctionEventPublisher;
 import com.barnizgallery.backend.patterns.state.AuctionContext;
 import com.barnizgallery.backend.repository.BidRepository;
@@ -54,9 +54,8 @@ class BidServiceTest {
     private final AiFacade aiFacade = mock(AiFacade.class);
     private final AuctionEventPublisher publisher = mock(AuctionEventPublisher.class);
     private final SimpMessageSendingOperations messaging = mock(SimpMessageSendingOperations.class);
-    private final AppProperties properties = new AppProperties(new AppProperties.Cors(List.of()),
-            new AppProperties.Auction("USD", BigDecimal.ONE, 5, BigDecimal.TEN, false),
-            new AppProperties.Ai("none", ""), new AppProperties.Hyper3d("", ""), new AppProperties.Storage("none"));
+    private final AuctionProperties properties = new AuctionProperties("USD", BigDecimal.ONE, 5, BigDecimal.TEN,
+            false);
 
     private BidService bidService;
     private Auction auction;
@@ -105,7 +104,7 @@ class BidServiceTest {
         assertThat(saved.currency()).isEqualTo("USD");
         ArgumentCaptor<AuctionEvent> event = ArgumentCaptor.forClass(AuctionEvent.class);
         verify(publisher).publish(event.capture());
-        assertThat(event.getValue().type()).isEqualTo(AuctionEvent.Type.BID_PLACED);
+        assertThat(event.getValue().type()).isEqualTo(AuctionEventType.BID_PLACED);
         assertThat(event.getValue().previousTopBidderId()).isEqualTo(8);
         assertThat(event.getValue().artworkId()).isEqualTo(7);
     }

@@ -11,19 +11,17 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
 import com.barnizgallery.backend.TestEntities;
-import com.barnizgallery.backend.config.AppProperties;
+import com.barnizgallery.backend.config.AuctionProperties;
 import com.barnizgallery.backend.model.entity.Artwork;
 import com.barnizgallery.backend.model.entity.Auction;
 import com.barnizgallery.backend.model.enums.ArtworkStatus;
 import com.barnizgallery.backend.model.enums.AuctionStatus;
 import com.barnizgallery.backend.patterns.adapter.AiTextClient;
 import com.barnizgallery.backend.patterns.adapter.DisabledAiClient;
-import com.barnizgallery.backend.patterns.facade.BidAssessment.Verdict;
 import com.barnizgallery.backend.patterns.strategy.RecommendationStrategyResolver;
 import com.barnizgallery.backend.repository.BidRepository;
 
@@ -31,9 +29,8 @@ class AiFacadeTest {
 
     private final BidRepository bidRepository = mock(BidRepository.class);
     private final RecommendationStrategyResolver resolver = mock(RecommendationStrategyResolver.class);
-    private final AppProperties properties = new AppProperties(new AppProperties.Cors(List.of()),
-            new AppProperties.Auction("USD", BigDecimal.ONE, 5, BigDecimal.TEN, false), new AppProperties.Ai("none", ""),
-            new AppProperties.Hyper3d("", ""), new AppProperties.Storage("none"));
+    private final AuctionProperties properties = new AuctionProperties("USD", BigDecimal.ONE, 5, BigDecimal.TEN,
+            false);
 
     private final Artwork artwork = TestEntities.artwork(3, TestEntities.room(1, TestEntities.master(1)),
             ArtworkStatus.IN_AUCTION);
@@ -71,7 +68,7 @@ class AiFacadeTest {
 
         BidAssessment assessment = facade(new DisabledAiClient()).assessBid(auction, new BigDecimal("150"), 9);
 
-        assertThat(assessment.verdict()).isEqualTo(Verdict.REJECTED);
+        assertThat(assessment.verdict()).isEqualTo(BidVerdict.REJECTED);
     }
 
     @Test
@@ -81,7 +78,7 @@ class AiFacadeTest {
 
         BidAssessment assessment = facade(new DisabledAiClient()).assessBid(auction, new BigDecimal("2001"), 9);
 
-        assertThat(assessment.verdict()).isEqualTo(Verdict.SUSPICIOUS);
+        assertThat(assessment.verdict()).isEqualTo(BidVerdict.SUSPICIOUS);
     }
 
     @Test
@@ -90,9 +87,9 @@ class AiFacadeTest {
         when(bidRepository.findHighestAmount(7)).thenReturn(null);
 
         assertThat(facade(new DisabledAiClient()).assessBid(auction, new BigDecimal("1001"), 9).verdict())
-                .isEqualTo(Verdict.SUSPICIOUS);
+                .isEqualTo(BidVerdict.SUSPICIOUS);
         assertThat(facade(new DisabledAiClient()).assessBid(auction, new BigDecimal("1000"), 9).verdict())
-                .isEqualTo(Verdict.OK);
+                .isEqualTo(BidVerdict.OK);
     }
 
     @Test
@@ -114,6 +111,6 @@ class AiFacadeTest {
         when(bidRepository.countByVisitorVisitorIdAndBidDateAfter(eq(9), any())).thenReturn(0L);
 
         assertThat(facade(client).assessBid(auction, new BigDecimal("150"), 9).verdict())
-                .isEqualTo(Verdict.SUSPICIOUS);
+                .isEqualTo(BidVerdict.SUSPICIOUS);
     }
 }

@@ -12,7 +12,7 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.barnizgallery.backend.config.AppProperties;
+import com.barnizgallery.backend.config.AuctionProperties;
 import com.barnizgallery.backend.dto.request.BidRequest;
 import com.barnizgallery.backend.dto.response.AnomalyAlert;
 import com.barnizgallery.backend.dto.response.BidResponse;
@@ -23,6 +23,7 @@ import com.barnizgallery.backend.model.entity.Bid;
 import com.barnizgallery.backend.model.entity.Visitor;
 import com.barnizgallery.backend.patterns.facade.AiFacade;
 import com.barnizgallery.backend.patterns.facade.BidAssessment;
+import com.barnizgallery.backend.patterns.facade.BidVerdict;
 import com.barnizgallery.backend.patterns.observer.AuctionEvent;
 import com.barnizgallery.backend.patterns.observer.AuctionEventPublisher;
 import com.barnizgallery.backend.repository.BidRepository;
@@ -43,19 +44,19 @@ public class BidService {
     private final AiFacade aiFacade;
     private final AuctionEventPublisher eventPublisher;
     private final SimpMessageSendingOperations messaging;
-    private final AppProperties properties;
+    private final AuctionProperties auctionProperties;
     private final Clock clock;
 
     public BidService(BidRepository bidRepository, AuctionService auctionService, VisitorService visitorService,
             AiFacade aiFacade, AuctionEventPublisher eventPublisher, SimpMessageSendingOperations messaging,
-            AppProperties properties, Clock clock) {
+            AuctionProperties auctionProperties, Clock clock) {
         this.bidRepository = bidRepository;
         this.auctionService = auctionService;
         this.visitorService = visitorService;
         this.aiFacade = aiFacade;
         this.eventPublisher = eventPublisher;
         this.messaging = messaging;
-        this.properties = properties;
+        this.auctionProperties = auctionProperties;
         this.clock = clock;
     }
 
@@ -77,8 +78,7 @@ public class BidService {
         auctionService.contextFor(auction).placeBid(request);
         Visitor visitor = visitorService.getVisitor(request.visitorId());
 
-        AppProperties.Auction rules = properties.auction();
-        String currency = rules.currency().toUpperCase(Locale.ROOT);
+        String currency = auctionProperties.currency().toUpperCase(Locale.ROOT);
         if (!currency.equals(request.currency().trim().toUpperCase(Locale.ROOT))) {
             throw BusinessRuleException.unprocessable("Currency must be " + currency);
         }
@@ -87,13 +87,13 @@ public class BidService {
                 .orElse(null);
         BigDecimal reference = currentTop == null ? auction.getBasePrice()
                 : currentTop.getAmount().max(auction.getBasePrice());
-        BigDecimal minimum = reference.add(rules.minIncrement());
+        BigDecimal minimum = reference.add(auctionProperties.minIncrement());
         if (request.amount().compareTo(minimum) < 0) {
             throw BusinessRuleException.unprocessable("The bid must be at least " + minimum + " " + currency);
         }
 
         BidAssessment assessment = aiFacade.assessBid(auction, request.amount(), visitor.getVisitorId());
-        if (assessment.verdict() == BidAssessment.Verdict.REJECTED) {
+        if (assessment.verdict() == BidVerdict.REJECTED) {
             throw BusinessRuleException.tooManyRequests(assessment.reason());
         }
 
@@ -105,7 +105,7 @@ public class BidService {
         bid.setBidDate(LocalDateTime.now(clock));
         BidResponse saved = AuctionMapper.toResponse(bidRepository.save(bid));
 
-        if (assessment.verdict() == BidAssessment.Verdict.SUSPICIOUS) {
+        if (assessment.verdict() == BidVerdict.SUSPICIOUS) {
             log.warn("Suspicious bid {} on auction {} by visitor {}: {}", saved.bidId(), auctionId,
                     visitor.getVisitorId(), assessment.reason());
             messaging.convertAndSend(ANOMALIES_TOPIC, new AnomalyAlert(auctionId, saved.bidId(),

@@ -27,6 +27,7 @@ import com.barnizgallery.backend.model.enums.ArtworkStatus;
 import com.barnizgallery.backend.model.enums.AuctionStatus;
 import com.barnizgallery.backend.patterns.facade.AiFacade;
 import com.barnizgallery.backend.patterns.observer.AuctionEvent;
+import com.barnizgallery.backend.patterns.observer.AuctionEventType;
 import com.barnizgallery.backend.patterns.observer.AuctionEventPublisher;
 import com.barnizgallery.backend.repository.AuctionRepository;
 import com.barnizgallery.backend.repository.BidRepository;
@@ -78,7 +79,7 @@ class AuctionServiceTest {
         assertThat(due.getStatus()).isEqualTo(AuctionStatus.ACTIVE);
         ArgumentCaptor<AuctionEvent> event = ArgumentCaptor.forClass(AuctionEvent.class);
         verify(publisher).publish(event.capture());
-        assertThat(event.getValue().type()).isEqualTo(AuctionEvent.Type.AUCTION_STARTED);
+        assertThat(event.getValue().type()).isEqualTo(AuctionEventType.AUCTION_STARTED);
     }
 
     @Test
@@ -91,7 +92,7 @@ class AuctionServiceTest {
 
         ArgumentCaptor<AuctionEvent> event = ArgumentCaptor.forClass(AuctionEvent.class);
         verify(publisher).publish(event.capture());
-        assertThat(event.getValue().type()).isEqualTo(AuctionEvent.Type.AUCTION_CANCELLED);
+        assertThat(event.getValue().type()).isEqualTo(AuctionEventType.AUCTION_CANCELLED);
         assertThat(event.getValue().artworkId()).isEqualTo(5);
     }
 

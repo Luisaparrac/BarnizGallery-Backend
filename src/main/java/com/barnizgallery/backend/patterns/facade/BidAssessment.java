@@ -6,21 +6,17 @@ package com.barnizgallery.backend.patterns.facade;
  * @param verdict OK (accept), SUSPICIOUS (accept but alert admins) or REJECTED (HTTP 429)
  * @param reason  explanation, null when the verdict is OK
  */
-public record BidAssessment(Verdict verdict, String reason) {
-
-    public enum Verdict {
-        OK, SUSPICIOUS, REJECTED
-    }
+public record BidAssessment(BidVerdict verdict, String reason) {
 
     public static BidAssessment ok() {
-        return new BidAssessment(Verdict.OK, null);
+        return new BidAssessment(BidVerdict.OK, null);
     }
 
     public static BidAssessment suspicious(String reason) {
-        return new BidAssessment(Verdict.SUSPICIOUS, reason);
+        return new BidAssessment(BidVerdict.SUSPICIOUS, reason);
     }
 
     public static BidAssessment rejected(String reason) {
-        return new BidAssessment(Verdict.REJECTED, reason);
+        return new BidAssessment(BidVerdict.REJECTED, reason);
     }
 }

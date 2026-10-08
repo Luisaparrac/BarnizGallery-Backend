@@ -3,12 +3,11 @@ package com.barnizgallery.backend.patterns.adapter;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import com.barnizgallery.backend.config.AppProperties;
+import com.barnizgallery.backend.config.Hyper3dProperties;
 import com.barnizgallery.backend.exception.FeatureDisabledException;
 import com.barnizgallery.backend.model.enums.GenerationStatus;
 
@@ -18,10 +17,7 @@ import com.barnizgallery.backend.model.enums.GenerationStatus;
 class Hyper3dRodinAdapterTest {
 
     private static Hyper3dRodinAdapter adapter(String apiKey) {
-        return new Hyper3dRodinAdapter(new AppProperties(new AppProperties.Cors(List.of()),
-                new AppProperties.Auction("USD", BigDecimal.ONE, 5, BigDecimal.TEN, false),
-                new AppProperties.Ai("none", ""), new AppProperties.Hyper3d(apiKey, "https://api.hyper3d.com"),
-                new AppProperties.Storage("none")));
+        return new Hyper3dRodinAdapter(new Hyper3dProperties(apiKey, "https://api.hyper3d.com"));
     }
 
     @Test

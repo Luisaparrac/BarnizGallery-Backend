@@ -16,14 +16,10 @@ public record ErrorResponse(
         String error,
         String message,
         String path,
-        List<FieldError> fieldErrors) {
+        List<FieldErrorResponse> fieldErrors) {
 
     public static ErrorResponse of(int status, String error, String message, String path,
-            List<FieldError> fieldErrors) {
+            List<FieldErrorResponse> fieldErrors) {
         return new ErrorResponse(LocalDateTime.now(), status, error, message, path, fieldErrors);
-    }
-
-    /** One invalid field of the request body. */
-    public record FieldError(String field, String message) {
     }
 }

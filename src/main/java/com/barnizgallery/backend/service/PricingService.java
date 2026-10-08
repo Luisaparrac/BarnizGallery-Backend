@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.barnizgallery.backend.config.AppProperties;
+import com.barnizgallery.backend.config.AuctionProperties;
 import com.barnizgallery.backend.dto.response.SuggestedPriceResponse;
 import com.barnizgallery.backend.exception.FeatureDisabledException;
 import com.barnizgallery.backend.model.entity.Artwork;
@@ -19,12 +19,12 @@ public class PricingService {
 
     private final AiFacade aiFacade;
     private final ArtworkService artworkService;
-    private final AppProperties properties;
+    private final AuctionProperties auctionProperties;
 
-    public PricingService(AiFacade aiFacade, ArtworkService artworkService, AppProperties properties) {
+    public PricingService(AiFacade aiFacade, ArtworkService artworkService, AuctionProperties auctionProperties) {
         this.aiFacade = aiFacade;
         this.artworkService = artworkService;
-        this.properties = properties;
+        this.auctionProperties = auctionProperties;
     }
 
     /** Suggested base price; 503 when AI is disabled or cannot give a price. */
@@ -36,6 +36,6 @@ public class PricingService {
         }
         BigDecimal price = aiFacade.suggestBasePrice(artwork)
                 .orElseThrow(() -> new FeatureDisabledException("AI could not suggest a price for this artwork"));
-        return new SuggestedPriceResponse(artworkId, price, properties.auction().currency());
+        return new SuggestedPriceResponse(artworkId, price, auctionProperties.currency());
     }
 }

@@ -36,7 +36,7 @@ public class MatchingAuctionNotifier implements AuctionObserver {
 
     @Override
     public void onEvent(AuctionEvent event) {
-        if (event.type() != AuctionEvent.Type.AUCTION_STARTED) {
+        if (event.type() != AuctionEventType.AUCTION_STARTED) {
             return;
         }
         artworkRepository.findById(event.artworkId()).ifPresent(artwork -> {

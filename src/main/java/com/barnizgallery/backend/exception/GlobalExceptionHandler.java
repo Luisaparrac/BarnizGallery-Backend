@@ -19,7 +19,7 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.barnizgallery.backend.dto.response.ErrorResponse;
-import com.barnizgallery.backend.dto.response.ErrorResponse.FieldError;
+import com.barnizgallery.backend.dto.response.FieldErrorResponse;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -56,8 +56,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleInvalidBody(MethodArgumentNotValidException ex,
             HttpServletRequest request) {
-        List<FieldError> fields = ex.getBindingResult().getFieldErrors().stream()
-                .map(error -> new FieldError(error.getField(), error.getDefaultMessage()))
+        List<FieldErrorResponse> fields = ex.getBindingResult().getFieldErrors().stream()
+                .map(error -> new FieldErrorResponse(error.getField(), error.getDefaultMessage()))
                 .toList();
         return build(HttpStatus.BAD_REQUEST, "Validation failed", request, fields);
     }
@@ -101,7 +101,7 @@ public class GlobalExceptionHandler {
     }
 
     private ResponseEntity<ErrorResponse> build(HttpStatus status, String message, HttpServletRequest request,
-            List<FieldError> fieldErrors) {
+            List<FieldErrorResponse> fieldErrors) {
         ErrorResponse body = ErrorResponse.of(status.value(), status.getReasonPhrase(), message,
                 request.getRequestURI(), fieldErrors);
         return ResponseEntity.status(status).body(body);

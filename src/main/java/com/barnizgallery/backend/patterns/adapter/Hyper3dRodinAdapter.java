@@ -4,25 +4,24 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
-import com.barnizgallery.backend.config.AppProperties;
+import com.barnizgallery.backend.config.Hyper3dProperties;
 import com.barnizgallery.backend.exception.BusinessRuleException;
 import com.barnizgallery.backend.exception.FeatureDisabledException;
 import com.barnizgallery.backend.model.enums.GenerationStatus;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+
+import tools.jackson.databind.JsonNode;
 
 /**
  * <b>Adapter pattern – Adapter.</b>
@@ -49,10 +48,10 @@ public class Hyper3dRodinAdapter implements ThreeDModelGenerator {
     private final RestClient api;
     private final RestClient downloader;
 
-    public Hyper3dRodinAdapter(AppProperties properties) {
-        this.apiKey = properties.hyper3d().apiKey();
+    public Hyper3dRodinAdapter(Hyper3dProperties properties) {
+        this.apiKey = properties.apiKey();
         this.api = RestClient.builder()
-                .baseUrl(properties.hyper3d().baseUrl() + "/api/v2")
+                .baseUrl(properties.baseUrl() + "/api/v2")
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
                 .build();
         this.downloader = RestClient.create();
@@ -66,26 +65,27 @@ public class Hyper3dRodinAdapter implements ThreeDModelGenerator {
     @Override
     public GenerationTicket submit(List<String> photoUrls) {
         requireEnabled();
-        MultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
+        MultipartBodyBuilder form = new MultipartBodyBuilder();
         int index = 0;
         for (String url : photoUrls.stream().limit(MAX_IMAGES).toList()) {
-            form.add("images", downloadImage(url, index++));
+            form.part("images", downloadImage(url)).filename("photo-" + index++ + extensionOf(url));
         }
-        form.add("tier", TIER);
-        form.add("geometry_file_format", "glb");
+        form.part("tier", TIER);
+        form.part("geometry_file_format", "glb");
 
-        SubmitResponse response = call(() -> api.post().uri("/rodin")
+        JsonNode response = call(() -> api.post().uri("/rodin")
                 .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(form)
+                .body(form.build())
                 .retrieve()
-                .body(SubmitResponse.class));
-        if (response == null || response.uuid() == null || response.uuid().isBlank()
-                || (response.error() != null && !response.error().isBlank())) {
+                .body(JsonNode.class));
+        String uuid = text(response, "uuid");
+        String error = text(response, "error");
+        if (uuid == null || uuid.isBlank() || (error != null && !error.isBlank())) {
             throw new BusinessRuleException("Hyper3D rejected the task: "
-                    + (response == null ? "empty response" : response.error()), HttpStatus.BAD_GATEWAY);
+                    + (response == null ? "empty response" : error), HttpStatus.BAD_GATEWAY);
         }
-        String subscriptionKey = response.jobs() == null ? null : response.jobs().subscriptionKey();
-        return new GenerationTicket(response.uuid(), subscriptionKey);
+        String subscriptionKey = text(response.path("jobs"), "subscription_key");
+        return new GenerationTicket(uuid, subscriptionKey);
     }
 
     @Override
@@ -95,14 +95,16 @@ public class Hyper3dRodinAdapter implements ThreeDModelGenerator {
             // Only the task uuid could be stored: the task is done when its GLB can be downloaded.
             return fetchGlbUrl(ticket).isPresent() ? GenerationStatus.COMPLETED : GenerationStatus.PROCESSING;
         }
-        StatusResponse response = call(() -> api.post().uri("/status")
+        JsonNode response = call(() -> api.post().uri("/status")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(new StatusRequest(ticket.subscriptionKey()))
+                .body(Map.of("subscription_key", ticket.subscriptionKey()))
                 .retrieve()
-                .body(StatusResponse.class));
+                .body(JsonNode.class));
         List<String> statuses = new ArrayList<>();
-        if (response != null && response.jobs() != null) {
-            response.jobs().forEach(job -> statuses.add(job.status()));
+        if (response != null) {
+            for (JsonNode job : response.path("jobs")) {
+                statuses.add(text(job, "status"));
+            }
         }
         return mapStatuses(statuses);
     }
@@ -110,18 +112,21 @@ public class Hyper3dRodinAdapter implements ThreeDModelGenerator {
     @Override
     public Optional<String> fetchGlbUrl(GenerationTicket ticket) {
         requireEnabled();
-        DownloadResponse response = call(() -> api.post().uri("/download")
+        JsonNode response = call(() -> api.post().uri("/download")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(new DownloadRequest(ticket.taskUuid()))
+                .body(Map.of("task_uuid", ticket.taskUuid()))
                 .retrieve()
-                .body(DownloadResponse.class));
-        if (response == null || response.list() == null) {
+                .body(JsonNode.class));
+        if (response == null) {
             return Optional.empty();
         }
-        return response.list().stream()
-                .filter(item -> item.name() != null && item.name().toLowerCase(Locale.ROOT).endsWith(".glb"))
-                .map(DownloadItem::url)
-                .findFirst();
+        for (JsonNode item : response.path("list")) {
+            String name = text(item, "name");
+            if (name != null && name.toLowerCase(Locale.ROOT).endsWith(".glb")) {
+                return Optional.ofNullable(text(item, "url"));
+            }
+        }
+        return Optional.empty();
     }
 
     /** Translates the Hyper3D job statuses to our enum: all Done → COMPLETED, any Failed → FAILED. */
@@ -138,8 +143,13 @@ public class Hyper3dRodinAdapter implements ThreeDModelGenerator {
         return GenerationStatus.PROCESSING;
     }
 
+    /** Text value of a JSON field, or null when it is missing or not a string. */
+    private static String text(JsonNode node, String field) {
+        return node == null ? null : node.path(field).stringValue(null);
+    }
+
     /** Hyper3D receives image files, so each photo URL is downloaded first. */
-    private ByteArrayResource downloadImage(String url, int index) {
+    private byte[] downloadImage(String url) {
         if (url == null || !(url.startsWith("http://") || url.startsWith("https://"))) {
             throw BusinessRuleException.unprocessable(
                     "Photo URL must be absolute (http/https) to send it to Hyper3D: " + url);
@@ -148,13 +158,7 @@ public class Hyper3dRodinAdapter implements ThreeDModelGenerator {
         if (bytes == null || bytes.length == 0) {
             throw BusinessRuleException.unprocessable("Photo could not be downloaded: " + url);
         }
-        String filename = "photo-" + index + extensionOf(url);
-        return new ByteArrayResource(bytes) {
-            @Override
-            public String getFilename() {
-                return filename;
-            }
-        };
+        return bytes;
     }
 
     private static String extensionOf(String url) {
@@ -176,37 +180,5 @@ public class Hyper3dRodinAdapter implements ThreeDModelGenerator {
             throw new BusinessRuleException("Error calling an external service: " + ex.getMessage(),
                     HttpStatus.BAD_GATEWAY);
         }
-    }
-
-    // ----- Hyper3D JSON formats (only the fields we use) -----
-
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    record SubmitResponse(String uuid, SubmitJobs jobs, String error) {
-    }
-
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    record SubmitJobs(List<String> uuids, @JsonProperty("subscription_key") String subscriptionKey) {
-    }
-
-    record StatusRequest(@JsonProperty("subscription_key") String subscriptionKey) {
-    }
-
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    record StatusResponse(List<StatusJob> jobs) {
-    }
-
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    record StatusJob(String uuid, String status) {
-    }
-
-    record DownloadRequest(@JsonProperty("task_uuid") String taskUuid) {
-    }
-
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    record DownloadResponse(List<DownloadItem> list) {
-    }
-
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    record DownloadItem(String url, String name) {
     }
 }

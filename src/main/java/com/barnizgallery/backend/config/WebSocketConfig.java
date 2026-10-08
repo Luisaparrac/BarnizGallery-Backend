@@ -17,16 +17,16 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    private final AppProperties properties;
+    private final CorsProperties properties;
 
-    public WebSocketConfig(AppProperties properties) {
+    public WebSocketConfig(CorsProperties properties) {
         this.properties = properties;
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOriginPatterns(properties.cors().allowedOrigins().toArray(String[]::new))
+                .setAllowedOriginPatterns(properties.allowedOrigins().toArray(String[]::new))
                 .withSockJS();
     }
 

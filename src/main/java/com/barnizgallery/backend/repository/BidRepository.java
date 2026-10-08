@@ -16,15 +16,6 @@ import com.barnizgallery.backend.model.entity.Bid;
  */
 public interface BidRepository extends JpaRepository<Bid, Integer> {
 
-    /** Highest bid and number of bids of one auction. */
-    interface AuctionBidStats {
-        Integer getAuctionId();
-
-        BigDecimal getHighest();
-
-        long getBidCount();
-    }
-
     /** Highest bid amount of an auction, or null if it has no bids. */
     @Query("select max(b.amount) from Bid b where b.auction.auctionId = :auctionId")
     BigDecimal findHighestAmount(Integer auctionId);
