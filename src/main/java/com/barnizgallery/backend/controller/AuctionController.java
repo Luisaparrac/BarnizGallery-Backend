@@ -12,17 +12,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.barnizgallery.backend.dto.request.BidRequest;
 import com.barnizgallery.backend.dto.request.CreateAuctionRequest;
 import com.barnizgallery.backend.dto.response.AuctionResponse;
+import com.barnizgallery.backend.dto.response.BidResponse;
 import com.barnizgallery.backend.model.enums.AuctionStatus;
 import com.barnizgallery.backend.service.AuctionService;
+import com.barnizgallery.backend.service.BidService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 /**
- * Auctions: creation (Builder pattern) and lifecycle (State pattern).
+ * Auctions: creation (Builder pattern), lifecycle (State pattern) and live bids (Observer pattern).
  */
 @RestController
 @RequestMapping("/api/auctions")
@@ -30,9 +33,11 @@ import jakarta.validation.Valid;
 public class AuctionController {
 
     private final AuctionService auctionService;
+    private final BidService bidService;
 
-    public AuctionController(AuctionService auctionService) {
+    public AuctionController(AuctionService auctionService, BidService bidService) {
         this.auctionService = auctionService;
+        this.bidService = bidService;
     }
 
     @GetMapping
@@ -65,5 +70,17 @@ public class AuctionController {
     @PostMapping("/{id}/cancel")
     public AuctionResponse cancel(@PathVariable Integer id) {
         return auctionService.cancel(id);
+    }
+
+    @GetMapping("/{id}/bids")
+    public List<BidResponse> findBids(@PathVariable Integer id) {
+        return bidService.findByAuction(id);
+    }
+
+    @PostMapping("/{id}/bids")
+    @Operation(summary = "Place a bid (only in active auctions; 422 invalid amount/currency, 429 too many bids)")
+    public ResponseEntity<BidResponse> placeBid(@PathVariable Integer id, @Valid @RequestBody BidRequest request) {
+        BidResponse created = bidService.placeBid(id, request);
+        return ResponseEntity.created(URI.create("/api/auctions/" + id + "/bids")).body(created);
     }
 }

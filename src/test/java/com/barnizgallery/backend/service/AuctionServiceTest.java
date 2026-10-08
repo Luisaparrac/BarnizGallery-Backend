@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
@@ -16,6 +17,7 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import com.barnizgallery.backend.TestEntities;
 import com.barnizgallery.backend.dto.request.CreateAuctionRequest;
@@ -24,6 +26,8 @@ import com.barnizgallery.backend.model.entity.Auction;
 import com.barnizgallery.backend.model.enums.ArtworkStatus;
 import com.barnizgallery.backend.model.enums.AuctionStatus;
 import com.barnizgallery.backend.patterns.facade.AiFacade;
+import com.barnizgallery.backend.patterns.observer.AuctionEvent;
+import com.barnizgallery.backend.patterns.observer.AuctionEventPublisher;
 import com.barnizgallery.backend.repository.AuctionRepository;
 import com.barnizgallery.backend.repository.BidRepository;
 
@@ -36,13 +40,14 @@ class AuctionServiceTest {
     private final BidRepository bidRepository = mock(BidRepository.class);
     private final ArtworkService artworkService = mock(ArtworkService.class);
     private final AuctionResponseAssembler assembler = mock(AuctionResponseAssembler.class);
+    private final AuctionEventPublisher publisher = mock(AuctionEventPublisher.class);
     private AuctionService auctionService;
     private Artwork artwork;
 
     @BeforeEach
     void setUp() {
         auctionService = new AuctionService(auctionRepository, bidRepository, artworkService, mock(AiFacade.class),
-                assembler, Clock.fixed(NOW.atZone(ZONE).toInstant(), ZONE));
+                assembler, publisher, Clock.fixed(NOW.atZone(ZONE).toInstant(), ZONE));
         artwork = TestEntities.artwork(5, TestEntities.room(1, TestEntities.master(1)), ArtworkStatus.EXHIBITED);
         when(artworkService.getArtwork(5)).thenReturn(artwork);
         when(auctionRepository.existsByArtworkArtworkIdAndStatusIn(eq(5), anyCollection())).thenReturn(false);
@@ -71,6 +76,23 @@ class AuctionServiceTest {
 
         assertThat(auctionService.syncDueAuctions()).isEqualTo(1);
         assertThat(due.getStatus()).isEqualTo(AuctionStatus.ACTIVE);
+        ArgumentCaptor<AuctionEvent> event = ArgumentCaptor.forClass(AuctionEvent.class);
+        verify(publisher).publish(event.capture());
+        assertThat(event.getValue().type()).isEqualTo(AuctionEvent.Type.AUCTION_STARTED);
+    }
+
+    @Test
+    void cancellingPublishesAuctionCancelled() {
+        Auction scheduled = TestEntities.auction(1, artwork, AuctionStatus.SCHEDULED, NOW.plusDays(1),
+                NOW.plusDays(2), "100");
+        when(auctionRepository.findByIdWithArtwork(1)).thenReturn(Optional.of(scheduled));
+
+        auctionService.cancel(1);
+
+        ArgumentCaptor<AuctionEvent> event = ArgumentCaptor.forClass(AuctionEvent.class);
+        verify(publisher).publish(event.capture());
+        assertThat(event.getValue().type()).isEqualTo(AuctionEvent.Type.AUCTION_CANCELLED);
+        assertThat(event.getValue().artworkId()).isEqualTo(5);
     }
 
     @Test

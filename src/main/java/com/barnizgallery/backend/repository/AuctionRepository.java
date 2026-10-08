@@ -6,10 +6,13 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 
 import com.barnizgallery.backend.model.entity.Auction;
 import com.barnizgallery.backend.model.enums.AuctionStatus;
+
+import jakarta.persistence.LockModeType;
 
 /**
  * Spring Data repository for {@link Auction}.
@@ -31,6 +34,14 @@ public interface AuctionRepository extends JpaRepository<Auction, Integer> {
 
     @Query("select a from Auction a join fetch a.artwork where a.auctionId = :auctionId")
     Optional<Auction> findByIdWithArtwork(Integer auctionId);
+
+    /**
+     * Loads the auction with a row lock (SELECT ... FOR UPDATE) so two bids on the same
+     * auction are processed one after the other.
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select a from Auction a join fetch a.artwork where a.auctionId = :auctionId")
+    Optional<Auction> findByIdForUpdate(Integer auctionId);
 
     /** Scheduled auctions whose start date has arrived, or active ones whose end date has passed. */
     @Query("select a from Auction a join fetch a.artwork where "

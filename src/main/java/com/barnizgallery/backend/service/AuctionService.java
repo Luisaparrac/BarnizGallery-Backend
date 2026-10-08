@@ -16,12 +16,15 @@ import com.barnizgallery.backend.model.enums.ArtworkStatus;
 import com.barnizgallery.backend.model.enums.AuctionStatus;
 import com.barnizgallery.backend.patterns.builder.AuctionBuilder;
 import com.barnizgallery.backend.patterns.facade.AiFacade;
+import com.barnizgallery.backend.patterns.observer.AuctionEvent;
+import com.barnizgallery.backend.patterns.observer.AuctionEventPublisher;
 import com.barnizgallery.backend.patterns.state.AuctionContext;
 import com.barnizgallery.backend.repository.AuctionRepository;
 import com.barnizgallery.backend.repository.BidRepository;
 
 /**
- * Auction lifecycle: creation with the Builder pattern and status changes with the State pattern.
+ * Auction lifecycle: creation with the Builder pattern, status changes with the State pattern
+ * and notifications with the Observer pattern.
  * <p>
  * Reading an auction first syncs its status with the current time, because Render's free plan
  * sleeps and the scheduler does not run while it sleeps. That is why the read methods here use
@@ -35,15 +38,18 @@ public class AuctionService {
     private final ArtworkService artworkService;
     private final AiFacade aiFacade;
     private final AuctionResponseAssembler assembler;
+    private final AuctionEventPublisher eventPublisher;
     private final Clock clock;
 
     public AuctionService(AuctionRepository auctionRepository, BidRepository bidRepository,
-            ArtworkService artworkService, AiFacade aiFacade, AuctionResponseAssembler assembler, Clock clock) {
+            ArtworkService artworkService, AiFacade aiFacade, AuctionResponseAssembler assembler,
+            AuctionEventPublisher eventPublisher, Clock clock) {
         this.auctionRepository = auctionRepository;
         this.bidRepository = bidRepository;
         this.artworkService = artworkService;
         this.aiFacade = aiFacade;
         this.assembler = assembler;
+        this.eventPublisher = eventPublisher;
         this.clock = clock;
     }
 
@@ -78,13 +84,18 @@ public class AuctionService {
         if (auction.getStatus() == AuctionStatus.ACTIVE) {
             artwork.setStatus(ArtworkStatus.IN_AUCTION);
         }
-        return assembler.toResponse(auctionRepository.save(auction));
+        Auction saved = auctionRepository.save(auction);
+        if (saved.getStatus() == AuctionStatus.ACTIVE) {
+            publish(saved, AuctionStatus.ACTIVE);
+        }
+        return assembler.toResponse(saved);
     }
 
     @Transactional
     public AuctionResponse start(Integer auctionId) {
         AuctionContext context = contextFor(getAuction(auctionId));
         context.start();
+        publish(context.getAuction(), context.getStatus());
         return assembler.toResponse(context.getAuction());
     }
 
@@ -92,6 +103,7 @@ public class AuctionService {
     public AuctionResponse finish(Integer auctionId) {
         AuctionContext context = contextFor(getAuction(auctionId));
         context.finish();
+        publish(context.getAuction(), context.getStatus());
         return assembler.toResponse(context.getAuction());
     }
 
@@ -99,6 +111,7 @@ public class AuctionService {
     public AuctionResponse cancel(Integer auctionId) {
         AuctionContext context = contextFor(getAuction(auctionId));
         context.cancel();
+        publish(context.getAuction(), context.getStatus());
         return assembler.toResponse(context.getAuction());
     }
 
@@ -113,7 +126,7 @@ public class AuctionService {
         LocalDateTime now = LocalDateTime.now(clock);
         int changed = 0;
         for (Auction auction : auctionRepository.findDueForTransition(now)) {
-            if (!contextFor(auction).syncWithClock(now).isEmpty()) {
+            if (sync(auction, now)) {
                 changed++;
             }
         }
@@ -124,13 +137,41 @@ public class AuctionService {
     @Transactional
     public Auction getSyncedAuction(Integer auctionId) {
         Auction auction = getAuction(auctionId);
-        contextFor(auction).syncWithClock(LocalDateTime.now(clock));
+        sync(auction, LocalDateTime.now(clock));
+        return auction;
+    }
+
+    /** Same as {@link #getSyncedAuction} but locks the auction row until the transaction ends. */
+    @Transactional
+    public Auction getSyncedAuctionForUpdate(Integer auctionId) {
+        Auction auction = auctionRepository.findByIdForUpdate(auctionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Auction", auctionId));
+        sync(auction, LocalDateTime.now(clock));
         return auction;
     }
 
     /** Wraps the auction in a State pattern context. */
     public AuctionContext contextFor(Auction auction) {
         return new AuctionContext(auction, () -> bidRepository.countByAuctionAuctionId(auction.getAuctionId()));
+    }
+
+    private boolean sync(Auction auction, LocalDateTime now) {
+        List<AuctionStatus> reached = contextFor(auction).syncWithClock(now);
+        reached.forEach(status -> publish(auction, status));
+        return !reached.isEmpty();
+    }
+
+    /** Translates a reached status into an Observer event. */
+    private void publish(Auction auction, AuctionStatus reached) {
+        AuctionEvent.Type type = switch (reached) {
+            case ACTIVE -> AuctionEvent.Type.AUCTION_STARTED;
+            case FINISHED -> AuctionEvent.Type.AUCTION_FINISHED;
+            case CANCELLED -> AuctionEvent.Type.AUCTION_CANCELLED;
+            case SCHEDULED -> null;
+        };
+        if (type != null) {
+            eventPublisher.publish(AuctionEvent.of(type, auction.getAuctionId(), auction.getArtwork().getArtworkId()));
+        }
     }
 
     private Auction getAuction(Integer auctionId) {
