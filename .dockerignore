@@ -9,7 +9,6 @@ target/
 HELP.md
 docs/
 README.md
-CLAUDE.md
 Dockerfile
 .dockerignore
 src/main/resources/application-local.properties
