@@ -78,7 +78,8 @@ Requirements: Java 21 and access to the database.
 | `CORS_ALLOWED_ORIGINS` | Comma-separated frontend origins (REST and WebSocket) | `http://localhost:5173,http://localhost:3000` |
 | `AUCTION_CURRENCY` | Single auction currency | `USD` |
 | `AUCTION_SCHEDULER_ENABLED` | Run the 60-second auction scheduler | `true` |
-| `AI_PROVIDER` / `AI_API_KEY` | AI provider (not chosen yet; `none` disables AI) | `none` |
+| `AI_PROVIDER` | AI provider (not chosen yet; `none` disables AI) | `none` |
+| `AI_API_KEY` | Not used yet: it will be added together with the adapter when the AI provider is chosen | – |
 | `HYPER3D_API_KEY` | Hyper3D Rodin key; empty disables 3D generation | empty |
 | `HYPER3D_BASE_URL` | Hyper3D API base URL | `https://api.hyper3d.com` |
 | `STORAGE_PROVIDER` | Photo storage provider (not chosen yet) | `none` |
@@ -197,7 +198,7 @@ auction is read or receives a bid, not only by the scheduler.
 
 | Integration | Status | How to enable |
 |---|---|---|
-| AI (recommendation strategy `ai`, price suggestions, AI bid review) | Disabled – provider not chosen | Add an adapter implementing `AiTextClient` and set `AI_PROVIDER` / `AI_API_KEY` |
+| AI (recommendation strategy `ai`, price suggestions, AI bid review) | Disabled – provider not chosen | When the provider is chosen: add an adapter implementing `AiTextClient`, add the `AI_API_KEY` property, and set `AI_PROVIDER` |
 | Hyper3D Rodin (photos → GLB) | Implemented, disabled without key | Set `HYPER3D_API_KEY`. Photos must have absolute public URLs. The GLB URL returned by Hyper3D may be temporary |
 | Photo storage | Disabled – provider not chosen | Add an adapter implementing `StorageService` and set `STORAGE_PROVIDER` |
 
