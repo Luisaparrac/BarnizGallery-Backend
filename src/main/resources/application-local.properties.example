@@ -1,0 +1,5 @@
+# Copy this file to application-local.properties (ignored by git) and fill in the values.
+# Run locally with: .\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=local"
+spring.datasource.url=jdbc:postgresql://<EXTERNAL_HOST>:5432/museo_hm45?sslmode=require
+spring.datasource.username=<USERNAME>
+spring.datasource.password=<PASSWORD>
