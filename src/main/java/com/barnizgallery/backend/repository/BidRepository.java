@@ -1,6 +1,7 @@
 package com.barnizgallery.backend.repository;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,4 +18,7 @@ public interface BidRepository extends JpaRepository<Bid, Integer> {
     BigDecimal findHighestAmount(Integer auctionId);
 
     long countByAuctionAuctionId(Integer auctionId);
+
+    /** Bids of a visitor after a moment (used to detect bid flooding). */
+    long countByVisitorVisitorIdAndBidDateAfter(Integer visitorId, LocalDateTime since);
 }

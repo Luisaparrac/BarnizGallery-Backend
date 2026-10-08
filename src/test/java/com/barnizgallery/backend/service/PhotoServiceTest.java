@@ -22,6 +22,7 @@ import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.model.entity.Artwork;
 import com.barnizgallery.backend.model.entity.Photo;
 import com.barnizgallery.backend.model.enums.ArtworkStatus;
+import com.barnizgallery.backend.patterns.adapter.StorageService;
 import com.barnizgallery.backend.repository.PhotoRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,6 +32,8 @@ class PhotoServiceTest {
     private PhotoRepository photoRepository;
     @Mock
     private ArtworkService artworkService;
+    @Mock
+    private StorageService storageService;
     @InjectMocks
     private PhotoService photoService;
 
@@ -50,6 +53,8 @@ class PhotoServiceTest {
 
     @Test
     void uploadIsDisabledWithoutStorage() {
+        when(storageService.isEnabled()).thenReturn(false);
+
         assertThatThrownBy(() -> photoService.upload(3, null, null))
                 .isInstanceOf(FeatureDisabledException.class);
     }

@@ -21,9 +21,11 @@ import com.barnizgallery.backend.dto.request.PhotoRequest;
 import com.barnizgallery.backend.dto.response.ArtworkDetailResponse;
 import com.barnizgallery.backend.dto.response.ArtworkSummaryResponse;
 import com.barnizgallery.backend.dto.response.PhotoResponse;
+import com.barnizgallery.backend.dto.response.SuggestedPriceResponse;
 import com.barnizgallery.backend.model.enums.ArtworkStatus;
 import com.barnizgallery.backend.service.ArtworkService;
 import com.barnizgallery.backend.service.PhotoService;
+import com.barnizgallery.backend.service.PricingService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -38,10 +40,13 @@ public class ArtworkController {
 
     private final ArtworkService artworkService;
     private final PhotoService photoService;
+    private final PricingService pricingService;
 
-    public ArtworkController(ArtworkService artworkService, PhotoService photoService) {
+    public ArtworkController(ArtworkService artworkService, PhotoService photoService,
+            PricingService pricingService) {
         this.artworkService = artworkService;
         this.photoService = photoService;
+        this.pricingService = pricingService;
     }
 
     @GetMapping
@@ -85,5 +90,11 @@ public class ArtworkController {
             @RequestParam(required = false) String angle) {
         PhotoResponse created = photoService.upload(id, file, angle);
         return ResponseEntity.created(URI.create("/api/artworks/" + id + "/photos")).body(created);
+    }
+
+    /** Base price suggested by the AI. Returns 503 while AI is disabled. */
+    @GetMapping("/{id}/suggested-price")
+    public SuggestedPriceResponse suggestedPrice(@PathVariable Integer id) {
+        return pricingService.suggestedPrice(id);
     }
 }

@@ -5,6 +5,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.barnizgallery.backend.dto.response.HealthResponse;
+import com.barnizgallery.backend.patterns.adapter.StorageService;
+import com.barnizgallery.backend.patterns.facade.AiFacade;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * Simple health endpoint used by Render and by the frontend to know
@@ -12,11 +16,20 @@ import com.barnizgallery.backend.dto.response.HealthResponse;
  */
 @RestController
 @RequestMapping("/api/health")
+@Tag(name = "System")
 public class HealthController {
+
+    private final AiFacade aiFacade;
+    private final StorageService storageService;
+
+    public HealthController(AiFacade aiFacade, StorageService storageService) {
+        this.aiFacade = aiFacade;
+        this.storageService = storageService;
+    }
 
     @GetMapping
     public HealthResponse health() {
-        // Integrations are wired in later phases; until then they are disabled.
-        return new HealthResponse("UP", false, false, false);
+        // Hyper3D is wired in the last phase; until then it is reported as disabled.
+        return new HealthResponse("UP", aiFacade.isAiEnabled(), false, storageService.isEnabled());
     }
 }

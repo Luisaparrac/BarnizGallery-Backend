@@ -13,6 +13,7 @@ import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.mapper.ArtworkMapper;
 import com.barnizgallery.backend.model.entity.Artwork;
 import com.barnizgallery.backend.model.entity.Photo;
+import com.barnizgallery.backend.patterns.adapter.StorageService;
 import com.barnizgallery.backend.repository.PhotoRepository;
 
 /**
@@ -24,10 +25,13 @@ public class PhotoService {
 
     private final PhotoRepository photoRepository;
     private final ArtworkService artworkService;
+    private final StorageService storageService;
 
-    public PhotoService(PhotoRepository photoRepository, ArtworkService artworkService) {
+    public PhotoService(PhotoRepository photoRepository, ArtworkService artworkService,
+            StorageService storageService) {
         this.photoRepository = photoRepository;
         this.artworkService = artworkService;
+        this.storageService = storageService;
     }
 
     @Transactional(readOnly = true)
@@ -48,9 +52,19 @@ public class PhotoService {
         return ArtworkMapper.toPhotoResponse(photoRepository.save(photo));
     }
 
+    /** Uploads the file through the {@link StorageService} adapter and registers its URL. */
     @Transactional
     public PhotoResponse upload(Integer artworkId, MultipartFile file, String angle) {
-        throw new FeatureDisabledException("Photo storage is not configured; register photos by URL instead");
+        if (!storageService.isEnabled()) {
+            throw new FeatureDisabledException("Photo storage is not configured; register photos by URL instead");
+        }
+        Artwork artwork = artworkService.getArtwork(artworkId);
+        String url = storageService.upload(file, "artworks/" + artworkId);
+        Photo photo = new Photo();
+        photo.setArtwork(artwork);
+        photo.setFileUrl(url);
+        photo.setAngle(angle);
+        return ArtworkMapper.toPhotoResponse(photoRepository.save(photo));
     }
 
     @Transactional
