@@ -1,0 +1,15 @@
+target/
+.git/
+.gitignore
+.idea/
+.vscode/
+*.iml
+*.log
+.env
+HELP.md
+docs/
+README.md
+CLAUDE.md
+Dockerfile
+.dockerignore
+src/main/resources/application-local.properties

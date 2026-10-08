@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import com.barnizgallery.backend.dto.response.HealthResponse;
 import com.barnizgallery.backend.patterns.adapter.DisabledStorageService;
+import com.barnizgallery.backend.patterns.adapter.ThreeDModelGenerator;
 import com.barnizgallery.backend.patterns.facade.AiFacade;
 
 class HealthControllerTest {
@@ -15,13 +16,15 @@ class HealthControllerTest {
     @Test
     void healthReportsUpAndIntegrationFlags() {
         AiFacade aiFacade = mock(AiFacade.class);
+        ThreeDModelGenerator generator = mock(ThreeDModelGenerator.class);
         when(aiFacade.isAiEnabled()).thenReturn(false);
+        when(generator.isEnabled()).thenReturn(true);
 
-        HealthResponse body = new HealthController(aiFacade, new DisabledStorageService()).health();
+        HealthResponse body = new HealthController(aiFacade, generator, new DisabledStorageService()).health();
 
         assertThat(body.status()).isEqualTo("UP");
         assertThat(body.aiEnabled()).isFalse();
-        assertThat(body.hyper3dEnabled()).isFalse();
+        assertThat(body.hyper3dEnabled()).isTrue();
         assertThat(body.storageEnabled()).isFalse();
     }
 }
