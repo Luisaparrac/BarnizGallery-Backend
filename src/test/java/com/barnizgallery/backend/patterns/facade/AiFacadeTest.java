@@ -32,7 +32,7 @@ class AiFacadeTest {
     private final BidRepository bidRepository = mock(BidRepository.class);
     private final RecommendationStrategyResolver resolver = mock(RecommendationStrategyResolver.class);
     private final AppProperties properties = new AppProperties(new AppProperties.Cors(List.of()),
-            new AppProperties.Auction("USD", BigDecimal.ONE, 5, BigDecimal.TEN), new AppProperties.Ai("none", ""),
+            new AppProperties.Auction("USD", BigDecimal.ONE, 5, BigDecimal.TEN, false), new AppProperties.Ai("none", ""),
             new AppProperties.Hyper3d("", ""), new AppProperties.Storage("none"));
 
     private final Artwork artwork = TestEntities.artwork(3, TestEntities.room(1, TestEntities.master(1)),

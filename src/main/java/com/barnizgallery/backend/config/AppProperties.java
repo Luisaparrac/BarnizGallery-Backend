@@ -14,8 +14,12 @@ public record AppProperties(Cors cors, Auction auction, Ai ai, Hyper3d hyper3d, 
     public record Cors(List<String> allowedOrigins) {
     }
 
+    /**
+     * @param schedulerEnabled when false the 60-second auction scheduler does not run
+     *                         (useful to avoid writes while developing against the real database)
+     */
     public record Auction(String currency, BigDecimal minIncrement, int maxBidsPerMinute,
-            BigDecimal suspiciousMultiplier) {
+            BigDecimal suspiciousMultiplier, boolean schedulerEnabled) {
     }
 
     public record Ai(String provider, String apiKey) {
