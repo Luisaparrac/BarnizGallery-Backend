@@ -17,6 +17,7 @@ import com.barnizgallery.backend.config.AuctionProperties;
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Auction;
 import com.barnizgallery.backend.entity.User;
+import com.barnizgallery.backend.mapper.ArtworkMapper;
 import com.barnizgallery.backend.patterns.adapter.AiTextClient;
 import com.barnizgallery.backend.patterns.strategy.RecommendationResult;
 import com.barnizgallery.backend.patterns.strategy.RecommendationStrategyResolver;
@@ -86,8 +87,8 @@ public class AiFacade {
                 + "\nDimensions (cm): " + artwork.getWidthCm() + " x " + artwork.getHeightCm() + " x "
                 + artwork.getDepthCm() + (artwork.getDimensionsLegacy() == null ? ""
                         : " (" + artwork.getDimensionsLegacy() + ")")
-                + "\nColors: " + artwork.getColorTags()
-                + "\nMotifs: " + artwork.getMotifTags();
+                + "\nColors: " + ArtworkMapper.colorCodes(artwork)
+                + "\nMotifs: " + ArtworkMapper.motifCodes(artwork);
         try {
             return parsePrice(aiClient.complete(PRICE_SYSTEM_PROMPT, prompt));
         } catch (RuntimeException ex) {

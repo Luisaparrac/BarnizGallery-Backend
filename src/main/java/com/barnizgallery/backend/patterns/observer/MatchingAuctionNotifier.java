@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import com.barnizgallery.backend.dto.UserNotification;
 import com.barnizgallery.backend.entity.TasteProfile;
+import com.barnizgallery.backend.mapper.ArtworkMapper;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.TasteProfileRepository;
 
@@ -40,7 +41,7 @@ public class MatchingAuctionNotifier implements AuctionObserver {
             return;
         }
         artworkRepository.findById(event.artworkId()).ifPresent(artwork -> {
-            Set<String> artworkColors = normalize(artwork.getColorTags());
+            Set<String> artworkColors = normalize(ArtworkMapper.colorCodes(artwork));
             if (artworkColors.isEmpty()) {
                 return;
             }

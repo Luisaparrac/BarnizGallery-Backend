@@ -14,7 +14,9 @@ import jakarta.validation.constraints.Size;
 /**
  * Body to create or update an artwork. The status is managed by auctions.
  *
- * @param currency ISO 4217 code of the price (for example USD)
+ * @param currency   ISO 4217 code of the price (for example USD)
+ * @param colorCodes codes of the color catalog
+ * @param motifCodes codes of the motif catalog
  */
 public record ArtworkRequest(
         @NotNull Long storeId,
@@ -31,6 +33,6 @@ public record ArtworkRequest(
         @PositiveOrZero BigDecimal price,
         @Pattern(regexp = "[A-Z]{3}") String currency,
         @PositiveOrZero Integer stock,
-        List<String> colorTags,
-        List<String> motifTags) {
+        List<String> colorCodes,
+        List<String> motifCodes) {
 }

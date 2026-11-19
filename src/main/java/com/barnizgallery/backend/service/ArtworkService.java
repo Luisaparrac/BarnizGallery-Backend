@@ -33,15 +33,17 @@ public class ArtworkService {
     private final AuctionRepository auctionRepository;
     private final AuctionResponseAssembler auctionAssembler;
     private final StoreService storeService;
+    private final CatalogCodeResolver catalogResolver;
 
     public ArtworkService(ArtworkRepository artworkRepository, PhotoRepository photoRepository,
             AuctionRepository auctionRepository, AuctionResponseAssembler auctionAssembler,
-            StoreService storeService) {
+            StoreService storeService, CatalogCodeResolver catalogResolver) {
         this.artworkRepository = artworkRepository;
         this.photoRepository = photoRepository;
         this.auctionRepository = auctionRepository;
         this.auctionAssembler = auctionAssembler;
         this.storeService = storeService;
+        this.catalogResolver = catalogResolver;
     }
 
     /** Lists artworks, optionally filtered by store and/or status. */
@@ -82,6 +84,7 @@ public class ArtworkService {
         artwork.setStore(store);
         artwork.setStatus(ArtworkStatus.EXHIBITED);
         ArtworkMapper.apply(request, artwork);
+        applyCatalogs(request, artwork);
         return ArtworkMapper.toSummary(artworkRepository.save(artwork));
     }
 
@@ -92,7 +95,13 @@ public class ArtworkService {
             artwork.setStore(storeService.getStore(request.storeId()));
         }
         ArtworkMapper.apply(request, artwork);
+        applyCatalogs(request, artwork);
         return ArtworkMapper.toSummary(artwork);
+    }
+
+    private void applyCatalogs(ArtworkRequest request, Artwork artwork) {
+        artwork.setColors(catalogResolver.colors(request.colorCodes()));
+        artwork.setMotifs(catalogResolver.motifs(request.motifCodes()));
     }
 
     /** Loads an artwork or throws 404. Used by other services too. */

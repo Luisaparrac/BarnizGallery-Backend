@@ -8,6 +8,8 @@ import com.barnizgallery.backend.dto.ArtworkSummaryResponse;
 import com.barnizgallery.backend.dto.AuctionResponse;
 import com.barnizgallery.backend.dto.PhotoResponse;
 import com.barnizgallery.backend.entity.Artwork;
+import com.barnizgallery.backend.entity.Color;
+import com.barnizgallery.backend.entity.Motif;
 import com.barnizgallery.backend.entity.Photo;
 
 /**
@@ -20,7 +22,7 @@ public final class ArtworkMapper {
 
     public static ArtworkSummaryResponse toSummary(Artwork artwork) {
         return new ArtworkSummaryResponse(artwork.getArtworkId(), artwork.getStore().getStoreId(), artwork.getTitleEs(),
-                artwork.getTitleEn(), artwork.getTechnique(), artwork.getColorTags(), artwork.getMotifTags(),
+                artwork.getTitleEn(), artwork.getTechnique(), colorCodes(artwork), motifCodes(artwork),
                 artwork.getStatus(), artwork.getSaleMode(), artwork.getPrice(), artwork.getCurrency(),
                 artwork.getStock());
     }
@@ -30,12 +32,15 @@ public final class ArtworkMapper {
         return new ArtworkDetailResponse(artwork.getArtworkId(), artwork.getStore().getStoreId(), artwork.getTitleEs(),
                 artwork.getTitleEn(), artwork.getHistoryEs(), artwork.getHistoryEn(), artwork.getTechnique(),
                 artwork.getDimensionsLegacy(), artwork.getWidthCm(), artwork.getHeightCm(), artwork.getDepthCm(),
-                artwork.getWeightG(), artwork.getColorTags(), artwork.getMotifTags(), artwork.getStatus(),
+                artwork.getWeightG(), colorCodes(artwork), motifCodes(artwork), artwork.getStatus(),
                 artwork.getSaleMode(), artwork.getPrice(), artwork.getCurrency(), artwork.getStock(), photos,
                 currentAuction);
     }
 
-    /** Copies the request fields into the entity. The store and status are set by the service. */
+    /**
+     * Copies the request fields into the entity. The store, status and catalog relations are set by the
+     * service.
+     */
     public static void apply(ArtworkRequest request, Artwork artwork) {
         artwork.setTitleEs(request.titleEs());
         artwork.setTitleEn(request.titleEn());
@@ -50,8 +55,16 @@ public final class ArtworkMapper {
         artwork.setPrice(request.price());
         artwork.setCurrency(request.currency());
         artwork.setStock(request.stock());
-        artwork.setColorTags(request.colorTags());
-        artwork.setMotifTags(request.motifTags());
+    }
+
+    /** Color catalog codes of the artwork, sorted. */
+    public static List<String> colorCodes(Artwork artwork) {
+        return artwork.getColors().stream().map(Color::getCode).sorted().toList();
+    }
+
+    /** Motif catalog codes of the artwork, sorted. */
+    public static List<String> motifCodes(Artwork artwork) {
+        return artwork.getMotifs().stream().map(Motif::getCode).sorted().toList();
     }
 
     public static PhotoResponse toPhotoResponse(Photo photo) {

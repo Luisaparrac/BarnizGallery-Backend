@@ -2,9 +2,9 @@ package com.barnizgallery.backend;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import com.barnizgallery.backend.entity.Artwork;
+import com.barnizgallery.backend.entity.Color;
 import com.barnizgallery.backend.entity.Auction;
 import com.barnizgallery.backend.entity.Master;
 import com.barnizgallery.backend.entity.Photo;
@@ -48,14 +48,18 @@ public final class TestEntities {
         return template;
     }
 
-    public static Artwork artwork(long id, Store store, ArtworkStatus status, String... colorTags) {
+    public static Artwork artwork(long id, Store store, ArtworkStatus status, String... colorCodes) {
         Artwork artwork = new Artwork();
         artwork.setArtworkId(id);
         artwork.setStore(store);
         artwork.setTitleEs("Obra " + id);
         artwork.setTitleEn("Artwork " + id);
         artwork.setStatus(status);
-        artwork.setColorTags(List.of(colorTags));
+        for (String code : colorCodes) {
+            Color color = new Color();
+            color.setCode(code);
+            artwork.getColors().add(color);
+        }
         return artwork;
     }
 

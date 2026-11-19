@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.TasteProfile;
 import com.barnizgallery.backend.entity.User;
+import com.barnizgallery.backend.mapper.ArtworkMapper;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.TasteProfileRepository;
 
@@ -53,7 +54,7 @@ public class ProfileBasedStrategy implements RecommendationStrategy {
         Map<Long, Set<String>> tagsByStore = new LinkedHashMap<>();
         for (Artwork artwork : artworkRepository.findAllByOrderByArtworkIdAsc()) {
             tagsByStore.computeIfAbsent(artwork.getStore().getStoreId(), id -> new LinkedHashSet<>())
-                    .addAll(normalize(artwork.getColorTags()));
+                    .addAll(normalize(ArtworkMapper.colorCodes(artwork)));
         }
 
         List<RecommendationResult> results = new ArrayList<>();

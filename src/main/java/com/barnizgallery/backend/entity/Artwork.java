@@ -2,12 +2,11 @@ package com.barnizgallery.backend.entity;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.type.SqlTypes;
 
 import com.barnizgallery.backend.converter.ArtworkStatusConverter;
 import com.barnizgallery.backend.converter.SaleModeConverter;
@@ -22,6 +21,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
@@ -96,13 +97,13 @@ public class Artwork {
     @Column(name = "stock")
     private Integer stock;
 
-    @JdbcTypeCode(SqlTypes.ARRAY)
-    @Column(name = "color_tags", columnDefinition = "text[]")
-    private List<String> colorTags;
+    @ManyToMany
+    @JoinTable(name = "artwork_colors", joinColumns = @JoinColumn(name = "artwork_id"), inverseJoinColumns = @JoinColumn(name = "color_id"))
+    private Set<Color> colors = new LinkedHashSet<>();
 
-    @JdbcTypeCode(SqlTypes.ARRAY)
-    @Column(name = "motif_tags", columnDefinition = "text[]")
-    private List<String> motifTags;
+    @ManyToMany
+    @JoinTable(name = "artwork_motifs", joinColumns = @JoinColumn(name = "artwork_id"), inverseJoinColumns = @JoinColumn(name = "motif_id"))
+    private Set<Motif> motifs = new LinkedHashSet<>();
 
     @Convert(converter = ArtworkStatusConverter.class)
     @Column(name = "status", nullable = false, length = 20)
@@ -274,20 +275,20 @@ public class Artwork {
         this.stock = stock;
     }
 
-    public List<String> getColorTags() {
-        return colorTags;
+    public Set<Color> getColors() {
+        return colors;
     }
 
-    public void setColorTags(List<String> colorTags) {
-        this.colorTags = colorTags;
+    public void setColors(Set<Color> colors) {
+        this.colors = colors;
     }
 
-    public List<String> getMotifTags() {
-        return motifTags;
+    public Set<Motif> getMotifs() {
+        return motifs;
     }
 
-    public void setMotifTags(List<String> motifTags) {
-        this.motifTags = motifTags;
+    public void setMotifs(Set<Motif> motifs) {
+        this.motifs = motifs;
     }
 
     public ArtworkStatus getStatus() {

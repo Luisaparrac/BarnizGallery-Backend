@@ -18,6 +18,7 @@ import com.barnizgallery.backend.entity.TasteProfile;
 import com.barnizgallery.backend.entity.User;
 import com.barnizgallery.backend.enums.Language;
 import com.barnizgallery.backend.exception.FeatureDisabledException;
+import com.barnizgallery.backend.mapper.ArtworkMapper;
 import com.barnizgallery.backend.patterns.adapter.AiTextClient;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.StoreRepository;
@@ -76,12 +77,8 @@ public class AiStrategy implements RecommendationStrategy {
         Map<Long, Set<String>> tagsByStore = new LinkedHashMap<>();
         for (Artwork artwork : artworkRepository.findAllByOrderByArtworkIdAsc()) {
             Set<String> tags = tagsByStore.computeIfAbsent(artwork.getStore().getStoreId(), id -> new LinkedHashSet<>());
-            if (artwork.getColorTags() != null) {
-                tags.addAll(artwork.getColorTags());
-            }
-            if (artwork.getMotifTags() != null) {
-                tags.addAll(artwork.getMotifTags());
-            }
+            tags.addAll(ArtworkMapper.colorCodes(artwork));
+            tags.addAll(ArtworkMapper.motifCodes(artwork));
         }
         StringBuilder prompt = new StringBuilder();
         prompt.append("Language: ").append(user.getPreferredLanguage() == Language.EN ? "English" : "Spanish")
