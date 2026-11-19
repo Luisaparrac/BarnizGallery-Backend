@@ -17,6 +17,7 @@ import com.barnizgallery.backend.enums.CameraMode;
 import com.barnizgallery.backend.enums.InteractionAction;
 import com.barnizgallery.backend.enums.Language;
 import com.barnizgallery.backend.enums.MasterVerificationStatus;
+import com.barnizgallery.backend.enums.OrderStatus;
 import com.barnizgallery.backend.enums.OrderType;
 import com.barnizgallery.backend.enums.SaleMode;
 import com.barnizgallery.backend.enums.StoreStatus;
@@ -77,6 +78,13 @@ class EnumConvertersTest {
                 Arguments.of(new OrderTypeConverter(), OrderType.PURCHASE, "compra"),
                 Arguments.of(new OrderTypeConverter(), OrderType.AUCTION, "subasta"),
                 Arguments.of(new OrderTypeConverter(), OrderType.CUSTOM, "encargo"),
+                Arguments.of(new OrderStatusConverter(), OrderStatus.PENDING_PAYMENT, "pendiente_pago"),
+                Arguments.of(new OrderStatusConverter(), OrderStatus.PAID, "pagado"),
+                Arguments.of(new OrderStatusConverter(), OrderStatus.IN_PREPARATION, "en_preparacion"),
+                Arguments.of(new OrderStatusConverter(), OrderStatus.SHIPPED, "enviado"),
+                Arguments.of(new OrderStatusConverter(), OrderStatus.DELIVERED, "entregado"),
+                Arguments.of(new OrderStatusConverter(), OrderStatus.CANCELLED, "cancelado"),
+                Arguments.of(new OrderStatusConverter(), OrderStatus.REFUNDED, "reembolsado"),
                 Arguments.of(new LanguageConverter(), Language.ES, "es"),
                 Arguments.of(new LanguageConverter(), Language.EN, "en"));
     }
