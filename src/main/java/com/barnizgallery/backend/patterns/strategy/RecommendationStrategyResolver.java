@@ -30,7 +30,7 @@ public class RecommendationStrategyResolver {
     }
 
     /**
-     * @param name profile, interactions, hybrid or ai; null or blank means {@value #DEFAULT_STRATEGY}
+     * @param name profile, interactions, hybrid, ai or ai-service; null or blank means {@value #DEFAULT_STRATEGY}
      */
     public RecommendationStrategy resolve(String name) {
         String key = (name == null || name.isBlank()) ? DEFAULT_STRATEGY : name.trim().toLowerCase(Locale.ROOT);

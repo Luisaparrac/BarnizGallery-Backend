@@ -23,4 +23,9 @@ public interface InteractionRepository extends JpaRepository<Interaction, Long> 
     List<StoreInteraction> findStoreInteractions(Long userId);
 
     long countByUserUserId(Long userId);
+
+    /** Interactions of all users with each artwork (its popularity), in a single query. */
+    @Query("select i.artwork.artworkId as artworkId, count(i) as interactionCount from Interaction i "
+            + "where i.artwork is not null group by i.artwork.artworkId")
+    List<ArtworkInteractionCount> countGroupedByArtwork();
 }

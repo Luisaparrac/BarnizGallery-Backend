@@ -2,12 +2,24 @@ package com.barnizgallery.backend.mapper;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
+import com.barnizgallery.backend.dto.AiBudget;
+import com.barnizgallery.backend.dto.AiCandidate;
 import com.barnizgallery.backend.dto.AiComparable;
+import com.barnizgallery.backend.dto.AiInteraction;
 import com.barnizgallery.backend.dto.AiPricingPiece;
 import com.barnizgallery.backend.dto.AiPricingRequest;
+import com.barnizgallery.backend.dto.AiTasteProfile;
 import com.barnizgallery.backend.entity.Artwork;
+import com.barnizgallery.backend.entity.BudgetRange;
+import com.barnizgallery.backend.entity.Interaction;
+import com.barnizgallery.backend.entity.Motif;
+import com.barnizgallery.backend.entity.Shape;
+import com.barnizgallery.backend.entity.Style;
+import com.barnizgallery.backend.entity.TasteProfile;
 import com.barnizgallery.backend.enums.ArtworkStatus;
+import com.barnizgallery.backend.enums.InteractionAction;
 
 /**
  * Builds the requests of the AI service from the entities, with catalog codes. Values the service would reject
@@ -29,6 +41,33 @@ public final class AiRequestMapper {
                 measure(piece.getHeightCm()), measure(piece.getDepthCm()), code(piece.getTechnique()));
         return new AiPricingRequest(description, comparables.stream().map(AiRequestMapper::toComparable).toList(),
                 currency);
+    }
+
+    /** An available artwork the service can rank; {@code popularity} is its number of interactions. */
+    public static AiCandidate toCandidate(Artwork artwork, long popularity) {
+        return new AiCandidate(artwork.getArtworkId(), artwork.getStore().getStoreId(),
+                ArtworkMapper.colorCodes(artwork), shapeCode(artwork), styleCode(artwork),
+                ArtworkMapper.motifCodes(artwork), artwork.getPrice(), artwork.getCurrency(), popularity);
+    }
+
+    /** Taste profile as catalog codes; the budget is only sent when its range has a currency. */
+    public static AiTasteProfile toProfile(TasteProfile profile) {
+        BudgetRange range = profile.getBudgetRange();
+        AiBudget budget = range == null || range.getCurrency() == null ? null
+                : new AiBudget(range.getMinAmount(), range.getMaxAmount(), range.getCurrency());
+        return new AiTasteProfile(UserMapper.colorCodes(profile),
+                profile.getShapes().stream().map(Shape::getCode).sorted().toList(),
+                profile.getStyles().stream().map(Style::getCode).sorted().toList(),
+                profile.getMotifs().stream().map(Motif::getCode).sorted().toList(), budget);
+    }
+
+    /** Interaction with an artwork; actions the service does not know (bids) are left out. */
+    public static Optional<AiInteraction> toInteraction(Interaction interaction) {
+        if (interaction.getArtwork() == null || interaction.getAction() == InteractionAction.BID) {
+            return Optional.empty();
+        }
+        return Optional.of(new AiInteraction(interaction.getArtwork().getArtworkId(),
+                interaction.getAction().name(), interaction.getDurationSeconds()));
     }
 
     private static AiComparable toComparable(Artwork artwork) {

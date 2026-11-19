@@ -9,7 +9,7 @@ import com.barnizgallery.backend.entity.User;
  * <p>
  * A family of interchangeable algorithms to recommend stores to a user.
  * The client ({@code AiFacade}) only knows this interface and picks one at runtime
- * by name ({@code ?strategy=profile|interactions|hybrid|ai}), so a new algorithm can
+ * by name ({@code ?strategy=profile|interactions|hybrid|ai|ai-service}), so a new algorithm can
  * be added without touching the code that uses it.
  */
 public interface RecommendationStrategy {

@@ -132,7 +132,7 @@ Dates are ISO-8601 (UTC). Enum values are in English (`EXHIBITED`, `ACTIVE`, `PE
 |---|---|---|
 | POST | `/api/interactions` | `{ userId, artworkId, action, durationSeconds }` – `VIEW` (duration required), `ZOOM`. `BID` interactions are recorded automatically |
 | GET | `/api/users/{id}/interactions` | History |
-| POST | `/api/users/{id}/recommendations?strategy=hybrid` | Compute (`profile`, `interactions`, `hybrid`, `ai`) and replace previous ones |
+| POST | `/api/users/{id}/recommendations?strategy=hybrid` | Compute (`profile`, `interactions`, `hybrid`, `ai`, `ai-service`) and replace previous ones. `ai-service` asks the AI service and falls back to `hybrid` if it is disabled or fails |
 | GET | `/api/users/{id}/recommendations` | Last saved recommendations |
 
 ### Auctions and bids
@@ -198,7 +198,7 @@ action changes their status.
 
 | Integration | Status | How to enable |
 |---|---|---|
-| AI service (price suggestions) | Enabled when configured | Set `AI_SERVICE_URL` and `AI_SERVICE_KEY` |
+| AI service (price suggestions, recommendation strategy `ai-service`) | Enabled when configured | Set `AI_SERVICE_URL` and `AI_SERVICE_KEY` |
 | AI text model (recommendation strategy `ai`, AI bid review) | Disabled – provider not chosen | When the provider is chosen: add an adapter implementing `AiTextClient`, add the `AI_API_KEY` property, and set `AI_PROVIDER` |
 | Photo storage | Disabled – provider not chosen | Add an adapter implementing `StorageService` and set `STORAGE_PROVIDER` |
 

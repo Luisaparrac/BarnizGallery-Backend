@@ -1,5 +1,6 @@
 package com.barnizgallery.backend.repository;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
@@ -23,6 +24,10 @@ public interface ArtworkRepository extends JpaRepository<Artwork, Long> {
     List<Artwork> findByStoreStoreIdAndStatusOrderByArtworkIdAsc(Long storeId, ArtworkStatus status);
 
     long countByStoreStoreId(Long storeId);
+
+    /** Artworks not deleted with one of the given statuses (the available ones for recommendations). */
+    List<Artwork> findByDeletedAtIsNullAndStatusInOrderByArtworkIdAsc(Collection<ArtworkStatus> statuses,
+            Pageable page);
 
     /** Priced artworks with a shape in a currency, except one, to compare prices with (newest first). */
     @Query("select a from Artwork a where a.deletedAt is null and a.price is not null and a.shape is not null "
