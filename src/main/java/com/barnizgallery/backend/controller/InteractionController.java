@@ -33,7 +33,7 @@ public class InteractionController {
 
     @PostMapping("/api/interactions")
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Record VIEW (durationSeconds required), TOUCH or ROTATE")
+    @Operation(summary = "Record VIEW (durationSeconds required) or ZOOM")
     public InteractionResponse record(@Valid @RequestBody InteractionRequest request) {
         return interactionService.record(request);
     }

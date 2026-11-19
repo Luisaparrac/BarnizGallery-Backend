@@ -29,8 +29,7 @@ class InteractionFactoryTest {
     static Stream<Arguments> creators() {
         return Stream.of(
                 Arguments.of(new ViewInteractionFactory(), InteractionAction.VIEW, 1),
-                Arguments.of(new TouchInteractionFactory(), InteractionAction.TOUCH, 2),
-                Arguments.of(new RotateInteractionFactory(), InteractionAction.ROTATE, 3),
+                Arguments.of(new ZoomInteractionFactory(), InteractionAction.ZOOM, 3),
                 Arguments.of(new BidInteractionFactory(), InteractionAction.BID, 5));
     }
 
@@ -62,17 +61,16 @@ class InteractionFactoryTest {
 
     @Test
     void otherActionsAcceptMissingDuration() {
-        assertThat(new TouchInteractionFactory().create(visitor, artwork, null).getDurationSeconds()).isNull();
-        assertThat(new RotateInteractionFactory().create(visitor, artwork, null).getDurationSeconds()).isNull();
+        assertThat(new ZoomInteractionFactory().create(visitor, artwork, null).getDurationSeconds()).isNull();
         assertThat(new BidInteractionFactory().create(visitor, artwork, null).getDurationSeconds()).isNull();
     }
 
     @Test
     void providerReturnsTheCreatorOfEachAction() {
         InteractionFactoryProvider provider = new InteractionFactoryProvider(List.of(new ViewInteractionFactory(),
-                new TouchInteractionFactory(), new RotateInteractionFactory(), new BidInteractionFactory()));
+                new ZoomInteractionFactory(), new BidInteractionFactory()));
 
-        assertThat(provider.forAction(InteractionAction.ROTATE)).isInstanceOf(RotateInteractionFactory.class);
+        assertThat(provider.forAction(InteractionAction.ZOOM)).isInstanceOf(ZoomInteractionFactory.class);
         assertThat(provider.weightOf(InteractionAction.BID)).isEqualTo(5);
     }
 

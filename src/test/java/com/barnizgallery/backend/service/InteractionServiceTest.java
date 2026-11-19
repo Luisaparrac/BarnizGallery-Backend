@@ -25,9 +25,8 @@ import com.barnizgallery.backend.enums.Language;
 import com.barnizgallery.backend.exception.BusinessRuleException;
 import com.barnizgallery.backend.patterns.factorymethod.BidInteractionFactory;
 import com.barnizgallery.backend.patterns.factorymethod.InteractionFactoryProvider;
-import com.barnizgallery.backend.patterns.factorymethod.RotateInteractionFactory;
-import com.barnizgallery.backend.patterns.factorymethod.TouchInteractionFactory;
 import com.barnizgallery.backend.patterns.factorymethod.ViewInteractionFactory;
+import com.barnizgallery.backend.patterns.factorymethod.ZoomInteractionFactory;
 import com.barnizgallery.backend.repository.InteractionRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,7 +43,7 @@ class InteractionServiceTest {
     @BeforeEach
     void setUp() {
         InteractionFactoryProvider provider = new InteractionFactoryProvider(List.of(new ViewInteractionFactory(),
-                new TouchInteractionFactory(), new RotateInteractionFactory(), new BidInteractionFactory()));
+                new ZoomInteractionFactory(), new BidInteractionFactory()));
         interactionService = new InteractionService(interactionRepository, provider, visitorService, artworkService);
     }
 
@@ -56,9 +55,9 @@ class InteractionServiceTest {
         when(interactionRepository.save(any(Interaction.class))).thenAnswer(inv -> inv.getArgument(0));
 
         InteractionResponse response = interactionService.record(
-                new InteractionRequest(1, 2, InteractionAction.ROTATE, null));
+                new InteractionRequest(1, 2, InteractionAction.ZOOM, null));
 
-        assertThat(response.action()).isEqualTo(InteractionAction.ROTATE);
+        assertThat(response.action()).isEqualTo(InteractionAction.ZOOM);
         assertThat(response.artworkId()).isEqualTo(2);
     }
 

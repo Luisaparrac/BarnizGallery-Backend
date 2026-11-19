@@ -122,7 +122,7 @@ Dates are ISO-8601 (UTC). Enum values are in English (`EXHIBITED`, `ACTIVE`, `FI
 ### Interactions and recommendations
 | Method | Path | Description |
 |---|---|---|
-| POST | `/api/interactions` | `{ visitorId, artworkId, action, durationSeconds }` – `VIEW` (duration required), `TOUCH`, `ROTATE`. `BID` interactions are recorded automatically |
+| POST | `/api/interactions` | `{ visitorId, artworkId, action, durationSeconds }` – `VIEW` (duration required), `ZOOM`. `BID` interactions are recorded automatically |
 | GET | `/api/visitors/{id}/interactions` | History |
 | POST | `/api/visitors/{id}/recommendations?strategy=hybrid` | Compute (`profile`, `interactions`, `hybrid`, `ai`) and replace previous ones |
 | GET | `/api/visitors/{id}/recommendations` | Last saved recommendations |

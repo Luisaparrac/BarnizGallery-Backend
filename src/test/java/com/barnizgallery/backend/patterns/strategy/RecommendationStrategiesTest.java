@@ -26,9 +26,8 @@ import com.barnizgallery.backend.patterns.adapter.AiTextClient;
 import com.barnizgallery.backend.patterns.adapter.DisabledAiClient;
 import com.barnizgallery.backend.patterns.factorymethod.BidInteractionFactory;
 import com.barnizgallery.backend.patterns.factorymethod.InteractionFactoryProvider;
-import com.barnizgallery.backend.patterns.factorymethod.RotateInteractionFactory;
-import com.barnizgallery.backend.patterns.factorymethod.TouchInteractionFactory;
 import com.barnizgallery.backend.patterns.factorymethod.ViewInteractionFactory;
+import com.barnizgallery.backend.patterns.factorymethod.ZoomInteractionFactory;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.InteractionRepository;
 import com.barnizgallery.backend.repository.RoomInteraction;
@@ -44,7 +43,7 @@ class RecommendationStrategiesTest {
     private final ArtworkRepository artworkRepository = mock(ArtworkRepository.class);
     private final InteractionRepository interactionRepository = mock(InteractionRepository.class);
     private final InteractionFactoryProvider factoryProvider = new InteractionFactoryProvider(List.of(
-            new ViewInteractionFactory(), new TouchInteractionFactory(), new RotateInteractionFactory(),
+            new ViewInteractionFactory(), new ZoomInteractionFactory(),
             new BidInteractionFactory()));
 
     private ProfileBasedStrategy profileStrategy;
@@ -112,8 +111,8 @@ class RecommendationStrategiesTest {
 
     @Test
     void interactionsUseFactoryWeightsAndDuration() {
-        // room 1: ROTATE (3) with 300 s -> 3 x 2 = 6 points; room 2: VIEW (1) without duration bonus -> 1 point
-        givenInteractions(interaction(1, InteractionAction.ROTATE, 300), interaction(2, InteractionAction.VIEW, 0));
+        // room 1: ZOOM (3) with 300 s -> 3 x 2 = 6 points; room 2: VIEW (1) without duration bonus -> 1 point
+        givenInteractions(interaction(1, InteractionAction.ZOOM, 300), interaction(2, InteractionAction.VIEW, 0));
 
         List<RecommendationResult> results = interactionStrategy.recommend(visitorEs);
 
@@ -132,7 +131,7 @@ class RecommendationStrategiesTest {
     @Test
     void hybridUsesOnlyProfileWithFewInteractions() {
         givenPreferredColors("azul");
-        givenInteractions(interaction(1, InteractionAction.TOUCH, null));
+        givenInteractions(interaction(1, InteractionAction.ZOOM, null));
 
         List<RecommendationResult> results = hybridStrategy.recommend(visitorEs);
 
@@ -145,8 +144,8 @@ class RecommendationStrategiesTest {
     @Test
     void hybridMixesSixtyPercentInteractionsAndFortyPercentProfile() {
         givenPreferredColors("azul");
-        givenInteractions(interaction(1, InteractionAction.TOUCH, null), interaction(1, InteractionAction.TOUCH, null),
-                interaction(1, InteractionAction.TOUCH, null));
+        givenInteractions(interaction(1, InteractionAction.ZOOM, null), interaction(1, InteractionAction.ZOOM, null),
+                interaction(1, InteractionAction.ZOOM, null));
 
         List<RecommendationResult> results = hybridStrategy.recommend(visitorEs);
 

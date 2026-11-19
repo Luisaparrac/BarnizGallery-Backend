@@ -7,14 +7,15 @@ import com.barnizgallery.backend.enums.InteractionAction;
 /**
  * <b>Factory Method pattern – ConcreteCreator.</b>
  * <p>
- * Creates ROTATE interactions (weight 3): the visitor rotated the 3D model to inspect it.
+ * Creates ZOOM interactions (weight 3): the visitor enlarged the photos of the piece to inspect it.
+ * Historical TOUCH and ROTATE interactions were migrated to this action.
  */
 @Component
-public class RotateInteractionFactory extends InteractionFactory {
+public class ZoomInteractionFactory extends InteractionFactory {
 
     @Override
     protected InteractionAction action() {
-        return InteractionAction.ROTATE;
+        return InteractionAction.ZOOM;
     }
 
     @Override

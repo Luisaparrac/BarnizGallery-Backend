@@ -6,8 +6,7 @@ package com.barnizgallery.backend.enums;
 public enum InteractionAction implements DbValueEnum {
 
     VIEW("ver"),
-    TOUCH("tocar"),
-    ROTATE("girar"),
+    ZOOM("ampliar"),
     BID("ofertar");
 
     private final String dbValue;
