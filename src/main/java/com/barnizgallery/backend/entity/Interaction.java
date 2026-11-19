@@ -18,7 +18,8 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 /**
- * An interaction of a user with an artwork. Maps the existing table {@code interactions}.
+ * An interaction of a user with an artwork or with a store (exactly one of them).
+ * Maps the table {@code museo.interactions}.
  */
 @Entity
 @Table(name = "interactions")
@@ -33,9 +34,13 @@ public class Interaction {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "artwork_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "artwork_id")
     private Artwork artwork;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_id")
+    private Store store;
 
     @Convert(converter = InteractionActionConverter.class)
     @Column(name = "action", nullable = false, length = 30)
@@ -47,7 +52,7 @@ public class Interaction {
     @Column(name = "interaction_date")
     private LocalDateTime interactionDate;
 
-    /** The column has a DB default, but the value is set from Java so we do not depend on it. */
+    /** The column has no default, so the moment is set from Java when it is missing. */
     @PrePersist
     void onCreate() {
         if (interactionDate == null) {
@@ -77,6 +82,14 @@ public class Interaction {
 
     public void setArtwork(Artwork artwork) {
         this.artwork = artwork;
+    }
+
+    public Store getStore() {
+        return store;
+    }
+
+    public void setStore(Store store) {
+        this.store = store;
     }
 
     public InteractionAction getAction() {

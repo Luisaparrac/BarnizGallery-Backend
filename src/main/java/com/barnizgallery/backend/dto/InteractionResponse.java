@@ -11,6 +11,7 @@ public record InteractionResponse(
         Long interactionId,
         Long userId,
         Long artworkId,
+        Long storeId,
         InteractionAction action,
         Integer durationSeconds,
         LocalDateTime interactionDate) {

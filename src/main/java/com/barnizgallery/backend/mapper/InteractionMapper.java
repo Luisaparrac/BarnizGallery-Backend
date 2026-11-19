@@ -14,9 +14,10 @@ public final class InteractionMapper {
     }
 
     public static InteractionResponse toResponse(Interaction interaction) {
-        return new InteractionResponse(interaction.getInteractionId(), interaction.getUser().getUserId(),
-                interaction.getArtwork().getArtworkId(), interaction.getAction(), interaction.getDurationSeconds(),
-                interaction.getInteractionDate());
+        Long artworkId = interaction.getArtwork() == null ? null : interaction.getArtwork().getArtworkId();
+        Long storeId = interaction.getStore() == null ? null : interaction.getStore().getStoreId();
+        return new InteractionResponse(interaction.getInteractionId(), interaction.getUser().getUserId(), artworkId,
+                storeId, interaction.getAction(), interaction.getDurationSeconds(), interaction.getInteractionDate());
     }
 
     public static RecommendationResponse toResponse(Recommendation recommendation) {
