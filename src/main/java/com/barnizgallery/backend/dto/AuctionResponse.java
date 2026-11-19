@@ -9,8 +9,8 @@ import com.barnizgallery.backend.enums.AuctionStatus;
  * An auction with its highest bid (null if none) and number of bids.
  */
 public record AuctionResponse(
-        Integer auctionId,
-        Integer artworkId,
+        Long auctionId,
+        Long artworkId,
         String artworkTitleEs,
         String artworkTitleEn,
         BigDecimal basePrice,

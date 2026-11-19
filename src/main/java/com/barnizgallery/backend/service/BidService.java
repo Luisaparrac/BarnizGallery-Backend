@@ -73,7 +73,7 @@ public class BidService {
      * </ol>
      */
     @Transactional
-    public BidResponse placeBid(Integer auctionId, BidRequest request) {
+    public BidResponse placeBid(Long auctionId, BidRequest request) {
         Auction auction = auctionService.getSyncedAuctionForUpdate(auctionId);
         auctionService.contextFor(auction).placeBid(request);
         Visitor visitor = visitorService.getVisitor(request.visitorId());
@@ -112,7 +112,7 @@ public class BidService {
                     visitor.getVisitorId(), saved.amount(), assessment.reason(), saved.bidDate()));
         }
 
-        Integer previousTopBidderId = currentTop == null ? null : currentTop.getVisitor().getVisitorId();
+        Long previousTopBidderId = currentTop == null ? null : currentTop.getVisitor().getVisitorId();
         eventPublisher.publish(AuctionEvent.bidPlaced(auctionId, auction.getArtwork().getArtworkId(), saved,
                 previousTopBidderId));
         return saved;
@@ -120,7 +120,7 @@ public class BidService {
 
     /** Bids of an auction, highest first. */
     @Transactional
-    public List<BidResponse> findByAuction(Integer auctionId) {
+    public List<BidResponse> findByAuction(Long auctionId) {
         auctionService.getSyncedAuction(auctionId);
         return bidRepository.findByAuctionWithVisitor(auctionId).stream()
                 .map(AuctionMapper::toResponse)

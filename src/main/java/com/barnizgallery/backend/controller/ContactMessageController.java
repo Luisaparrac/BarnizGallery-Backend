@@ -37,7 +37,7 @@ public class ContactMessageController {
     }
 
     @GetMapping("/api/masters/{id}/messages")
-    public List<ContactMessageResponse> findByMaster(@PathVariable Integer id) {
+    public List<ContactMessageResponse> findByMaster(@PathVariable Long id) {
         return contactMessageService.findByMaster(id);
     }
 }

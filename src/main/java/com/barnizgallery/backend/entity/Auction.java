@@ -27,7 +27,7 @@ public class Auction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "auction_id")
-    private Integer auctionId;
+    private Long auctionId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "artwork_id", nullable = false)
@@ -46,11 +46,11 @@ public class Auction {
     @Column(name = "status", nullable = false, length = 30)
     private AuctionStatus status;
 
-    public Integer getAuctionId() {
+    public Long getAuctionId() {
         return auctionId;
     }
 
-    public void setAuctionId(Integer auctionId) {
+    public void setAuctionId(Long auctionId) {
         this.auctionId = auctionId;
     }
 

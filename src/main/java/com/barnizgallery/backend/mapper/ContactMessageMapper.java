@@ -12,7 +12,7 @@ public final class ContactMessageMapper {
     }
 
     public static ContactMessageResponse toResponse(ContactMessage message) {
-        Integer artworkId = message.getArtwork() == null ? null : message.getArtwork().getArtworkId();
+        Long artworkId = message.getArtwork() == null ? null : message.getArtwork().getArtworkId();
         return new ContactMessageResponse(message.getMessageId(), message.getVisitor().getVisitorId(),
                 message.getVisitor().getName(), message.getVisitor().getEmail(), message.getMaster().getMasterId(),
                 artworkId, message.getContent(), message.getMessageDate());

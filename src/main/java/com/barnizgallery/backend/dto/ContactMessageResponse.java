@@ -6,12 +6,12 @@ import java.time.LocalDateTime;
  * A message received by a master.
  */
 public record ContactMessageResponse(
-        Integer messageId,
-        Integer visitorId,
+        Long messageId,
+        Long visitorId,
         String visitorName,
         String visitorEmail,
-        Integer masterId,
-        Integer artworkId,
+        Long masterId,
+        Long artworkId,
         String content,
         LocalDateTime messageDate) {
 }

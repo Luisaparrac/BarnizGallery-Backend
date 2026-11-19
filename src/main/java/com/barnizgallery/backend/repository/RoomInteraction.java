@@ -8,7 +8,7 @@ import com.barnizgallery.backend.enums.InteractionAction;
  */
 public interface RoomInteraction {
 
-    Integer getRoomId();
+    Long getRoomId();
 
     InteractionAction getAction();
 

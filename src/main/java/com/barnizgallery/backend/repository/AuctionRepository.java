@@ -17,13 +17,13 @@ import jakarta.persistence.LockModeType;
 /**
  * Spring Data repository for {@link Auction}.
  */
-public interface AuctionRepository extends JpaRepository<Auction, Integer> {
+public interface AuctionRepository extends JpaRepository<Auction, Long> {
 
     /** Most recent auction of an artwork among the given statuses (for example scheduled or active). */
-    Optional<Auction> findFirstByArtworkArtworkIdAndStatusInOrderByStartDateDesc(Integer artworkId,
+    Optional<Auction> findFirstByArtworkArtworkIdAndStatusInOrderByStartDateDesc(Long artworkId,
             Collection<AuctionStatus> statuses);
 
-    boolean existsByArtworkArtworkIdAndStatusIn(Integer artworkId, Collection<AuctionStatus> statuses);
+    boolean existsByArtworkArtworkIdAndStatusIn(Long artworkId, Collection<AuctionStatus> statuses);
 
     @Query("select a from Auction a join fetch a.artwork order by a.startDate desc, a.auctionId desc")
     List<Auction> findAllWithArtwork();
@@ -33,7 +33,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Integer> {
     List<Auction> findByStatusWithArtwork(AuctionStatus status);
 
     @Query("select a from Auction a join fetch a.artwork where a.auctionId = :auctionId")
-    Optional<Auction> findByIdWithArtwork(Integer auctionId);
+    Optional<Auction> findByIdWithArtwork(Long auctionId);
 
     /**
      * Loads the auction with a row lock (SELECT ... FOR UPDATE) so two bids on the same
@@ -41,7 +41,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Integer> {
      */
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select a from Auction a join fetch a.artwork where a.auctionId = :auctionId")
-    Optional<Auction> findByIdForUpdate(Integer auctionId);
+    Optional<Auction> findByIdForUpdate(Long auctionId);
 
     /** Scheduled auctions whose start date has arrived, or active ones whose end date has passed. */
     @Query("select a from Auction a join fetch a.artwork where "

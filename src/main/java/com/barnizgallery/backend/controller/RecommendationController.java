@@ -32,13 +32,13 @@ public class RecommendationController {
     @PostMapping
     @Operation(summary = "Compute recommendations (strategy = profile | interactions | hybrid | ai) "
             + "and replace the previous ones")
-    public List<RecommendationResponse> compute(@PathVariable Integer id,
+    public List<RecommendationResponse> compute(@PathVariable Long id,
             @RequestParam(defaultValue = "hybrid") String strategy) {
         return recommendationService.compute(id, strategy);
     }
 
     @GetMapping
-    public List<RecommendationResponse> latest(@PathVariable Integer id) {
+    public List<RecommendationResponse> latest(@PathVariable Long id) {
         return recommendationService.latest(id);
     }
 }

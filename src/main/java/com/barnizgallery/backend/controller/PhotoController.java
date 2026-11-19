@@ -25,7 +25,7 @@ public class PhotoController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Integer id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         photoService.delete(id);
         return ResponseEntity.noContent().build();
     }

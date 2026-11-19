@@ -4,7 +4,7 @@ package com.barnizgallery.backend.dto;
  * A master artisan.
  */
 public record MasterResponse(
-        Integer masterId,
+        Long masterId,
         String name,
         String biographyEs,
         String biographyEn,

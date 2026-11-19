@@ -5,7 +5,7 @@ package com.barnizgallery.backend.dto;
  *
  * @param type OUTBID or MATCHING_AUCTION
  */
-public record VisitorNotification(String type, Integer auctionId, Integer artworkId, String message) {
+public record VisitorNotification(String type, Long auctionId, Long artworkId, String message) {
 
     public static final String OUTBID = "OUTBID";
     public static final String MATCHING_AUCTION = "MATCHING_AUCTION";

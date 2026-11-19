@@ -9,7 +9,7 @@ import com.barnizgallery.backend.entity.TasteProfile;
 /**
  * Spring Data repository for {@link TasteProfile}.
  */
-public interface TasteProfileRepository extends JpaRepository<TasteProfile, Integer> {
+public interface TasteProfileRepository extends JpaRepository<TasteProfile, Long> {
 
-    Optional<TasteProfile> findByVisitorVisitorId(Integer visitorId);
+    Optional<TasteProfile> findByVisitorVisitorId(Long visitorId);
 }

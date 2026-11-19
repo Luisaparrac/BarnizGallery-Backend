@@ -10,7 +10,7 @@ import jakarta.validation.constraints.PositiveOrZero;
  * Body to create an auction. basePrice is optional when AI can suggest one.
  */
 public record CreateAuctionRequest(
-        @NotNull Integer artworkId,
+        @NotNull Long artworkId,
         @PositiveOrZero BigDecimal basePrice,
         @NotNull LocalDateTime startDate,
         @NotNull LocalDateTime endDate) {

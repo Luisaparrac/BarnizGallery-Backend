@@ -47,13 +47,13 @@ public class VisitorService {
     }
 
     @Transactional(readOnly = true)
-    public VisitorResponse findById(Integer visitorId) {
+    public VisitorResponse findById(Long visitorId) {
         return VisitorMapper.toResponse(getVisitor(visitorId));
     }
 
     /** Changes the language and/or camera mode. Null fields are left as they are. */
     @Transactional
-    public VisitorResponse updatePreferences(Integer visitorId, VisitorPreferencesRequest request) {
+    public VisitorResponse updatePreferences(Long visitorId, VisitorPreferencesRequest request) {
         Visitor visitor = getVisitor(visitorId);
         if (request.preferredLanguage() != null) {
             visitor.setPreferredLanguage(request.preferredLanguage());
@@ -65,7 +65,7 @@ public class VisitorService {
     }
 
     @Transactional(readOnly = true)
-    public TasteProfileResponse getTasteProfile(Integer visitorId) {
+    public TasteProfileResponse getTasteProfile(Long visitorId) {
         getVisitor(visitorId);
         return tasteProfileRepository.findByVisitorVisitorId(visitorId)
                 .map(VisitorMapper::toResponse)
@@ -75,7 +75,7 @@ public class VisitorService {
 
     /** Creates the taste profile or replaces its answers, and refreshes updated_at. */
     @Transactional
-    public TasteProfileResponse saveTasteProfile(Integer visitorId, TasteProfileRequest request) {
+    public TasteProfileResponse saveTasteProfile(Long visitorId, TasteProfileRequest request) {
         Visitor visitor = getVisitor(visitorId);
         TasteProfile profile = tasteProfileRepository.findByVisitorVisitorId(visitorId).orElseGet(() -> {
             TasteProfile created = new TasteProfile();
@@ -89,7 +89,7 @@ public class VisitorService {
 
     /** Loads a visitor or throws 404. Used by other services too. */
     @Transactional(readOnly = true)
-    public Visitor getVisitor(Integer visitorId) {
+    public Visitor getVisitor(Long visitorId) {
         return visitorRepository.findById(visitorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Visitor", visitorId));
     }

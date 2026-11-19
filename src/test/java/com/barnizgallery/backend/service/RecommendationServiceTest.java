@@ -40,19 +40,19 @@ class RecommendationServiceTest {
     @Test
     void computeReplacesPreviousRecommendations() {
         Visitor visitor = TestEntities.visitor(1, Language.ES);
-        when(visitorService.getVisitor(1)).thenReturn(visitor);
+        when(visitorService.getVisitor(1L)).thenReturn(visitor);
         when(aiFacade.recommendRooms(visitor, "profile")).thenReturn(List.of(
-                RecommendationResult.of(2, 80, "reason 2"), RecommendationResult.of(1, 40, "reason 1")));
-        when(roomRepository.findAllById(List.of(2, 1))).thenReturn(List.of(
+                RecommendationResult.of(2L, 80, "reason 2"), RecommendationResult.of(1L, 40, "reason 1")));
+        when(roomRepository.findAllById(List.of(2L, 1L))).thenReturn(List.of(
                 TestEntities.room(1, TestEntities.master(1)), TestEntities.room(2, TestEntities.master(2))));
         when(recommendationRepository.saveAll(anyList())).thenAnswer(inv -> inv.getArgument(0));
 
-        List<RecommendationResponse> saved = recommendationService.compute(1, "profile");
+        List<RecommendationResponse> saved = recommendationService.compute(1L, "profile");
 
-        assertThat(saved).extracting(RecommendationResponse::roomId).containsExactly(2, 1);
+        assertThat(saved).extracting(RecommendationResponse::roomId).containsExactly(2L, 1L);
         assertThat(saved.get(0).roomNameEn()).isEqualTo("Room 2");
         InOrder order = inOrder(recommendationRepository);
-        order.verify(recommendationRepository).deleteByVisitorId(1);
+        order.verify(recommendationRepository).deleteByVisitorId(1L);
         order.verify(recommendationRepository).saveAll(anyList());
     }
 }

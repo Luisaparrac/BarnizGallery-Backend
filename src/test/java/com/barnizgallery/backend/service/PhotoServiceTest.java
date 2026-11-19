@@ -41,10 +41,10 @@ class PhotoServiceTest {
     void addByUrlLinksPhotoToArtwork() {
         Artwork artwork = TestEntities.artwork(3, TestEntities.room(1, TestEntities.master(1)),
                 ArtworkStatus.EXHIBITED);
-        when(artworkService.getArtwork(3)).thenReturn(artwork);
+        when(artworkService.getArtwork(3L)).thenReturn(artwork);
         when(photoRepository.save(any(Photo.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        PhotoResponse photo = photoService.addByUrl(3, new PhotoRequest("https://img/front.jpg", "front"));
+        PhotoResponse photo = photoService.addByUrl(3L, new PhotoRequest("https://img/front.jpg", "front"));
 
         assertThat(photo.artworkId()).isEqualTo(3);
         assertThat(photo.fileUrl()).isEqualTo("https://img/front.jpg");
@@ -55,23 +55,23 @@ class PhotoServiceTest {
     void uploadIsDisabledWithoutStorage() {
         when(storageService.isEnabled()).thenReturn(false);
 
-        assertThatThrownBy(() -> photoService.upload(3, null, null))
+        assertThatThrownBy(() -> photoService.upload(3L, null, null))
                 .isInstanceOf(FeatureDisabledException.class);
     }
 
     @Test
     void deleteMissingPhotoIs404() {
-        when(photoRepository.findById(5)).thenReturn(Optional.empty());
+        when(photoRepository.findById(5L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> photoService.delete(5)).isInstanceOf(ResourceNotFoundException.class);
+        assertThatThrownBy(() -> photoService.delete(5L)).isInstanceOf(ResourceNotFoundException.class);
     }
 
     @Test
     void deleteExistingPhoto() {
         Photo photo = new Photo();
-        when(photoRepository.findById(5)).thenReturn(Optional.of(photo));
+        when(photoRepository.findById(5L)).thenReturn(Optional.of(photo));
 
-        photoService.delete(5);
+        photoService.delete(5L);
 
         verify(photoRepository).delete(photo);
     }

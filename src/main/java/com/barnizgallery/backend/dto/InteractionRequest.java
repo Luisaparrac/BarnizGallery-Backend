@@ -9,8 +9,8 @@ import jakarta.validation.constraints.NotNull;
  * Body to record an interaction of a visitor with an artwork.
  */
 public record InteractionRequest(
-        @NotNull Integer visitorId,
-        @NotNull Integer artworkId,
+        @NotNull Long visitorId,
+        @NotNull Long artworkId,
         @NotNull InteractionAction action,
         @Min(0) Integer durationSeconds) {
 }

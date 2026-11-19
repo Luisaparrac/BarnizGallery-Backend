@@ -46,7 +46,7 @@ public class ArtworkService {
 
     /** Lists artworks, optionally filtered by room and/or status. */
     @Transactional(readOnly = true)
-    public List<ArtworkSummaryResponse> findAll(Integer roomId, ArtworkStatus status) {
+    public List<ArtworkSummaryResponse> findAll(Long roomId, ArtworkStatus status) {
         List<Artwork> artworks;
         if (roomId != null && status != null) {
             artworks = artworkRepository.findByRoomRoomIdAndStatusOrderByArtworkIdAsc(roomId, status);
@@ -62,7 +62,7 @@ public class ArtworkService {
 
     /** Full detail: data, photos and current (scheduled or active) auction. */
     @Transactional(readOnly = true)
-    public ArtworkDetailResponse findById(Integer artworkId) {
+    public ArtworkDetailResponse findById(Long artworkId) {
         Artwork artwork = getArtwork(artworkId);
         List<PhotoResponse> photos = photoRepository.findByArtworkArtworkIdOrderByPhotoIdAsc(artworkId).stream()
                 .map(ArtworkMapper::toPhotoResponse)
@@ -86,7 +86,7 @@ public class ArtworkService {
     }
 
     @Transactional
-    public ArtworkSummaryResponse update(Integer artworkId, ArtworkRequest request) {
+    public ArtworkSummaryResponse update(Long artworkId, ArtworkRequest request) {
         Artwork artwork = getArtwork(artworkId);
         if (!artwork.getRoom().getRoomId().equals(request.roomId())) {
             artwork.setRoom(roomService.getRoom(request.roomId()));
@@ -97,7 +97,7 @@ public class ArtworkService {
 
     /** Loads an artwork or throws 404. Used by other services too. */
     @Transactional(readOnly = true)
-    public Artwork getArtwork(Integer artworkId) {
+    public Artwork getArtwork(Long artworkId) {
         return artworkRepository.findById(artworkId)
                 .orElseThrow(() -> new ResourceNotFoundException("Artwork", artworkId));
     }

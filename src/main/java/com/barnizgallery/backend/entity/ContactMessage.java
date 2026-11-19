@@ -23,7 +23,7 @@ public class ContactMessage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "message_id")
-    private Integer messageId;
+    private Long messageId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "visitor_id", nullable = false)
@@ -51,11 +51,11 @@ public class ContactMessage {
         }
     }
 
-    public Integer getMessageId() {
+    public Long getMessageId() {
         return messageId;
     }
 
-    public void setMessageId(Integer messageId) {
+    public void setMessageId(Long messageId) {
         this.messageId = messageId;
     }
 

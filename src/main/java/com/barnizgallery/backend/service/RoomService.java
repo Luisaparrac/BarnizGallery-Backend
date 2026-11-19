@@ -41,7 +41,7 @@ public class RoomService {
 
     @Transactional(readOnly = true)
     public List<RoomSummaryResponse> findAll() {
-        Map<Integer, Long> counts = artworkRepository.countGroupedByRoom().stream()
+        Map<Long, Long> counts = artworkRepository.countGroupedByRoom().stream()
                 .collect(Collectors.toMap(RoomArtworkCount::getRoomId, RoomArtworkCount::getArtworkCount));
         return roomRepository.findAllWithMaster().stream()
                 .map(room -> RoomMapper.toSummary(room, counts.getOrDefault(room.getRoomId(), 0L)))
@@ -49,7 +49,7 @@ public class RoomService {
     }
 
     @Transactional(readOnly = true)
-    public RoomDetailResponse findById(Integer roomId) {
+    public RoomDetailResponse findById(Long roomId) {
         Room room = roomRepository.findByIdWithMaster(roomId)
                 .orElseThrow(() -> new ResourceNotFoundException("Room", roomId));
         List<ArtworkSummaryResponse> artworks = artworkRepository.findByRoomRoomIdOrderByArtworkIdAsc(roomId)
@@ -72,7 +72,7 @@ public class RoomService {
     }
 
     @Transactional
-    public RoomSummaryResponse update(Integer roomId, RoomRequest request) {
+    public RoomSummaryResponse update(Long roomId, RoomRequest request) {
         Room room = getRoom(roomId);
         if (!room.getMaster().getMasterId().equals(request.masterId())) {
             Master newMaster = masterService.getMaster(request.masterId());
@@ -87,7 +87,7 @@ public class RoomService {
 
     /** Loads a room or throws 404. Used by other services too. */
     @Transactional(readOnly = true)
-    public Room getRoom(Integer roomId) {
+    public Room getRoom(Long roomId) {
         return roomRepository.findById(roomId)
                 .orElseThrow(() -> new ResourceNotFoundException("Room", roomId));
     }

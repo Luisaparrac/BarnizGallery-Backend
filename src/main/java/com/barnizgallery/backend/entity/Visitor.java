@@ -23,7 +23,7 @@ public class Visitor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "visitor_id")
-    private Integer visitorId;
+    private Long visitorId;
 
     @Column(name = "name", nullable = false, length = 100)
     private String name;
@@ -42,11 +42,11 @@ public class Visitor {
     @Column(name = "camera_mode", nullable = false, length = 30)
     private CameraMode cameraMode;
 
-    public Integer getVisitorId() {
+    public Long getVisitorId() {
         return visitorId;
     }
 
-    public void setVisitorId(Integer visitorId) {
+    public void setVisitorId(Long visitorId) {
         this.visitorId = visitorId;
     }
 

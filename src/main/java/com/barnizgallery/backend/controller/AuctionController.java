@@ -46,7 +46,7 @@ public class AuctionController {
     }
 
     @GetMapping("/{id}")
-    public AuctionResponse findById(@PathVariable Integer id) {
+    public AuctionResponse findById(@PathVariable Long id) {
         return auctionService.findById(id);
     }
 
@@ -58,28 +58,28 @@ public class AuctionController {
     }
 
     @PostMapping("/{id}/start")
-    public AuctionResponse start(@PathVariable Integer id) {
+    public AuctionResponse start(@PathVariable Long id) {
         return auctionService.start(id);
     }
 
     @PostMapping("/{id}/finish")
-    public AuctionResponse finish(@PathVariable Integer id) {
+    public AuctionResponse finish(@PathVariable Long id) {
         return auctionService.finish(id);
     }
 
     @PostMapping("/{id}/cancel")
-    public AuctionResponse cancel(@PathVariable Integer id) {
+    public AuctionResponse cancel(@PathVariable Long id) {
         return auctionService.cancel(id);
     }
 
     @GetMapping("/{id}/bids")
-    public List<BidResponse> findBids(@PathVariable Integer id) {
+    public List<BidResponse> findBids(@PathVariable Long id) {
         return bidService.findByAuction(id);
     }
 
     @PostMapping("/{id}/bids")
     @Operation(summary = "Place a bid (only in active auctions; 422 invalid amount/currency, 429 too many bids)")
-    public ResponseEntity<BidResponse> placeBid(@PathVariable Integer id, @Valid @RequestBody BidRequest request) {
+    public ResponseEntity<BidResponse> placeBid(@PathVariable Long id, @Valid @RequestBody BidRequest request) {
         BidResponse created = bidService.placeBid(id, request);
         return ResponseEntity.created(URI.create("/api/auctions/" + id + "/bids")).body(created);
     }

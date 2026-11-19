@@ -35,7 +35,7 @@ public class PhotoService {
     }
 
     @Transactional(readOnly = true)
-    public List<PhotoResponse> findByArtwork(Integer artworkId) {
+    public List<PhotoResponse> findByArtwork(Long artworkId) {
         artworkService.getArtwork(artworkId);
         return photoRepository.findByArtworkArtworkIdOrderByPhotoIdAsc(artworkId).stream()
                 .map(ArtworkMapper::toPhotoResponse)
@@ -43,7 +43,7 @@ public class PhotoService {
     }
 
     @Transactional
-    public PhotoResponse addByUrl(Integer artworkId, PhotoRequest request) {
+    public PhotoResponse addByUrl(Long artworkId, PhotoRequest request) {
         Artwork artwork = artworkService.getArtwork(artworkId);
         Photo photo = new Photo();
         photo.setArtwork(artwork);
@@ -54,7 +54,7 @@ public class PhotoService {
 
     /** Uploads the file through the {@link StorageService} adapter and registers its URL. */
     @Transactional
-    public PhotoResponse upload(Integer artworkId, MultipartFile file, String angle) {
+    public PhotoResponse upload(Long artworkId, MultipartFile file, String angle) {
         if (!storageService.isEnabled()) {
             throw new FeatureDisabledException("Photo storage is not configured; register photos by URL instead");
         }
@@ -68,7 +68,7 @@ public class PhotoService {
     }
 
     @Transactional
-    public void delete(Integer photoId) {
+    public void delete(Long photoId) {
         Photo photo = photoRepository.findById(photoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Photo", photoId));
         photoRepository.delete(photo);

@@ -62,7 +62,7 @@ class VisitorServiceTest {
         when(visitorRepository.findByEmailIgnoreCase("ana@mail.com")).thenReturn(Optional.empty());
         when(visitorRepository.save(any(Visitor.class))).thenAnswer(inv -> {
             Visitor saved = inv.getArgument(0);
-            saved.setVisitorId(9);
+            saved.setVisitorId(9L);
             return saved;
         });
 
@@ -76,9 +76,9 @@ class VisitorServiceTest {
     @Test
     void updatePreferencesOnlyChangesGivenFields() {
         Visitor visitor = TestEntities.visitor(1, Language.ES);
-        when(visitorRepository.findById(1)).thenReturn(Optional.of(visitor));
+        when(visitorRepository.findById(1L)).thenReturn(Optional.of(visitor));
 
-        VisitorResponse updated = visitorService.updatePreferences(1, new VisitorPreferencesRequest(Language.EN, null));
+        VisitorResponse updated = visitorService.updatePreferences(1L, new VisitorPreferencesRequest(Language.EN, null));
 
         assertThat(updated.preferredLanguage()).isEqualTo(Language.EN);
         assertThat(updated.cameraMode()).isEqualTo(CameraMode.FIRST_PERSON);
@@ -86,10 +86,10 @@ class VisitorServiceTest {
 
     @Test
     void tasteProfileMissingIs404() {
-        when(visitorRepository.findById(1)).thenReturn(Optional.of(TestEntities.visitor(1, Language.ES)));
-        when(tasteProfileRepository.findByVisitorVisitorId(1)).thenReturn(Optional.empty());
+        when(visitorRepository.findById(1L)).thenReturn(Optional.of(TestEntities.visitor(1, Language.ES)));
+        when(tasteProfileRepository.findByVisitorVisitorId(1L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> visitorService.getTasteProfile(1)).isInstanceOf(ResourceNotFoundException.class);
+        assertThatThrownBy(() -> visitorService.getTasteProfile(1L)).isInstanceOf(ResourceNotFoundException.class);
     }
 
     @Test
@@ -98,11 +98,11 @@ class VisitorServiceTest {
         TasteProfile profile = new TasteProfile();
         profile.setVisitor(visitor);
         profile.setUpdatedAt(LocalDateTime.of(2020, 1, 1, 0, 0));
-        when(visitorRepository.findById(1)).thenReturn(Optional.of(visitor));
-        when(tasteProfileRepository.findByVisitorVisitorId(1)).thenReturn(Optional.of(profile));
+        when(visitorRepository.findById(1L)).thenReturn(Optional.of(visitor));
+        when(tasteProfileRepository.findByVisitorVisitorId(1L)).thenReturn(Optional.of(profile));
         when(tasteProfileRepository.save(profile)).thenReturn(profile);
 
-        TasteProfileResponse saved = visitorService.saveTasteProfile(1,
+        TasteProfileResponse saved = visitorService.saveTasteProfile(1L,
                 new TasteProfileRequest(List.of("rojo"), null, null, "low"));
 
         assertThat(saved.preferredColors()).containsExactly("rojo");
@@ -111,8 +111,8 @@ class VisitorServiceTest {
 
     @Test
     void unknownVisitorIs404() {
-        when(visitorRepository.findById(77)).thenReturn(Optional.empty());
+        when(visitorRepository.findById(77L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> visitorService.findById(77)).hasMessage("Visitor 77 not found");
+        assertThatThrownBy(() -> visitorService.findById(77L)).hasMessage("Visitor 77 not found");
     }
 }

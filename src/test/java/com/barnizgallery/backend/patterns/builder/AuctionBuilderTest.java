@@ -67,7 +67,7 @@ class AuctionBuilderTest {
 
     @Test
     void artworkCannotHaveAnotherOpenAuction() {
-        when(auctionRepository.existsByArtworkArtworkIdAndStatusIn(eq(5), anyCollection())).thenReturn(true);
+        when(auctionRepository.existsByArtworkArtworkIdAndStatusIn(eq(5L), anyCollection())).thenReturn(true);
 
         assertThatThrownBy(() -> builder().forArtwork(artwork).basePrice(BigDecimal.TEN)
                 .startsAt(NOW).endsAt(NOW.plusDays(1)).build())

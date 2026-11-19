@@ -12,7 +12,7 @@ import com.barnizgallery.backend.exception.BusinessRuleException;
  * <b>Factory Method pattern – Creator (abstract).</b>
  * <p>
  * Creates {@link Interaction} objects (the Product). The common steps live in
- * {@link #create(Visitor, Artwork, Integer)}; each subclass (ConcreteCreator) decides
+ * {@link #create(Visitor, Artwork, Long)}; each subclass (ConcreteCreator) decides
  * the parts that change: which action it creates ({@link #action()}, the factory method),
  * how much the interaction is worth for recommendations ({@link #weight()}) and
  * its own validation ({@link #validateDuration(Integer)}).

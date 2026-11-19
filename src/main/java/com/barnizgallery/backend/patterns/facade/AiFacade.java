@@ -102,7 +102,7 @@ public class AiFacade {
      * </ul>
      * When AI is enabled it can also mark the bid as SUSPICIOUS (never reject it).
      */
-    public BidAssessment assessBid(Auction auction, BigDecimal amount, Integer visitorId) {
+    public BidAssessment assessBid(Auction auction, BigDecimal amount, Long visitorId) {
 
         long recentBids = bidRepository.countByVisitorVisitorIdAndBidDateAfter(visitorId,
                 LocalDateTime.now().minusSeconds(60));

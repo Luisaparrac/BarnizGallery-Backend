@@ -45,23 +45,23 @@ public class VisitorController {
     }
 
     @GetMapping("/{id}")
-    public VisitorResponse findById(@PathVariable Integer id) {
+    public VisitorResponse findById(@PathVariable Long id) {
         return visitorService.findById(id);
     }
 
     @PatchMapping("/{id}/preferences")
-    public VisitorResponse updatePreferences(@PathVariable Integer id,
+    public VisitorResponse updatePreferences(@PathVariable Long id,
             @Valid @RequestBody VisitorPreferencesRequest request) {
         return visitorService.updatePreferences(id, request);
     }
 
     @GetMapping("/{id}/taste-profile")
-    public TasteProfileResponse getTasteProfile(@PathVariable Integer id) {
+    public TasteProfileResponse getTasteProfile(@PathVariable Long id) {
         return visitorService.getTasteProfile(id);
     }
 
     @PutMapping("/{id}/taste-profile")
-    public TasteProfileResponse saveTasteProfile(@PathVariable Integer id,
+    public TasteProfileResponse saveTasteProfile(@PathVariable Long id,
             @Valid @RequestBody TasteProfileRequest request) {
         return visitorService.saveTasteProfile(id, request);
     }

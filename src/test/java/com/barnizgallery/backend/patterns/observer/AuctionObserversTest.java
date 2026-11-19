@@ -34,10 +34,10 @@ class AuctionObserversTest {
 
     private final SimpMessageSendingOperations messaging = mock(SimpMessageSendingOperations.class);
 
-    private static AuctionEvent bidEvent(int bidderId, Integer previousTopBidderId) {
-        BidResponse bid = new BidResponse(10, 1, bidderId, "Visitor", new BigDecimal("500"), "USD",
+    private static AuctionEvent bidEvent(long bidderId, Long previousTopBidderId) {
+        BidResponse bid = new BidResponse(10L, 1L, bidderId, "Visitor", new BigDecimal("500"), "USD",
                 LocalDateTime.now());
-        return AuctionEvent.bidPlaced(1, 7, bid, previousTopBidderId);
+        return AuctionEvent.bidPlaced(1L, 7L, bid, previousTopBidderId);
     }
 
     @Test
@@ -47,7 +47,7 @@ class AuctionObserversTest {
         AuctionObserver second = received::add;
         AuctionEventPublisher publisher = new AuctionEventPublisher(List.of(first, second));
 
-        publisher.publish(AuctionEvent.of(AuctionEventType.AUCTION_STARTED, 1, 7));
+        publisher.publish(AuctionEvent.of(AuctionEventType.AUCTION_STARTED, 1L, 7L));
 
         assertThat(received).hasSize(2);
     }
@@ -60,7 +60,7 @@ class AuctionObserversTest {
         };
         AuctionEventPublisher publisher = new AuctionEventPublisher(List.of(failing, received::add));
 
-        publisher.publish(AuctionEvent.of(AuctionEventType.AUCTION_CANCELLED, 1, 7));
+        publisher.publish(AuctionEvent.of(AuctionEventType.AUCTION_CANCELLED, 1L, 7L));
 
         assertThat(received).hasSize(1);
     }
@@ -76,7 +76,7 @@ class AuctionObserversTest {
 
     @Test
     void outbidNotifierWarnsThePreviousTopBidder() {
-        new OutbidNotifier(messaging).onEvent(bidEvent(3, 8));
+        new OutbidNotifier(messaging).onEvent(bidEvent(3, 8L));
 
         ArgumentCaptor<Object> payload = ArgumentCaptor.forClass(Object.class);
         verify(messaging).convertAndSend(eq("/topic/visitors/8/notifications"), payload.capture());
@@ -88,8 +88,8 @@ class AuctionObserversTest {
         OutbidNotifier notifier = new OutbidNotifier(messaging);
 
         notifier.onEvent(bidEvent(3, null));
-        notifier.onEvent(bidEvent(3, 3));
-        notifier.onEvent(AuctionEvent.of(AuctionEventType.AUCTION_STARTED, 1, 7));
+        notifier.onEvent(bidEvent(3, 3L));
+        notifier.onEvent(AuctionEvent.of(AuctionEventType.AUCTION_STARTED, 1L, 7L));
 
         verify(messaging, never()).convertAndSend(anyString(), any(Object.class));
     }
@@ -100,12 +100,12 @@ class AuctionObserversTest {
         TasteProfileRepository tasteProfileRepository = mock(TasteProfileRepository.class);
         Artwork artwork = TestEntities.artwork(7, TestEntities.room(1, TestEntities.master(1)),
                 ArtworkStatus.IN_AUCTION, "Rojo", "dorado");
-        when(artworkRepository.findById(7)).thenReturn(Optional.of(artwork));
+        when(artworkRepository.findById(7L)).thenReturn(Optional.of(artwork));
         when(tasteProfileRepository.findAll()).thenReturn(List.of(profile(1, "rojo"), profile(2, "azul"),
                 profile(3, "DORADO", "verde")));
 
         new MatchingAuctionNotifier(artworkRepository, tasteProfileRepository, messaging)
-                .onEvent(AuctionEvent.of(AuctionEventType.AUCTION_STARTED, 1, 7));
+                .onEvent(AuctionEvent.of(AuctionEventType.AUCTION_STARTED, 1L, 7L));
 
         verify(messaging).convertAndSend(eq("/topic/visitors/1/notifications"), any(Object.class));
         verify(messaging).convertAndSend(eq("/topic/visitors/3/notifications"), any(Object.class));

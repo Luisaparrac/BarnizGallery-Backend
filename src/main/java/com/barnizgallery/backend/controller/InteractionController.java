@@ -39,7 +39,7 @@ public class InteractionController {
     }
 
     @GetMapping("/api/visitors/{id}/interactions")
-    public List<InteractionResponse> history(@PathVariable Integer id) {
+    public List<InteractionResponse> history(@PathVariable Long id) {
         return interactionService.history(id);
     }
 }

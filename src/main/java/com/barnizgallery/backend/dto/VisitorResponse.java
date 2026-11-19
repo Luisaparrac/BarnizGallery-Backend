@@ -7,7 +7,7 @@ import com.barnizgallery.backend.enums.Language;
  * A visitor.
  */
 public record VisitorResponse(
-        Integer visitorId,
+        Long visitorId,
         String name,
         String email,
         String country,

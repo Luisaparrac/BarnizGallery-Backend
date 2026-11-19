@@ -49,13 +49,13 @@ class InteractionServiceTest {
 
     @Test
     void recordUsesTheFactoryOfTheAction() {
-        when(visitorService.getVisitor(1)).thenReturn(TestEntities.visitor(1, Language.ES));
-        when(artworkService.getArtwork(2)).thenReturn(
+        when(visitorService.getVisitor(1L)).thenReturn(TestEntities.visitor(1, Language.ES));
+        when(artworkService.getArtwork(2L)).thenReturn(
                 TestEntities.artwork(2, TestEntities.room(1, TestEntities.master(1)), ArtworkStatus.EXHIBITED));
         when(interactionRepository.save(any(Interaction.class))).thenAnswer(inv -> inv.getArgument(0));
 
         InteractionResponse response = interactionService.record(
-                new InteractionRequest(1, 2, InteractionAction.ZOOM, null));
+                new InteractionRequest(1L, 2L, InteractionAction.ZOOM, null));
 
         assertThat(response.action()).isEqualTo(InteractionAction.ZOOM);
         assertThat(response.artworkId()).isEqualTo(2);
@@ -63,7 +63,7 @@ class InteractionServiceTest {
 
     @Test
     void bidCannotBeRecordedFromTheEndpoint() {
-        assertThatThrownBy(() -> interactionService.record(new InteractionRequest(1, 2, InteractionAction.BID, null)))
+        assertThatThrownBy(() -> interactionService.record(new InteractionRequest(1L, 2L, InteractionAction.BID, null)))
                 .isInstanceOf(BusinessRuleException.class);
         verify(interactionRepository, never()).save(any());
     }

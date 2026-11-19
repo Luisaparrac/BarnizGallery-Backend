@@ -7,7 +7,7 @@ import java.math.BigDecimal;
  */
 public interface AuctionBidStats {
 
-    Integer getAuctionId();
+    Long getAuctionId();
 
     BigDecimal getHighest();
 

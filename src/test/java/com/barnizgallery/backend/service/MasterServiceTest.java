@@ -49,11 +49,11 @@ class MasterServiceTest {
     void findByIdIncludesRoomWithArtworkCount() {
         Master master = TestEntities.master(1);
         Room room = TestEntities.room(10, master);
-        when(masterRepository.findById(1)).thenReturn(Optional.of(master));
-        when(roomRepository.findByMasterMasterId(1)).thenReturn(Optional.of(room));
-        when(artworkRepository.countByRoomRoomId(10)).thenReturn(4L);
+        when(masterRepository.findById(1L)).thenReturn(Optional.of(master));
+        when(roomRepository.findByMasterMasterId(1L)).thenReturn(Optional.of(room));
+        when(artworkRepository.countByRoomRoomId(10L)).thenReturn(4L);
 
-        MasterDetailResponse detail = masterService.findById(1);
+        MasterDetailResponse detail = masterService.findById(1L);
 
         assertThat(detail.masterId()).isEqualTo(1);
         assertThat(detail.room().roomId()).isEqualTo(10);
@@ -62,17 +62,17 @@ class MasterServiceTest {
 
     @Test
     void findByIdWithoutRoomReturnsNullRoom() {
-        when(masterRepository.findById(1)).thenReturn(Optional.of(TestEntities.master(1)));
-        when(roomRepository.findByMasterMasterId(1)).thenReturn(Optional.empty());
+        when(masterRepository.findById(1L)).thenReturn(Optional.of(TestEntities.master(1)));
+        when(roomRepository.findByMasterMasterId(1L)).thenReturn(Optional.empty());
 
-        assertThat(masterService.findById(1).room()).isNull();
+        assertThat(masterService.findById(1L).room()).isNull();
     }
 
     @Test
     void findByIdThrows404WhenMissing() {
-        when(masterRepository.findById(99)).thenReturn(Optional.empty());
+        when(masterRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> masterService.findById(99))
+        assertThatThrownBy(() -> masterService.findById(99L))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage("Master 99 not found");
     }
@@ -80,9 +80,9 @@ class MasterServiceTest {
     @Test
     void updateCopiesRequestFields() {
         Master master = TestEntities.master(1);
-        when(masterRepository.findById(1)).thenReturn(Optional.of(master));
+        when(masterRepository.findById(1L)).thenReturn(Optional.of(master));
 
-        MasterResponse updated = masterService.update(1,
+        MasterResponse updated = masterService.update(1L,
                 new MasterRequest("New name", "Bio ES", "Bio EN", "Workshop", "contact"));
 
         assertThat(updated.name()).isEqualTo("New name");

@@ -9,13 +9,13 @@ import com.barnizgallery.backend.dto.GalleryNodeResponse;
  */
 public class RoomComposite extends CompositeGalleryComponent {
 
-    private final Integer id;
+    private final Long id;
     private final String nameEs;
     private final String nameEn;
-    private final Integer masterId;
+    private final Long masterId;
     private final String masterName;
 
-    public RoomComposite(Integer id, String nameEs, String nameEn, Integer masterId, String masterName) {
+    public RoomComposite(Long id, String nameEs, String nameEn, Long masterId, String masterName) {
         this.id = id;
         this.nameEs = nameEs;
         this.nameEn = nameEn;
@@ -24,7 +24,7 @@ public class RoomComposite extends CompositeGalleryComponent {
     }
 
     @Override
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 

@@ -49,10 +49,10 @@ class ArtworkServiceTest {
 
     @Test
     void findAllUsesTheRightFilter() {
-        when(artworkRepository.findByRoomRoomIdAndStatusOrderByArtworkIdAsc(1, ArtworkStatus.SOLD))
+        when(artworkRepository.findByRoomRoomIdAndStatusOrderByArtworkIdAsc(1L, ArtworkStatus.SOLD))
                 .thenReturn(List.of(TestEntities.artwork(7, room, ArtworkStatus.SOLD)));
 
-        List<ArtworkSummaryResponse> result = artworkService.findAll(1, ArtworkStatus.SOLD);
+        List<ArtworkSummaryResponse> result = artworkService.findAll(1L, ArtworkStatus.SOLD);
 
         assertThat(result).singleElement().satisfies(a -> {
             assertThat(a.artworkId()).isEqualTo(7);
@@ -71,13 +71,13 @@ class ArtworkServiceTest {
     @Test
     void detailIncludesPhotosAndNoAuctionWhenAbsent() {
         Artwork artwork = TestEntities.artwork(3, room, ArtworkStatus.EXHIBITED);
-        when(artworkRepository.findById(3)).thenReturn(Optional.of(artwork));
-        when(photoRepository.findByArtworkArtworkIdOrderByPhotoIdAsc(3))
+        when(artworkRepository.findById(3L)).thenReturn(Optional.of(artwork));
+        when(photoRepository.findByArtworkArtworkIdOrderByPhotoIdAsc(3L))
                 .thenReturn(List.of(TestEntities.photo(1, artwork, "https://img/1.jpg")));
-        when(auctionRepository.findFirstByArtworkArtworkIdAndStatusInOrderByStartDateDesc(eq(3), anyCollection()))
+        when(auctionRepository.findFirstByArtworkArtworkIdAndStatusInOrderByStartDateDesc(eq(3L), anyCollection()))
                 .thenReturn(Optional.empty());
 
-        ArtworkDetailResponse detail = artworkService.findById(3);
+        ArtworkDetailResponse detail = artworkService.findById(3L);
 
         assertThat(detail.photos()).hasSize(1);
         assertThat(detail.currentAuction()).isNull();
@@ -85,11 +85,11 @@ class ArtworkServiceTest {
 
     @Test
     void createStartsAsExhibited() {
-        when(roomService.getRoom(1)).thenReturn(room);
+        when(roomService.getRoom(1L)).thenReturn(room);
         when(artworkRepository.save(any(Artwork.class))).thenAnswer(inv -> inv.getArgument(0));
 
         ArtworkSummaryResponse created = artworkService.create(
-                new ArtworkRequest(1, "Obra", "Artwork", null, null, null, null, List.of("red"), List.of()));
+                new ArtworkRequest(1L, "Obra", "Artwork", null, null, null, null, List.of("red"), List.of()));
 
         assertThat(created.status()).isEqualTo(ArtworkStatus.EXHIBITED);
         assertThat(created.colorTags()).containsExactly("red");
@@ -98,10 +98,10 @@ class ArtworkServiceTest {
     @Test
     void updateDoesNotChangeStatus() {
         Artwork artwork = TestEntities.artwork(3, room, ArtworkStatus.IN_AUCTION);
-        when(artworkRepository.findById(3)).thenReturn(Optional.of(artwork));
+        when(artworkRepository.findById(3L)).thenReturn(Optional.of(artwork));
 
-        ArtworkSummaryResponse updated = artworkService.update(3,
-                new ArtworkRequest(1, "Nuevo", "New", null, null, null, null, null, null));
+        ArtworkSummaryResponse updated = artworkService.update(3L,
+                new ArtworkRequest(1L, "Nuevo", "New", null, null, null, null, null, null));
 
         assertThat(updated.titleEn()).isEqualTo("New");
         assertThat(updated.status()).isEqualTo(ArtworkStatus.IN_AUCTION);
@@ -109,8 +109,8 @@ class ArtworkServiceTest {
 
     @Test
     void missingArtworkIs404() {
-        when(artworkRepository.findById(99)).thenReturn(Optional.empty());
+        when(artworkRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> artworkService.getArtwork(99)).isInstanceOf(ResourceNotFoundException.class);
+        assertThatThrownBy(() -> artworkService.getArtwork(99L)).isInstanceOf(ResourceNotFoundException.class);
     }
 }

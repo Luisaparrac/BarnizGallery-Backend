@@ -64,7 +64,7 @@ public class AuctionService {
     }
 
     @Transactional
-    public AuctionResponse findById(Integer auctionId) {
+    public AuctionResponse findById(Long auctionId) {
         return assembler.toResponse(getSyncedAuction(auctionId));
     }
 
@@ -93,7 +93,7 @@ public class AuctionService {
     }
 
     @Transactional
-    public AuctionResponse start(Integer auctionId) {
+    public AuctionResponse start(Long auctionId) {
         AuctionContext context = contextFor(getAuction(auctionId));
         context.start();
         publish(context.getAuction(), context.getStatus());
@@ -101,7 +101,7 @@ public class AuctionService {
     }
 
     @Transactional
-    public AuctionResponse finish(Integer auctionId) {
+    public AuctionResponse finish(Long auctionId) {
         AuctionContext context = contextFor(getAuction(auctionId));
         context.finish();
         publish(context.getAuction(), context.getStatus());
@@ -109,7 +109,7 @@ public class AuctionService {
     }
 
     @Transactional
-    public AuctionResponse cancel(Integer auctionId) {
+    public AuctionResponse cancel(Long auctionId) {
         AuctionContext context = contextFor(getAuction(auctionId));
         context.cancel();
         publish(context.getAuction(), context.getStatus());
@@ -136,7 +136,7 @@ public class AuctionService {
 
     /** Loads an auction and brings its status up to date with the current time. */
     @Transactional
-    public Auction getSyncedAuction(Integer auctionId) {
+    public Auction getSyncedAuction(Long auctionId) {
         Auction auction = getAuction(auctionId);
         sync(auction, LocalDateTime.now(clock));
         return auction;
@@ -144,7 +144,7 @@ public class AuctionService {
 
     /** Same as {@link #getSyncedAuction} but locks the auction row until the transaction ends. */
     @Transactional
-    public Auction getSyncedAuctionForUpdate(Integer auctionId) {
+    public Auction getSyncedAuctionForUpdate(Long auctionId) {
         Auction auction = auctionRepository.findByIdForUpdate(auctionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Auction", auctionId));
         sync(auction, LocalDateTime.now(clock));
@@ -177,7 +177,7 @@ public class AuctionService {
         }
     }
 
-    private Auction getAuction(Integer auctionId) {
+    private Auction getAuction(Long auctionId) {
         return auctionRepository.findByIdWithArtwork(auctionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Auction", auctionId));
     }

@@ -11,16 +11,16 @@ import com.barnizgallery.backend.entity.Room;
 /**
  * Spring Data repository for {@link Room}.
  */
-public interface RoomRepository extends JpaRepository<Room, Integer> {
+public interface RoomRepository extends JpaRepository<Room, Long> {
 
     /** All rooms with their master loaded in the same query (avoids N+1). */
     @Query("select r from Room r join fetch r.master order by r.roomId")
     List<Room> findAllWithMaster();
 
     @Query("select r from Room r join fetch r.master where r.roomId = :roomId")
-    Optional<Room> findByIdWithMaster(Integer roomId);
+    Optional<Room> findByIdWithMaster(Long roomId);
 
-    Optional<Room> findByMasterMasterId(Integer masterId);
+    Optional<Room> findByMasterMasterId(Long masterId);
 
-    boolean existsByMasterMasterId(Integer masterId);
+    boolean existsByMasterMasterId(Long masterId);
 }

@@ -61,7 +61,7 @@ public class InteractionService {
     }
 
     @Transactional(readOnly = true)
-    public List<InteractionResponse> history(Integer visitorId) {
+    public List<InteractionResponse> history(Long visitorId) {
         visitorService.getVisitor(visitorId);
         return interactionRepository.findHistory(visitorId).stream()
                 .map(InteractionMapper::toResponse)

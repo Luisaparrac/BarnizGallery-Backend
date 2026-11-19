@@ -70,7 +70,7 @@ class VisitorControllerTest {
 
     private static IdentifyVisitorResponse response(boolean isNew) {
         return new IdentifyVisitorResponse(
-                new VisitorResponse(1, "Ana", "ana@mail.com", "Colombia", Language.ES, CameraMode.FIRST_PERSON),
+                new VisitorResponse(1L, "Ana", "ana@mail.com", "Colombia", Language.ES, CameraMode.FIRST_PERSON),
                 isNew);
     }
 }

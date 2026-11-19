@@ -20,7 +20,7 @@ public class Photo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "photo_id")
-    private Integer photoId;
+    private Long photoId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "artwork_id", nullable = false)
@@ -32,11 +32,11 @@ public class Photo {
     @Column(name = "angle", length = 50)
     private String angle;
 
-    public Integer getPhotoId() {
+    public Long getPhotoId() {
         return photoId;
     }
 
-    public void setPhotoId(Integer photoId) {
+    public void setPhotoId(Long photoId) {
         this.photoId = photoId;
     }
 

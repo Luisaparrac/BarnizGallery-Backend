@@ -10,9 +10,9 @@ import com.barnizgallery.backend.entity.Photo;
 /**
  * Spring Data repository for {@link Photo}.
  */
-public interface PhotoRepository extends JpaRepository<Photo, Integer> {
+public interface PhotoRepository extends JpaRepository<Photo, Long> {
 
-    List<Photo> findByArtworkArtworkIdOrderByPhotoIdAsc(Integer artworkId);
+    List<Photo> findByArtworkArtworkIdOrderByPhotoIdAsc(Long artworkId);
 
     /** The first photo (lowest id) of every artwork, in a single query. Used as thumbnail. */
     @Query("select p from Photo p where p.photoId in "

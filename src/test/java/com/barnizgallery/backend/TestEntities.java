@@ -23,14 +23,14 @@ public final class TestEntities {
     private TestEntities() {
     }
 
-    public static Master master(int id) {
+    public static Master master(long id) {
         Master master = new Master();
         master.setMasterId(id);
         master.setName("Test master " + id);
         return master;
     }
 
-    public static Room room(int id, Master master) {
+    public static Room room(long id, Master master) {
         Room room = new Room();
         room.setRoomId(id);
         room.setMaster(master);
@@ -39,7 +39,7 @@ public final class TestEntities {
         return room;
     }
 
-    public static Artwork artwork(int id, Room room, ArtworkStatus status, String... colorTags) {
+    public static Artwork artwork(long id, Room room, ArtworkStatus status, String... colorTags) {
         Artwork artwork = new Artwork();
         artwork.setArtworkId(id);
         artwork.setRoom(room);
@@ -50,7 +50,7 @@ public final class TestEntities {
         return artwork;
     }
 
-    public static Photo photo(int id, Artwork artwork, String url) {
+    public static Photo photo(long id, Artwork artwork, String url) {
         Photo photo = new Photo();
         photo.setPhotoId(id);
         photo.setArtwork(artwork);
@@ -58,7 +58,7 @@ public final class TestEntities {
         return photo;
     }
 
-    public static Visitor visitor(int id, Language language) {
+    public static Visitor visitor(long id, Language language) {
         Visitor visitor = new Visitor();
         visitor.setVisitorId(id);
         visitor.setName("Visitor " + id);
@@ -68,7 +68,7 @@ public final class TestEntities {
         return visitor;
     }
 
-    public static Auction auction(int id, Artwork artwork, AuctionStatus status, LocalDateTime start,
+    public static Auction auction(long id, Artwork artwork, AuctionStatus status, LocalDateTime start,
             LocalDateTime end, String basePrice) {
         Auction auction = new Auction();
         auction.setAuctionId(id);

@@ -50,13 +50,13 @@ public class ArtworkController {
     }
 
     @GetMapping
-    public List<ArtworkSummaryResponse> findAll(@RequestParam(required = false) Integer roomId,
+    public List<ArtworkSummaryResponse> findAll(@RequestParam(required = false) Long roomId,
             @RequestParam(required = false) ArtworkStatus status) {
         return artworkService.findAll(roomId, status);
     }
 
     @GetMapping("/{id}")
-    public ArtworkDetailResponse findById(@PathVariable Integer id) {
+    public ArtworkDetailResponse findById(@PathVariable Long id) {
         return artworkService.findById(id);
     }
 
@@ -67,17 +67,17 @@ public class ArtworkController {
     }
 
     @PutMapping("/{id}")
-    public ArtworkSummaryResponse update(@PathVariable Integer id, @Valid @RequestBody ArtworkRequest request) {
+    public ArtworkSummaryResponse update(@PathVariable Long id, @Valid @RequestBody ArtworkRequest request) {
         return artworkService.update(id, request);
     }
 
     @GetMapping("/{id}/photos")
-    public List<PhotoResponse> findPhotos(@PathVariable Integer id) {
+    public List<PhotoResponse> findPhotos(@PathVariable Long id) {
         return photoService.findByArtwork(id);
     }
 
     @PostMapping("/{id}/photos")
-    public ResponseEntity<PhotoResponse> addPhoto(@PathVariable Integer id,
+    public ResponseEntity<PhotoResponse> addPhoto(@PathVariable Long id,
             @Valid @RequestBody PhotoRequest request) {
         PhotoResponse created = photoService.addByUrl(id, request);
         return ResponseEntity.created(URI.create("/api/artworks/" + id + "/photos")).body(created);
@@ -85,7 +85,7 @@ public class ArtworkController {
 
     /** Multipart upload. Returns 503 while no storage provider is configured. */
     @PostMapping(path = "/{id}/photos/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<PhotoResponse> uploadPhoto(@PathVariable Integer id,
+    public ResponseEntity<PhotoResponse> uploadPhoto(@PathVariable Long id,
             @RequestPart("file") MultipartFile file,
             @RequestParam(required = false) String angle) {
         PhotoResponse created = photoService.upload(id, file, angle);
@@ -94,7 +94,7 @@ public class ArtworkController {
 
     /** Base price suggested by the AI. Returns 503 while AI is disabled. */
     @GetMapping("/{id}/suggested-price")
-    public SuggestedPriceResponse suggestedPrice(@PathVariable Integer id) {
+    public SuggestedPriceResponse suggestedPrice(@PathVariable Long id) {
         return pricingService.suggestedPrice(id);
     }
 }

@@ -20,7 +20,7 @@ public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "room_id")
-    private Integer roomId;
+    private Long roomId;
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "master_id", nullable = false, unique = true)
@@ -41,11 +41,11 @@ public class Room {
     @Column(name = "scene_3d_url", length = 255)
     private String scene3dUrl;
 
-    public Integer getRoomId() {
+    public Long getRoomId() {
         return roomId;
     }
 
-    public void setRoomId(Integer roomId) {
+    public void setRoomId(Long roomId) {
         this.roomId = roomId;
     }
 

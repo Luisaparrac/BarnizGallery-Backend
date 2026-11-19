@@ -53,7 +53,7 @@ public class ContactMessageService {
     }
 
     @Transactional(readOnly = true)
-    public List<ContactMessageResponse> findByMaster(Integer masterId) {
+    public List<ContactMessageResponse> findByMaster(Long masterId) {
         masterService.getMaster(masterId);
         return contactMessageRepository.findByMasterWithVisitor(masterId).stream()
                 .map(ContactMessageMapper::toResponse)

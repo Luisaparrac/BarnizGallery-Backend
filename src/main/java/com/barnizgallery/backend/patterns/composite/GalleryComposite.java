@@ -14,7 +14,7 @@ public class GalleryComposite extends CompositeGalleryComponent {
     private static final String NAME_EN = "Barniz de Pasto Mopa-Mopa Gallery";
 
     @Override
-    public Integer getId() {
+    public Long getId() {
         return null;
     }
 

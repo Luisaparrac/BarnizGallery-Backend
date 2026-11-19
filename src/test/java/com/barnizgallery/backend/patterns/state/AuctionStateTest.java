@@ -22,7 +22,7 @@ import com.barnizgallery.backend.exception.BusinessRuleException;
 class AuctionStateTest {
 
     private static final LocalDateTime NOW = LocalDateTime.of(2026, 10, 8, 12, 0);
-    private static final BidRequest BID = new BidRequest(1, new BigDecimal("10"), "USD");
+    private static final BidRequest BID = new BidRequest(1L, new BigDecimal("10"), "USD");
 
     private Artwork artwork;
 

@@ -50,21 +50,21 @@ class AuctionServiceTest {
         auctionService = new AuctionService(auctionRepository, bidRepository, artworkService, mock(AiFacade.class),
                 assembler, publisher, Clock.fixed(NOW.atZone(ZONE).toInstant(), ZONE));
         artwork = TestEntities.artwork(5, TestEntities.room(1, TestEntities.master(1)), ArtworkStatus.EXHIBITED);
-        when(artworkService.getArtwork(5)).thenReturn(artwork);
-        when(auctionRepository.existsByArtworkArtworkIdAndStatusIn(eq(5), anyCollection())).thenReturn(false);
+        when(artworkService.getArtwork(5L)).thenReturn(artwork);
+        when(auctionRepository.existsByArtworkArtworkIdAndStatusIn(eq(5L), anyCollection())).thenReturn(false);
         when(auctionRepository.save(any(Auction.class))).thenAnswer(inv -> inv.getArgument(0));
     }
 
     @Test
     void creatingAnAuctionThatStartsNowPutsArtworkInAuction() {
-        auctionService.create(new CreateAuctionRequest(5, new BigDecimal("100"), NOW, NOW.plusDays(2)));
+        auctionService.create(new CreateAuctionRequest(5L, new BigDecimal("100"), NOW, NOW.plusDays(2)));
 
         assertThat(artwork.getStatus()).isEqualTo(ArtworkStatus.IN_AUCTION);
     }
 
     @Test
     void creatingAFutureAuctionKeepsArtworkExhibited() {
-        auctionService.create(new CreateAuctionRequest(5, new BigDecimal("100"), NOW.plusDays(1), NOW.plusDays(2)));
+        auctionService.create(new CreateAuctionRequest(5L, new BigDecimal("100"), NOW.plusDays(1), NOW.plusDays(2)));
 
         assertThat(artwork.getStatus()).isEqualTo(ArtworkStatus.EXHIBITED);
     }
@@ -86,9 +86,9 @@ class AuctionServiceTest {
     void cancellingPublishesAuctionCancelled() {
         Auction scheduled = TestEntities.auction(1, artwork, AuctionStatus.SCHEDULED, NOW.plusDays(1),
                 NOW.plusDays(2), "100");
-        when(auctionRepository.findByIdWithArtwork(1)).thenReturn(Optional.of(scheduled));
+        when(auctionRepository.findByIdWithArtwork(1L)).thenReturn(Optional.of(scheduled));
 
-        auctionService.cancel(1);
+        auctionService.cancel(1L);
 
         ArgumentCaptor<AuctionEvent> event = ArgumentCaptor.forClass(AuctionEvent.class);
         verify(publisher).publish(event.capture());
@@ -101,10 +101,10 @@ class AuctionServiceTest {
         artwork.setStatus(ArtworkStatus.IN_AUCTION);
         Auction expired = TestEntities.auction(1, artwork, AuctionStatus.ACTIVE, NOW.minusDays(3),
                 NOW.minusDays(1), "100");
-        when(auctionRepository.findByIdWithArtwork(1)).thenReturn(Optional.of(expired));
-        when(bidRepository.countByAuctionAuctionId(1)).thenReturn(2L);
+        when(auctionRepository.findByIdWithArtwork(1L)).thenReturn(Optional.of(expired));
+        when(bidRepository.countByAuctionAuctionId(1L)).thenReturn(2L);
 
-        auctionService.getSyncedAuction(1);
+        auctionService.getSyncedAuction(1L);
 
         assertThat(expired.getStatus()).isEqualTo(AuctionStatus.FINISHED);
         assertThat(artwork.getStatus()).isEqualTo(ArtworkStatus.SOLD);

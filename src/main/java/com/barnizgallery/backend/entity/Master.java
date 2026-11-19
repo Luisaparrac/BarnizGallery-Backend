@@ -17,7 +17,7 @@ public class Master {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "master_id")
-    private Integer masterId;
+    private Long masterId;
 
     @Column(name = "name", nullable = false, length = 100)
     private String name;
@@ -34,11 +34,11 @@ public class Master {
     @Column(name = "contact_info", length = 200)
     private String contactInfo;
 
-    public Integer getMasterId() {
+    public Long getMasterId() {
         return masterId;
     }
 
-    public void setMasterId(Integer masterId) {
+    public void setMasterId(Long masterId) {
         this.masterId = masterId;
     }
 

@@ -29,7 +29,7 @@ public class PricingService {
 
     /** Suggested base price; 503 when AI is disabled or cannot give a price. */
     @Transactional(readOnly = true)
-    public SuggestedPriceResponse suggestedPrice(Integer artworkId) {
+    public SuggestedPriceResponse suggestedPrice(Long artworkId) {
         Artwork artwork = artworkService.getArtwork(artworkId);
         if (!aiFacade.isAiEnabled()) {
             throw new FeatureDisabledException("AI is disabled: no price suggestion available");

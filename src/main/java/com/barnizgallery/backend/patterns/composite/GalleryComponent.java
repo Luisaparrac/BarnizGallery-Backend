@@ -14,7 +14,7 @@ import com.barnizgallery.backend.dto.GalleryNodeResponse;
 public interface GalleryComponent {
 
     /** Database id, or null for the gallery root. */
-    Integer getId();
+    Long getId();
 
     /** GALLERY, ROOM or ARTWORK. */
     String getType();

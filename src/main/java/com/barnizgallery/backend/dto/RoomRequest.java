@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
  * Body to create or update a room (one room per master).
  */
 public record RoomRequest(
-        @NotNull Integer masterId,
+        @NotNull Long masterId,
         @NotBlank @Size(max = 150) String nameEs,
         @NotBlank @Size(max = 150) String nameEn,
         String descriptionEs,

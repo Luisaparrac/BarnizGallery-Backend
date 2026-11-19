@@ -41,7 +41,7 @@ public class AuctionResponseAssembler {
         if (auctions.isEmpty()) {
             return List.of();
         }
-        Map<Integer, AuctionBidStats> stats = bidRepository
+        Map<Long, AuctionBidStats> stats = bidRepository
                 .findStats(auctions.stream().map(Auction::getAuctionId).toList()).stream()
                 .collect(Collectors.toMap(AuctionBidStats::getAuctionId, Function.identity()));
         String currency = auctionProperties.currency();

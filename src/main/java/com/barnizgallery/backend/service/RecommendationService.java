@@ -42,12 +42,12 @@ public class RecommendationService {
 
     /** Computes new recommendations, replaces the previous ones and returns them by score. */
     @Transactional
-    public List<RecommendationResponse> compute(Integer visitorId, String strategyName) {
+    public List<RecommendationResponse> compute(Long visitorId, String strategyName) {
         Visitor visitor = visitorService.getVisitor(visitorId);
         List<RecommendationResult> results = aiFacade.recommendRooms(visitor, strategyName);
 
         recommendationRepository.deleteByVisitorId(visitorId);
-        Map<Integer, Room> rooms = roomRepository.findAllById(results.stream().map(RecommendationResult::roomId)
+        Map<Long, Room> rooms = roomRepository.findAllById(results.stream().map(RecommendationResult::roomId)
                 .toList()).stream().collect(Collectors.toMap(Room::getRoomId, Function.identity()));
 
         LocalDateTime now = LocalDateTime.now();
@@ -71,7 +71,7 @@ public class RecommendationService {
     }
 
     @Transactional(readOnly = true)
-    public List<RecommendationResponse> latest(Integer visitorId) {
+    public List<RecommendationResponse> latest(Long visitorId) {
         visitorService.getVisitor(visitorId);
         return recommendationRepository.findByVisitorWithRoom(visitorId).stream()
                 .map(InteractionMapper::toResponse)

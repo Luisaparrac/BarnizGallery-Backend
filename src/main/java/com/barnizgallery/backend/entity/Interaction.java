@@ -27,7 +27,7 @@ public class Interaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "interaction_id")
-    private Integer interactionId;
+    private Long interactionId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "visitor_id", nullable = false)
@@ -55,11 +55,11 @@ public class Interaction {
         }
     }
 
-    public Integer getInteractionId() {
+    public Long getInteractionId() {
         return interactionId;
     }
 
-    public void setInteractionId(Integer interactionId) {
+    public void setInteractionId(Long interactionId) {
         this.interactionId = interactionId;
     }
 

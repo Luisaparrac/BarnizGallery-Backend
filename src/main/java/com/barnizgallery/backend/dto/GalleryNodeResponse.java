@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record GalleryNodeResponse(
-        Integer id,
+        Long id,
         String type,
         String nameEs,
         String nameEn,
@@ -28,7 +28,7 @@ public record GalleryNodeResponse(
         int availableForAuctionCount,
         String status,
         String thumbnailUrl,
-        Integer masterId,
+        Long masterId,
         String masterName,
         List<GalleryNodeResponse> children) {
 }

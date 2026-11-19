@@ -29,7 +29,7 @@ public class Artwork {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "artwork_id")
-    private Integer artworkId;
+    private Long artworkId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "room_id", nullable = false)
@@ -65,11 +65,11 @@ public class Artwork {
     @Column(name = "status", nullable = false, length = 30)
     private ArtworkStatus status;
 
-    public Integer getArtworkId() {
+    public Long getArtworkId() {
         return artworkId;
     }
 
-    public void setArtworkId(Integer artworkId) {
+    public void setArtworkId(Long artworkId) {
         this.artworkId = artworkId;
     }
 

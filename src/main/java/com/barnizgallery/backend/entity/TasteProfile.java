@@ -27,7 +27,7 @@ public class TasteProfile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "profile_id")
-    private Integer profileId;
+    private Long profileId;
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "visitor_id", nullable = false, unique = true)
@@ -59,11 +59,11 @@ public class TasteProfile {
         }
     }
 
-    public Integer getProfileId() {
+    public Long getProfileId() {
         return profileId;
     }
 
-    public void setProfileId(Integer profileId) {
+    public void setProfileId(Long profileId) {
         this.profileId = profileId;
     }
 

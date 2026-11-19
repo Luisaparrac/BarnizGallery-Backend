@@ -11,7 +11,7 @@ class GalleryCompositeTest {
 
     @Test
     void leafCountsItself() {
-        ArtworkLeaf leaf = new ArtworkLeaf(1, "Obra", "Artwork", ArtworkStatus.IN_AUCTION, null);
+        ArtworkLeaf leaf = new ArtworkLeaf(1L, "Obra", "Artwork", ArtworkStatus.IN_AUCTION, null);
 
         assertThat(leaf.countArtworks()).isEqualTo(1);
         assertThat(leaf.countAvailableForAuction()).isEqualTo(1);
@@ -19,12 +19,12 @@ class GalleryCompositeTest {
 
     @Test
     void compositesAddTheCountsOfTheirChildren() {
-        RoomComposite room1 = new RoomComposite(1, "Sala 1", "Room 1", 1, "Master 1");
-        room1.add(new ArtworkLeaf(1, "A", "A", ArtworkStatus.EXHIBITED, null));
-        room1.add(new ArtworkLeaf(2, "B", "B", ArtworkStatus.IN_AUCTION, null));
-        RoomComposite room2 = new RoomComposite(2, "Sala 2", "Room 2", 2, "Master 2");
-        room2.add(new ArtworkLeaf(3, "C", "C", ArtworkStatus.SOLD, null));
-        RoomComposite emptyRoom = new RoomComposite(3, "Sala 3", "Room 3", 3, "Master 3");
+        RoomComposite room1 = new RoomComposite(1L, "Sala 1", "Room 1", 1L, "Master 1");
+        room1.add(new ArtworkLeaf(1L, "A", "A", ArtworkStatus.EXHIBITED, null));
+        room1.add(new ArtworkLeaf(2L, "B", "B", ArtworkStatus.IN_AUCTION, null));
+        RoomComposite room2 = new RoomComposite(2L, "Sala 2", "Room 2", 2L, "Master 2");
+        room2.add(new ArtworkLeaf(3L, "C", "C", ArtworkStatus.SOLD, null));
+        RoomComposite emptyRoom = new RoomComposite(3L, "Sala 3", "Room 3", 3L, "Master 3");
         GalleryComposite gallery = new GalleryComposite();
         gallery.add(room1);
         gallery.add(room2);
@@ -38,8 +38,8 @@ class GalleryCompositeTest {
 
     @Test
     void toNodeBuildsTheTreeRecursively() {
-        RoomComposite room = new RoomComposite(1, "Sala", "Room", 7, "Master");
-        room.add(new ArtworkLeaf(5, "Obra", "Artwork", ArtworkStatus.EXHIBITED, "thumb.jpg"));
+        RoomComposite room = new RoomComposite(1L, "Sala", "Room", 7L, "Master");
+        room.add(new ArtworkLeaf(5L, "Obra", "Artwork", ArtworkStatus.EXHIBITED, "thumb.jpg"));
         GalleryComposite gallery = new GalleryComposite();
         gallery.add(room);
 

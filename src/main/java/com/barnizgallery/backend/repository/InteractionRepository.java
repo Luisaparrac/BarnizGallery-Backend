@@ -10,17 +10,17 @@ import com.barnizgallery.backend.entity.Interaction;
 /**
  * Spring Data repository for {@link Interaction}.
  */
-public interface InteractionRepository extends JpaRepository<Interaction, Integer> {
+public interface InteractionRepository extends JpaRepository<Interaction, Long> {
 
     /** History of a visitor, newest first. */
     @Query("select i from Interaction i where i.visitor.visitorId = :visitorId "
             + "order by i.interactionDate desc, i.interactionId desc")
-    List<Interaction> findHistory(Integer visitorId);
+    List<Interaction> findHistory(Long visitorId);
 
     /** Interactions of a visitor with the room of each artwork, in a single query. */
     @Query("select i.artwork.room.roomId as roomId, i.action as action, i.durationSeconds as durationSeconds "
             + "from Interaction i where i.visitor.visitorId = :visitorId")
-    List<RoomInteraction> findRoomInteractions(Integer visitorId);
+    List<RoomInteraction> findRoomInteractions(Long visitorId);
 
-    long countByVisitorVisitorId(Integer visitorId);
+    long countByVisitorVisitorId(Long visitorId);
 }

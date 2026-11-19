@@ -4,7 +4,7 @@ package com.barnizgallery.backend.dto;
  * A master with its room (room is null if it has none yet).
  */
 public record MasterDetailResponse(
-        Integer masterId,
+        Long masterId,
         String name,
         String biographyEs,
         String biographyEn,

@@ -15,19 +15,19 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record AuctionEvent(
         AuctionEventType type,
-        Integer auctionId,
-        Integer artworkId,
+        Long auctionId,
+        Long artworkId,
         BidResponse bid,
-        Integer previousTopBidderId,
+        Long previousTopBidderId,
         LocalDateTime timestamp) {
 
-    public static AuctionEvent bidPlaced(Integer auctionId, Integer artworkId, BidResponse bid,
-            Integer previousTopBidderId) {
+    public static AuctionEvent bidPlaced(Long auctionId, Long artworkId, BidResponse bid,
+            Long previousTopBidderId) {
         return new AuctionEvent(AuctionEventType.BID_PLACED, auctionId, artworkId, bid, previousTopBidderId,
                 LocalDateTime.now());
     }
 
-    public static AuctionEvent of(AuctionEventType type, Integer auctionId, Integer artworkId) {
+    public static AuctionEvent of(AuctionEventType type, Long auctionId, Long artworkId) {
         return new AuctionEvent(type, auctionId, artworkId, null, null, LocalDateTime.now());
     }
 }

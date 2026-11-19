@@ -38,11 +38,11 @@ public class GalleryTreeBuilder {
     }
 
     public GalleryComposite build() {
-        Map<Integer, String> thumbnails = photoRepository.findFirstPhotoOfEachArtwork().stream()
+        Map<Long, String> thumbnails = photoRepository.findFirstPhotoOfEachArtwork().stream()
                 .collect(Collectors.toMap(p -> p.getArtwork().getArtworkId(), Photo::getFileUrl));
 
         GalleryComposite gallery = new GalleryComposite();
-        Map<Integer, RoomComposite> rooms = new LinkedHashMap<>();
+        Map<Long, RoomComposite> rooms = new LinkedHashMap<>();
         for (Room room : roomRepository.findAllWithMaster()) {
             RoomComposite node = new RoomComposite(room.getRoomId(), room.getNameEs(), room.getNameEn(),
                     room.getMaster().getMasterId(), room.getMaster().getName());

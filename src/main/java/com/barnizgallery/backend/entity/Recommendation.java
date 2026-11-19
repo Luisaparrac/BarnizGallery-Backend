@@ -24,7 +24,7 @@ public class Recommendation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "recommendation_id")
-    private Integer recommendationId;
+    private Long recommendationId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "visitor_id", nullable = false)
@@ -51,11 +51,11 @@ public class Recommendation {
         }
     }
 
-    public Integer getRecommendationId() {
+    public Long getRecommendationId() {
         return recommendationId;
     }
 
-    public void setRecommendationId(Integer recommendationId) {
+    public void setRecommendationId(Long recommendationId) {
         this.recommendationId = recommendationId;
     }
 

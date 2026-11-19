@@ -8,8 +8,8 @@ import com.barnizgallery.backend.enums.ArtworkStatus;
  * Main data of an artwork, used in lists.
  */
 public record ArtworkSummaryResponse(
-        Integer artworkId,
-        Integer roomId,
+        Long artworkId,
+        Long roomId,
         String titleEs,
         String titleEn,
         String technique,

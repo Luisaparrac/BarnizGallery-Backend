@@ -66,11 +66,11 @@ class BidServiceTest {
         bidService = new BidService(bidRepository, auctionService, visitorService, aiFacade, publisher, messaging,
                 properties, Clock.fixed(NOW.atZone(ZONE).toInstant(), ZONE));
         givenAuction(AuctionStatus.ACTIVE);
-        when(visitorService.getVisitor(3)).thenReturn(visitor);
-        when(aiFacade.assessBid(any(), any(), eq(3))).thenReturn(BidAssessment.ok());
+        when(visitorService.getVisitor(3L)).thenReturn(visitor);
+        when(aiFacade.assessBid(any(), any(), eq(3L))).thenReturn(BidAssessment.ok());
         when(bidRepository.save(any(Bid.class))).thenAnswer(inv -> {
             Bid bid = inv.getArgument(0);
-            bid.setBidId(99);
+            bid.setBidId(99L);
             return bid;
         });
     }
@@ -79,7 +79,7 @@ class BidServiceTest {
         Artwork artwork = TestEntities.artwork(7, TestEntities.room(1, TestEntities.master(1)),
                 ArtworkStatus.IN_AUCTION);
         auction = TestEntities.auction(1, artwork, status, NOW.minusDays(1), NOW.plusDays(1), "100");
-        when(auctionService.getSyncedAuctionForUpdate(1)).thenReturn(auction);
+        when(auctionService.getSyncedAuctionForUpdate(1L)).thenReturn(auction);
         when(auctionService.contextFor(auction)).thenReturn(new AuctionContext(auction, () -> 0));
     }
 
@@ -87,18 +87,18 @@ class BidServiceTest {
         Bid top = new Bid();
         top.setAmount(new BigDecimal(amount));
         top.setVisitor(TestEntities.visitor(visitorId, Language.EN));
-        when(bidRepository.findFirstByAuctionAuctionIdOrderByAmountDescBidDateAsc(1)).thenReturn(Optional.of(top));
+        when(bidRepository.findFirstByAuctionAuctionIdOrderByAmountDescBidDateAsc(1L)).thenReturn(Optional.of(top));
     }
 
     private static BidRequest bid(String amount, String currency) {
-        return new BidRequest(3, new BigDecimal(amount), currency);
+        return new BidRequest(3L, new BigDecimal(amount), currency);
     }
 
     @Test
     void validBidIsSavedAndPublishedWithPreviousTopBidder() {
         givenTopBid("150", 8);
 
-        BidResponse saved = bidService.placeBid(1, bid("151", "usd"));
+        BidResponse saved = bidService.placeBid(1L, bid("151", "usd"));
 
         assertThat(saved.bidId()).isEqualTo(99);
         assertThat(saved.currency()).isEqualTo("USD");
@@ -111,36 +111,36 @@ class BidServiceTest {
 
     @Test
     void firstBidMustBeatBasePriceByTheMinimumIncrement() {
-        when(bidRepository.findFirstByAuctionAuctionIdOrderByAmountDescBidDateAsc(1)).thenReturn(Optional.empty());
+        when(bidRepository.findFirstByAuctionAuctionIdOrderByAmountDescBidDateAsc(1L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> bidService.placeBid(1, bid("100.50", "USD")))
+        assertThatThrownBy(() -> bidService.placeBid(1L, bid("100.50", "USD")))
                 .isInstanceOfSatisfying(BusinessRuleException.class,
                         ex -> assertThat(ex.getStatus()).isEqualTo(HttpStatus.UNPROCESSABLE_CONTENT))
                 .hasMessageContaining("at least 101");
-        assertThat(bidService.placeBid(1, bid("101", "USD")).amount()).isEqualByComparingTo("101");
+        assertThat(bidService.placeBid(1L, bid("101", "USD")).amount()).isEqualByComparingTo("101");
     }
 
     @Test
     void bidMustBeatTheHighestBid() {
         givenTopBid("300", 8);
 
-        assertThatThrownBy(() -> bidService.placeBid(1, bid("300.99", "USD")))
+        assertThatThrownBy(() -> bidService.placeBid(1L, bid("300.99", "USD")))
                 .hasMessageContaining("at least 301");
         verify(bidRepository, never()).save(any());
     }
 
     @Test
     void otherCurrencyIsRejected() {
-        assertThatThrownBy(() -> bidService.placeBid(1, bid("500", "COP")))
+        assertThatThrownBy(() -> bidService.placeBid(1L, bid("500", "COP")))
                 .isInstanceOf(BusinessRuleException.class)
                 .hasMessage("Currency must be USD");
     }
 
     @Test
     void bidFloodingIs429() {
-        when(aiFacade.assessBid(any(), any(), eq(3))).thenReturn(BidAssessment.rejected("Too many bids"));
+        when(aiFacade.assessBid(any(), any(), eq(3L))).thenReturn(BidAssessment.rejected("Too many bids"));
 
-        assertThatThrownBy(() -> bidService.placeBid(1, bid("500", "USD")))
+        assertThatThrownBy(() -> bidService.placeBid(1L, bid("500", "USD")))
                 .isInstanceOfSatisfying(BusinessRuleException.class,
                         ex -> assertThat(ex.getStatus()).isEqualTo(HttpStatus.TOO_MANY_REQUESTS));
         verify(bidRepository, never()).save(any());
@@ -148,9 +148,9 @@ class BidServiceTest {
 
     @Test
     void suspiciousBidIsAcceptedAndReportedToAdmins() {
-        when(aiFacade.assessBid(any(), any(), eq(3))).thenReturn(BidAssessment.suspicious("huge"));
+        when(aiFacade.assessBid(any(), any(), eq(3L))).thenReturn(BidAssessment.suspicious("huge"));
 
-        bidService.placeBid(1, bid("5000", "USD"));
+        bidService.placeBid(1L, bid("5000", "USD"));
 
         verify(bidRepository).save(any(Bid.class));
         verify(messaging).convertAndSend(eq(BidService.ANOMALIES_TOPIC), any(AnomalyAlert.class));
@@ -160,7 +160,7 @@ class BidServiceTest {
     void scheduledAuctionRejectsBidsThroughTheState() {
         givenAuction(AuctionStatus.SCHEDULED);
 
-        assertThatThrownBy(() -> bidService.placeBid(1, bid("500", "USD")))
+        assertThatThrownBy(() -> bidService.placeBid(1L, bid("500", "USD")))
                 .isInstanceOf(BusinessRuleException.class)
                 .hasMessage("The auction has not started yet");
         verify(messaging, never()).convertAndSend(anyString(), any(Object.class));

@@ -11,17 +11,17 @@ import com.barnizgallery.backend.enums.ArtworkStatus;
 /**
  * Spring Data repository for {@link Artwork}.
  */
-public interface ArtworkRepository extends JpaRepository<Artwork, Integer> {
+public interface ArtworkRepository extends JpaRepository<Artwork, Long> {
 
     List<Artwork> findAllByOrderByArtworkIdAsc();
 
-    List<Artwork> findByRoomRoomIdOrderByArtworkIdAsc(Integer roomId);
+    List<Artwork> findByRoomRoomIdOrderByArtworkIdAsc(Long roomId);
 
     List<Artwork> findByStatusOrderByArtworkIdAsc(ArtworkStatus status);
 
-    List<Artwork> findByRoomRoomIdAndStatusOrderByArtworkIdAsc(Integer roomId, ArtworkStatus status);
+    List<Artwork> findByRoomRoomIdAndStatusOrderByArtworkIdAsc(Long roomId, ArtworkStatus status);
 
-    long countByRoomRoomId(Integer roomId);
+    long countByRoomRoomId(Long roomId);
 
     /** Artwork count of every room in a single query. */
     @Query("select a.room.roomId as roomId, count(a) as artworkCount from Artwork a group by a.room.roomId")

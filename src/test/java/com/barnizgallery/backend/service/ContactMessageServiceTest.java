@@ -43,12 +43,12 @@ class ContactMessageServiceTest {
 
     @Test
     void sendWithArtworkOfAnotherMasterIsRejected() {
-        when(visitorService.getVisitor(5)).thenReturn(TestEntities.visitor(5, Language.ES));
-        when(masterService.getMaster(1)).thenReturn(master1);
-        when(artworkService.getArtwork(30)).thenReturn(
+        when(visitorService.getVisitor(5L)).thenReturn(TestEntities.visitor(5, Language.ES));
+        when(masterService.getMaster(1L)).thenReturn(master1);
+        when(artworkService.getArtwork(30L)).thenReturn(
                 TestEntities.artwork(30, TestEntities.room(2, master2), ArtworkStatus.EXHIBITED));
 
-        assertThatThrownBy(() -> contactMessageService.send(new ContactMessageRequest(5, 1, 30, "Hello")))
+        assertThatThrownBy(() -> contactMessageService.send(new ContactMessageRequest(5L, 1L, 30L, "Hello")))
                 .isInstanceOfSatisfying(BusinessRuleException.class,
                         ex -> assertThat(ex.getStatus()).isEqualTo(HttpStatus.UNPROCESSABLE_CONTENT));
         verify(contactMessageRepository, never()).save(any());
@@ -56,13 +56,13 @@ class ContactMessageServiceTest {
 
     @Test
     void sendWithArtworkOfSameMasterIsSaved() {
-        when(visitorService.getVisitor(5)).thenReturn(TestEntities.visitor(5, Language.ES));
-        when(masterService.getMaster(1)).thenReturn(master1);
-        when(artworkService.getArtwork(30)).thenReturn(
+        when(visitorService.getVisitor(5L)).thenReturn(TestEntities.visitor(5, Language.ES));
+        when(masterService.getMaster(1L)).thenReturn(master1);
+        when(artworkService.getArtwork(30L)).thenReturn(
                 TestEntities.artwork(30, TestEntities.room(1, master1), ArtworkStatus.EXHIBITED));
         when(contactMessageRepository.save(any(ContactMessage.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        ContactMessageResponse sent = contactMessageService.send(new ContactMessageRequest(5, 1, 30, " Hello "));
+        ContactMessageResponse sent = contactMessageService.send(new ContactMessageRequest(5L, 1L, 30L, " Hello "));
 
         assertThat(sent.artworkId()).isEqualTo(30);
         assertThat(sent.content()).isEqualTo("Hello");
@@ -70,11 +70,11 @@ class ContactMessageServiceTest {
 
     @Test
     void sendWithoutArtworkIsSaved() {
-        when(visitorService.getVisitor(5)).thenReturn(TestEntities.visitor(5, Language.ES));
-        when(masterService.getMaster(1)).thenReturn(master1);
+        when(visitorService.getVisitor(5L)).thenReturn(TestEntities.visitor(5, Language.ES));
+        when(masterService.getMaster(1L)).thenReturn(master1);
         when(contactMessageRepository.save(any(ContactMessage.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        ContactMessageResponse sent = contactMessageService.send(new ContactMessageRequest(5, 1, null, "Hi"));
+        ContactMessageResponse sent = contactMessageService.send(new ContactMessageRequest(5L, 1L, null, "Hi"));
 
         assertThat(sent.artworkId()).isNull();
         assertThat(sent.masterId()).isEqualTo(1);

@@ -4,8 +4,8 @@ package com.barnizgallery.backend.dto;
  * A photo of an artwork.
  */
 public record PhotoResponse(
-        Integer photoId,
-        Integer artworkId,
+        Long photoId,
+        Long artworkId,
         String fileUrl,
         String angle) {
 }

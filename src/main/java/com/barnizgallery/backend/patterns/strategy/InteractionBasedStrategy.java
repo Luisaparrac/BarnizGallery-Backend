@@ -43,8 +43,8 @@ public class InteractionBasedStrategy implements RecommendationStrategy {
 
     @Override
     public List<RecommendationResult> recommend(Visitor visitor) {
-        Map<Integer, Double> pointsByRoom = new LinkedHashMap<>();
-        Map<Integer, Integer> countByRoom = new LinkedHashMap<>();
+        Map<Long, Double> pointsByRoom = new LinkedHashMap<>();
+        Map<Long, Integer> countByRoom = new LinkedHashMap<>();
         for (RoomInteraction interaction : interactionRepository.findRoomInteractions(visitor.getVisitorId())) {
             double points = factoryProvider.weightOf(interaction.getAction())
                     * durationFactor(interaction.getDurationSeconds());

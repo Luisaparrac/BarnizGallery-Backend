@@ -50,7 +50,7 @@ public class ProfileBasedStrategy implements RecommendationStrategy {
             return List.of();
         }
 
-        Map<Integer, Set<String>> tagsByRoom = new LinkedHashMap<>();
+        Map<Long, Set<String>> tagsByRoom = new LinkedHashMap<>();
         for (Artwork artwork : artworkRepository.findAllByOrderByArtworkIdAsc()) {
             tagsByRoom.computeIfAbsent(artwork.getRoom().getRoomId(), id -> new LinkedHashSet<>())
                     .addAll(normalize(artwork.getColorTags()));

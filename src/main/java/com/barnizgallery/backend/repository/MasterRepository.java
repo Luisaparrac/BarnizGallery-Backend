@@ -7,5 +7,5 @@ import com.barnizgallery.backend.entity.Master;
 /**
  * Spring Data repository for {@link Master}.
  */
-public interface MasterRepository extends JpaRepository<Master, Integer> {
+public interface MasterRepository extends JpaRepository<Master, Long> {
 }

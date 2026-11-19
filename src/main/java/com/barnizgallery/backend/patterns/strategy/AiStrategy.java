@@ -65,7 +65,7 @@ public class AiStrategy implements RecommendationStrategy {
             throw new FeatureDisabledException("The 'ai' recommendation strategy needs an AI provider");
         }
         String answer = aiClient.complete(SYSTEM_PROMPT, buildUserPrompt(visitor));
-        Set<Integer> validRooms = new LinkedHashSet<>();
+        Set<Long> validRooms = new LinkedHashSet<>();
         roomRepository.findAll().forEach(room -> validRooms.add(room.getRoomId()));
         List<RecommendationResult> results = parse(answer, validRooms);
         results.sort(Comparator.comparing(RecommendationResult::score).reversed());
@@ -73,7 +73,7 @@ public class AiStrategy implements RecommendationStrategy {
     }
 
     private String buildUserPrompt(Visitor visitor) {
-        Map<Integer, Set<String>> tagsByRoom = new LinkedHashMap<>();
+        Map<Long, Set<String>> tagsByRoom = new LinkedHashMap<>();
         for (Artwork artwork : artworkRepository.findAllByOrderByArtworkIdAsc()) {
             Set<String> tags = tagsByRoom.computeIfAbsent(artwork.getRoom().getRoomId(), id -> new LinkedHashSet<>());
             if (artwork.getColorTags() != null) {
@@ -100,19 +100,19 @@ public class AiStrategy implements RecommendationStrategy {
     }
 
     /** Parses lines "roomId|score|reason". Invalid lines are skipped. */
-    static List<RecommendationResult> parse(String answer, Set<Integer> validRooms) {
+    static List<RecommendationResult> parse(String answer, Set<Long> validRooms) {
         List<RecommendationResult> results = new ArrayList<>();
         if (answer == null) {
             return results;
         }
-        Set<Integer> seen = new LinkedHashSet<>();
+        Set<Long> seen = new LinkedHashSet<>();
         for (String line : answer.split("\\R")) {
             String[] parts = line.split("\\|", 3);
             if (parts.length < 3) {
                 continue;
             }
             try {
-                Integer roomId = Integer.valueOf(parts[0].trim());
+                Long roomId = Long.valueOf(parts[0].trim());
                 double score = Double.parseDouble(parts[1].trim());
                 if (validRooms.contains(roomId) && seen.add(roomId)) {
                     results.add(RecommendationResult.of(roomId, score, parts[2].trim()));

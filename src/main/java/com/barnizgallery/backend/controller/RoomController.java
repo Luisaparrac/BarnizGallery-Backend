@@ -40,7 +40,7 @@ public class RoomController {
     }
 
     @GetMapping("/{id}")
-    public RoomDetailResponse findById(@PathVariable Integer id) {
+    public RoomDetailResponse findById(@PathVariable Long id) {
         return roomService.findById(id);
     }
 
@@ -51,7 +51,7 @@ public class RoomController {
     }
 
     @PutMapping("/{id}")
-    public RoomSummaryResponse update(@PathVariable Integer id, @Valid @RequestBody RoomRequest request) {
+    public RoomSummaryResponse update(@PathVariable Long id, @Valid @RequestBody RoomRequest request) {
         return roomService.update(id, request);
     }
 }

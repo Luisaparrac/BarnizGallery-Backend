@@ -44,7 +44,7 @@ public class MasterService {
     }
 
     @Transactional(readOnly = true)
-    public MasterDetailResponse findById(Integer masterId) {
+    public MasterDetailResponse findById(Long masterId) {
         Master master = getMaster(masterId);
         RoomSummaryResponse room = roomRepository.findByMasterMasterId(masterId)
                 .map(r -> RoomMapper.toSummary(r, artworkRepository.countByRoomRoomId(r.getRoomId())))
@@ -60,7 +60,7 @@ public class MasterService {
     }
 
     @Transactional
-    public MasterResponse update(Integer masterId, MasterRequest request) {
+    public MasterResponse update(Long masterId, MasterRequest request) {
         Master master = getMaster(masterId);
         MasterMapper.apply(request, master);
         return MasterMapper.toResponse(master);
@@ -68,7 +68,7 @@ public class MasterService {
 
     /** Loads a master or throws 404. Used by other services too. */
     @Transactional(readOnly = true)
-    public Master getMaster(Integer masterId) {
+    public Master getMaster(Long masterId) {
         return masterRepository.findById(masterId)
                 .orElseThrow(() -> new ResourceNotFoundException("Master", masterId));
     }

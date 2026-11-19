@@ -7,9 +7,9 @@ import java.time.LocalDateTime;
  * A bid of an auction.
  */
 public record BidResponse(
-        Integer bidId,
-        Integer auctionId,
-        Integer visitorId,
+        Long bidId,
+        Long auctionId,
+        Long visitorId,
         String visitorName,
         BigDecimal amount,
         String currency,

@@ -40,7 +40,7 @@ public class MasterController {
     }
 
     @GetMapping("/{id}")
-    public MasterDetailResponse findById(@PathVariable Integer id) {
+    public MasterDetailResponse findById(@PathVariable Long id) {
         return masterService.findById(id);
     }
 
@@ -51,7 +51,7 @@ public class MasterController {
     }
 
     @PutMapping("/{id}")
-    public MasterResponse update(@PathVariable Integer id, @Valid @RequestBody MasterRequest request) {
+    public MasterResponse update(@PathVariable Long id, @Valid @RequestBody MasterRequest request) {
         return masterService.update(id, request);
     }
 }

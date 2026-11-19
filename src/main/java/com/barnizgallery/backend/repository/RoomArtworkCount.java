@@ -5,7 +5,7 @@ package com.barnizgallery.backend.repository;
  */
 public interface RoomArtworkCount {
 
-    Integer getRoomId();
+    Long getRoomId();
 
     long getArtworkCount();
 }

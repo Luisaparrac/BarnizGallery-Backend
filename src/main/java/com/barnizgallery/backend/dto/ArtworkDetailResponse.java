@@ -8,8 +8,8 @@ import com.barnizgallery.backend.enums.ArtworkStatus;
  * Full artwork: data, photos and current auction (null if none).
  */
 public record ArtworkDetailResponse(
-        Integer artworkId,
-        Integer roomId,
+        Long artworkId,
+        Long roomId,
         String titleEs,
         String titleEn,
         String historyEs,

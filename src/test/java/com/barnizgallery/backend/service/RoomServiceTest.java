@@ -3,6 +3,7 @@ package com.barnizgallery.backend.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -43,7 +44,8 @@ class RoomServiceTest {
         Room room1 = TestEntities.room(1, TestEntities.master(1));
         Room room2 = TestEntities.room(2, TestEntities.master(2));
         when(roomRepository.findAllWithMaster()).thenReturn(List.of(room1, room2));
-        when(artworkRepository.countGroupedByRoom()).thenReturn(List.of(count(1, 3)));
+        RoomArtworkCount count = count(1, 3);
+        when(artworkRepository.countGroupedByRoom()).thenReturn(List.of(count));
 
         List<RoomSummaryResponse> rooms = roomService.findAll();
 
@@ -54,8 +56,8 @@ class RoomServiceTest {
     @Test
     void createFailsWhenMasterAlreadyHasRoom() {
         Master master = TestEntities.master(1);
-        when(masterService.getMaster(1)).thenReturn(master);
-        when(roomRepository.existsByMasterMasterId(1)).thenReturn(true);
+        when(masterService.getMaster(1L)).thenReturn(master);
+        when(roomRepository.existsByMasterMasterId(1L)).thenReturn(true);
 
         assertThatThrownBy(() -> roomService.create(request(1)))
                 .isInstanceOf(BusinessRuleException.class)
@@ -66,11 +68,11 @@ class RoomServiceTest {
     @Test
     void createSavesRoomLinkedToMaster() {
         Master master = TestEntities.master(1);
-        when(masterService.getMaster(1)).thenReturn(master);
-        when(roomRepository.existsByMasterMasterId(1)).thenReturn(false);
+        when(masterService.getMaster(1L)).thenReturn(master);
+        when(roomRepository.existsByMasterMasterId(1L)).thenReturn(false);
         when(roomRepository.save(any(Room.class))).thenAnswer(inv -> {
             Room saved = inv.getArgument(0);
-            saved.setRoomId(5);
+            saved.setRoomId(5L);
             return saved;
         });
 
@@ -84,29 +86,22 @@ class RoomServiceTest {
     @Test
     void updateToAnotherMasterWithRoomFails() {
         Room room = TestEntities.room(1, TestEntities.master(1));
-        when(roomRepository.findById(1)).thenReturn(Optional.of(room));
-        when(masterService.getMaster(2)).thenReturn(TestEntities.master(2));
-        when(roomRepository.existsByMasterMasterId(2)).thenReturn(true);
+        when(roomRepository.findById(1L)).thenReturn(Optional.of(room));
+        when(masterService.getMaster(2L)).thenReturn(TestEntities.master(2));
+        when(roomRepository.existsByMasterMasterId(2L)).thenReturn(true);
 
-        assertThatThrownBy(() -> roomService.update(1, request(2)))
+        assertThatThrownBy(() -> roomService.update(1L, request(2)))
                 .isInstanceOf(BusinessRuleException.class);
     }
 
-    private static RoomRequest request(int masterId) {
+    private static RoomRequest request(long masterId) {
         return new RoomRequest(masterId, "Sala", "Room", null, null);
     }
 
-    private static RoomArtworkCount count(int roomId, long artworkCount) {
-        return new RoomArtworkCount() {
-            @Override
-            public Integer getRoomId() {
-                return roomId;
-            }
-
-            @Override
-            public long getArtworkCount() {
-                return artworkCount;
-            }
-        };
+    private static RoomArtworkCount count(long roomId, long artworkCount) {
+        RoomArtworkCount count = mock(RoomArtworkCount.class);
+        when(count.getRoomId()).thenReturn(roomId);
+        when(count.getArtworkCount()).thenReturn(artworkCount);
+        return count;
     }
 }

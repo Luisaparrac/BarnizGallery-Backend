@@ -7,8 +7,8 @@ import java.util.List;
  * Taste profile of a visitor.
  */
 public record TasteProfileResponse(
-        Integer profileId,
-        Integer visitorId,
+        Long profileId,
+        Long visitorId,
         List<String> preferredColors,
         List<String> preferredTypes,
         List<String> preferredStyles,

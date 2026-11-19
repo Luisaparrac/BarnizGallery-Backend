@@ -69,12 +69,12 @@ class RecommendationStrategiesTest {
     private void givenPreferredColors(String... colors) {
         TasteProfile profile = new TasteProfile();
         profile.setPreferredColors(List.of(colors));
-        when(tasteProfileRepository.findByVisitorVisitorId(1)).thenReturn(Optional.of(profile));
+        when(tasteProfileRepository.findByVisitorVisitorId(1L)).thenReturn(Optional.of(profile));
     }
 
     private void givenInteractions(RoomInteraction... interactions) {
-        when(interactionRepository.findRoomInteractions(1)).thenReturn(List.of(interactions));
-        when(interactionRepository.countByVisitorVisitorId(1)).thenReturn((long) interactions.length);
+        when(interactionRepository.findRoomInteractions(1L)).thenReturn(List.of(interactions));
+        when(interactionRepository.countByVisitorVisitorId(1L)).thenReturn((long) interactions.length);
     }
 
     @Test
@@ -83,7 +83,7 @@ class RecommendationStrategiesTest {
 
         List<RecommendationResult> results = profileStrategy.recommend(visitorEs);
 
-        assertThat(results).extracting(RecommendationResult::roomId).containsExactly(1, 2);
+        assertThat(results).extracting(RecommendationResult::roomId).containsExactly(1L, 2L);
         assertThat(results.get(0).score()).isEqualByComparingTo("75.00");
         assertThat(results.get(1).score()).isEqualByComparingTo("25.00");
         assertThat(results.get(0).reason()).startsWith("Coincide con tus colores preferidos");
@@ -104,7 +104,7 @@ class RecommendationStrategiesTest {
 
     @Test
     void profileWithoutTasteProfileGivesNothing() {
-        when(tasteProfileRepository.findByVisitorVisitorId(1)).thenReturn(Optional.empty());
+        when(tasteProfileRepository.findByVisitorVisitorId(1L)).thenReturn(Optional.empty());
 
         assertThat(profileStrategy.recommend(visitorEs)).isEmpty();
     }
@@ -116,7 +116,7 @@ class RecommendationStrategiesTest {
 
         List<RecommendationResult> results = interactionStrategy.recommend(visitorEs);
 
-        assertThat(results).extracting(RecommendationResult::roomId).containsExactly(1, 2);
+        assertThat(results).extracting(RecommendationResult::roomId).containsExactly(1L, 2L);
         assertThat(results.get(0).score()).isEqualByComparingTo("100");
         assertThat(results.get(1).score()).isEqualByComparingTo("16.67");
     }
@@ -150,7 +150,7 @@ class RecommendationStrategiesTest {
         List<RecommendationResult> results = hybridStrategy.recommend(visitorEs);
 
         // room 1: 0.6 x 100 + 0.4 x 0 = 60; room 2: 0.6 x 0 + 0.4 x 100 = 40
-        assertThat(results).extracting(RecommendationResult::roomId).containsExactly(1, 2);
+        assertThat(results).extracting(RecommendationResult::roomId).containsExactly(1L, 2L);
         assertThat(results).extracting(RecommendationResult::score)
                 .usingElementComparator(BigDecimal::compareTo)
                 .containsExactly(new BigDecimal("60"), new BigDecimal("40"));
@@ -165,9 +165,9 @@ class RecommendationStrategiesTest {
                 1|abc|bad score
                 1|150|Clamped""";
 
-        List<RecommendationResult> results = AiStrategy.parse(answer, Set.of(1, 2));
+        List<RecommendationResult> results = AiStrategy.parse(answer, Set.of(1L, 2L));
 
-        assertThat(results).extracting(RecommendationResult::roomId).containsExactly(2, 1);
+        assertThat(results).extracting(RecommendationResult::roomId).containsExactly(2L, 1L);
         assertThat(results.get(1).score()).isEqualByComparingTo("100");
     }
 
@@ -194,22 +194,11 @@ class RecommendationStrategiesTest {
         assertThatThrownBy(() -> resolver.resolve("magic")).isInstanceOf(BusinessRuleException.class);
     }
 
-    private static RoomInteraction interaction(int roomId, InteractionAction action, Integer duration) {
-        return new RoomInteraction() {
-            @Override
-            public Integer getRoomId() {
-                return roomId;
-            }
-
-            @Override
-            public InteractionAction getAction() {
-                return action;
-            }
-
-            @Override
-            public Integer getDurationSeconds() {
-                return duration;
-            }
-        };
+    private static RoomInteraction interaction(long roomId, InteractionAction action, Integer duration) {
+        RoomInteraction interaction = mock(RoomInteraction.class);
+        when(interaction.getRoomId()).thenReturn(roomId);
+        when(interaction.getAction()).thenReturn(action);
+        when(interaction.getDurationSeconds()).thenReturn(duration);
+        return interaction;
     }
 }

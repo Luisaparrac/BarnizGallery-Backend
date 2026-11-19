@@ -11,13 +11,13 @@ import com.barnizgallery.backend.enums.ArtworkStatus;
  */
 public class ArtworkLeaf implements GalleryComponent {
 
-    private final Integer id;
+    private final Long id;
     private final String nameEs;
     private final String nameEn;
     private final ArtworkStatus status;
     private final String thumbnailUrl;
 
-    public ArtworkLeaf(Integer id, String nameEs, String nameEn, ArtworkStatus status,
+    public ArtworkLeaf(Long id, String nameEs, String nameEn, ArtworkStatus status,
             String thumbnailUrl) {
         this.id = id;
         this.nameEs = nameEs;
@@ -27,7 +27,7 @@ public class ArtworkLeaf implements GalleryComponent {
     }
 
     @Override
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 

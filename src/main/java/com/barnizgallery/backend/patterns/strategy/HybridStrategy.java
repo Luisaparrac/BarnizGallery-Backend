@@ -51,13 +51,13 @@ public class HybridStrategy implements RecommendationStrategy {
         }
         List<RecommendationResult> byInteractions = interactionStrategy.recommend(visitor);
 
-        Map<Integer, RecommendationResult> profileMap = toMap(byProfile);
-        Map<Integer, RecommendationResult> interactionMap = toMap(byInteractions);
-        Set<Integer> roomIds = new LinkedHashSet<>(interactionMap.keySet());
+        Map<Long, RecommendationResult> profileMap = toMap(byProfile);
+        Map<Long, RecommendationResult> interactionMap = toMap(byInteractions);
+        Set<Long> roomIds = new LinkedHashSet<>(interactionMap.keySet());
         roomIds.addAll(profileMap.keySet());
 
         List<RecommendationResult> results = new ArrayList<>();
-        for (Integer roomId : roomIds) {
+        for (Long roomId : roomIds) {
             RecommendationResult fromInteractions = interactionMap.get(roomId);
             RecommendationResult fromProfile = profileMap.get(roomId);
             double score = INTERACTION_WEIGHT * scoreOf(fromInteractions) + PROFILE_WEIGHT * scoreOf(fromProfile);
@@ -74,8 +74,8 @@ public class HybridStrategy implements RecommendationStrategy {
         return results;
     }
 
-    private static Map<Integer, RecommendationResult> toMap(List<RecommendationResult> results) {
-        Map<Integer, RecommendationResult> map = new LinkedHashMap<>();
+    private static Map<Long, RecommendationResult> toMap(List<RecommendationResult> results) {
+        Map<Long, RecommendationResult> map = new LinkedHashMap<>();
         results.forEach(r -> map.put(r.roomId(), r));
         return map;
     }

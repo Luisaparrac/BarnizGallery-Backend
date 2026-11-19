@@ -9,7 +9,7 @@ import com.barnizgallery.backend.entity.Visitor;
 /**
  * Spring Data repository for {@link Visitor}.
  */
-public interface VisitorRepository extends JpaRepository<Visitor, Integer> {
+public interface VisitorRepository extends JpaRepository<Visitor, Long> {
 
     Optional<Visitor> findByEmailIgnoreCase(String email);
 }

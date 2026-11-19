@@ -6,7 +6,7 @@ import java.util.List;
  * A room with its master and its artworks.
  */
 public record RoomDetailResponse(
-        Integer roomId,
+        Long roomId,
         MasterResponse master,
         String nameEs,
         String nameEn,
