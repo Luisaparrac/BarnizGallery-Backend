@@ -1,0 +1,169 @@
+package com.barnizgallery.backend.patterns.adapter;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withException;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+
+import java.math.BigDecimal;
+import java.net.SocketTimeoutException;
+import java.util.List;
+import java.util.UUID;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestClient;
+
+import com.barnizgallery.backend.dto.AiCandidate;
+import com.barnizgallery.backend.dto.AiComparable;
+import com.barnizgallery.backend.dto.AiPriceSuggestion;
+import com.barnizgallery.backend.dto.AiPricingPiece;
+import com.barnizgallery.backend.dto.AiPricingRequest;
+import com.barnizgallery.backend.dto.AiRecommendationRequest;
+import com.barnizgallery.backend.dto.AiRecommendationResponse;
+import com.barnizgallery.backend.exception.AiServiceException;
+
+/** Uses the JSON examples of the AI service integration guide. No real call is made. */
+class AiServiceClientTest {
+
+    private static final String BASE_URL = "http://ai.test";
+
+    private final String apiKey = UUID.randomUUID().toString();
+    private MockRestServiceServer server;
+    private AiServiceClient client;
+
+    @BeforeEach
+    void setUp() {
+        RestClient.Builder builder = RestClient.builder().baseUrl(BASE_URL)
+                .defaultHeader(AiServiceClient.API_KEY_HEADER, apiKey);
+        server = MockRestServiceServer.bindTo(builder).build();
+        client = new AiServiceClient(builder.build());
+    }
+
+    @Test
+    void suggestPriceSendsTheKeyAndSnakeCaseJson() {
+        server.expect(requestTo(BASE_URL + "/v1/pricing/suggest"))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(header(AiServiceClient.API_KEY_HEADER, apiKey))
+                .andExpect(jsonPath("$.piece.shape").value("bandeja"))
+                .andExpect(jsonPath("$.piece.width_cm").value(30))
+                .andExpect(jsonPath("$.comparables[0].artwork_id").value(9))
+                .andExpect(jsonPath("$.comparables[0].sold").value(true))
+                .andExpect(jsonPath("$.currency").value("USD"))
+                .andRespond(withSuccess("""
+                        {"suggested_price": 95, "min_price": 90, "max_price": 115, "currency": "USD",
+                         "method": "comparables", "explanation": "Basado en 6 piezas parecidas"}""",
+                        MediaType.APPLICATION_JSON));
+
+        AiPriceSuggestion suggestion = client.suggestPrice(pricingRequest());
+
+        assertThat(suggestion.suggestedPrice()).isEqualByComparingTo("95");
+        assertThat(suggestion.minPrice()).isEqualByComparingTo("90");
+        assertThat(suggestion.maxPrice()).isEqualByComparingTo("115");
+        assertThat(suggestion.method()).isEqualTo("comparables");
+        server.verify();
+    }
+
+    @Test
+    void notEnoughDataKeepsStatusAndCode() {
+        server.expect(requestTo(BASE_URL + "/v1/pricing/suggest"))
+                .andRespond(withStatus(HttpStatus.UNPROCESSABLE_CONTENT).contentType(MediaType.APPLICATION_JSON)
+                        .body("{\"code\": \"not_enough_data\", \"message\": \"Se necesitan al menos 3 piezas\"}"));
+
+        assertThatThrownBy(() -> client.suggestPrice(pricingRequest()))
+                .isInstanceOfSatisfying(AiServiceException.class, ex -> {
+                    assertThat(ex.getStatus()).isEqualTo(422);
+                    assertThat(ex.getCode()).isEqualTo("not_enough_data");
+                    assertThat(ex.getMessage()).isEqualTo("Se necesitan al menos 3 piezas");
+                });
+    }
+
+    @Test
+    void unauthorizedIsTranslated() {
+        server.expect(requestTo(BASE_URL + "/v1/recommendations"))
+                .andRespond(withStatus(HttpStatus.UNAUTHORIZED).contentType(MediaType.APPLICATION_JSON)
+                        .body("{\"code\": \"unauthorized\", \"message\": \"Clave inválida\"}"));
+
+        assertThatThrownBy(() -> client.recommend(recommendationRequest()))
+                .isInstanceOfSatisfying(AiServiceException.class, ex -> {
+                    assertThat(ex.getStatus()).isEqualTo(401);
+                    assertThat(ex.getCode()).isEqualTo("unauthorized");
+                });
+    }
+
+    @Test
+    void errorWithoutJsonBodyGetsAGenericCode() {
+        server.expect(requestTo(BASE_URL + "/v1/recommendations"))
+                .andRespond(withStatus(HttpStatus.BAD_GATEWAY).contentType(MediaType.TEXT_HTML)
+                        .body("<html>Bad gateway</html>"));
+
+        assertThatThrownBy(() -> client.recommend(recommendationRequest()))
+                .isInstanceOfSatisfying(AiServiceException.class, ex -> {
+                    assertThat(ex.getStatus()).isEqualTo(502);
+                    assertThat(ex.getCode()).isEqualTo("unknown_error");
+                });
+    }
+
+    @Test
+    void timeoutBecomesServiceUnreachable() {
+        server.expect(requestTo(BASE_URL + "/v1/recommendations"))
+                .andRespond(withException(new SocketTimeoutException("Read timed out")));
+
+        assertThatThrownBy(() -> client.recommend(recommendationRequest()))
+                .isInstanceOfSatisfying(AiServiceException.class, ex -> {
+                    assertThat(ex.getStatus()).isEqualTo(503);
+                    assertThat(ex.getCode()).isEqualTo("service_unreachable");
+                    assertThat(ex.getMessage()).doesNotContain(apiKey);
+                });
+    }
+
+    @Test
+    void recommendReadsItemsAndNullBudget() {
+        server.expect(requestTo(BASE_URL + "/v1/recommendations"))
+                .andExpect(jsonPath("$.candidates[0].artwork_id").value(5))
+                .andExpect(jsonPath("$.candidates[0].store_id").value(2))
+                .andExpect(jsonPath("$.limit").value(10))
+                .andRespond(withSuccess("""
+                        {"strategy": "hybrid", "items": [
+                          {"artwork_id": 5, "store_id": 2, "score": 0.9476,
+                           "reasons": {"colors": ["rojo", "amarillo"], "shape": true, "style": true,
+                                       "motifs": ["colibri"], "budget": null}}]}""",
+                        MediaType.APPLICATION_JSON));
+
+        AiRecommendationResponse response = client.recommend(recommendationRequest());
+
+        assertThat(response.strategy()).isEqualTo("hybrid");
+        assertThat(response.items()).singleElement().satisfies(item -> {
+            assertThat(item.artworkId()).isEqualTo(5L);
+            assertThat(item.storeId()).isEqualTo(2L);
+            assertThat(item.score()).isEqualTo(0.9476);
+            assertThat(item.reasons().colors()).containsExactly("rojo", "amarillo");
+            assertThat(item.reasons().shape()).isTrue();
+            assertThat(item.reasons().budget()).isNull();
+        });
+    }
+
+    private static AiPricingRequest pricingRequest() {
+        AiPricingPiece piece = new AiPricingPiece("bandeja", "tradicional", List.of("rojo"), List.of("colibri"),
+                new BigDecimal("30"), new BigDecimal("30"), new BigDecimal("3"), "barniz");
+        AiComparable comparable = new AiComparable(9L, "bandeja", "tradicional", List.of("rojo"),
+                List.of("colibri", "flores"), new BigDecimal("28"), new BigDecimal("28"), null, new BigDecimal("90"),
+                "USD", true);
+        return new AiPricingRequest(piece, List.of(comparable), "USD");
+    }
+
+    private static AiRecommendationRequest recommendationRequest() {
+        AiCandidate candidate = new AiCandidate(5L, 2L, List.of("rojo", "amarillo"), "bandeja", "tradicional",
+                List.of("colibri"), new BigDecimal("80"), "USD", 12);
+        return new AiRecommendationRequest(null, List.of(), List.of(candidate), 10);
+    }
+}

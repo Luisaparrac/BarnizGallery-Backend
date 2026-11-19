@@ -11,15 +11,22 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import com.barnizgallery.backend.TestEntities;
 import com.barnizgallery.backend.config.AuctionProperties;
+import com.barnizgallery.backend.dto.AiPriceSuggestion;
+import com.barnizgallery.backend.dto.AiPricingRequest;
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Auction;
+import com.barnizgallery.backend.entity.Shape;
 import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.enums.AuctionStatus;
+import com.barnizgallery.backend.exception.AiServiceException;
+import com.barnizgallery.backend.patterns.adapter.AiServiceGateway;
 import com.barnizgallery.backend.patterns.adapter.AiTextClient;
 import com.barnizgallery.backend.patterns.adapter.DisabledAiClient;
 import com.barnizgallery.backend.patterns.adapter.DisabledAiServiceGateway;
@@ -30,6 +37,8 @@ import com.barnizgallery.backend.repository.BidRepository;
 class AiFacadeTest {
 
     private final BidRepository bidRepository = mock(BidRepository.class);
+    private final ArtworkRepository artworkRepository = mock(ArtworkRepository.class);
+    private final AiServiceGateway aiService = mock(AiServiceGateway.class);
     private final RecommendationStrategyResolver resolver = mock(RecommendationStrategyResolver.class);
     private final AuctionProperties properties = new AuctionProperties("USD", BigDecimal.ONE, 5, BigDecimal.TEN,
             false);
@@ -40,8 +49,72 @@ class AiFacadeTest {
             LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(1), "100");
 
     private AiFacade facade(AiTextClient client) {
-        return new AiFacade(resolver, client, new DisabledAiServiceGateway(), bidRepository,
-                mock(ArtworkRepository.class), properties);
+        return new AiFacade(resolver, client, new DisabledAiServiceGateway(), bidRepository, artworkRepository,
+                properties);
+    }
+
+    private AiFacade facadeWithAiService() {
+        when(aiService.isAvailable()).thenReturn(true);
+        return new AiFacade(resolver, new DisabledAiClient(), aiService, bidRepository, artworkRepository,
+                properties);
+    }
+
+    private static Shape shape(String code) {
+        Shape shape = new Shape();
+        shape.setCode(code);
+        return shape;
+    }
+
+    @Test
+    void aiIsEnabledWhenOnlyTheAiServiceIsAvailable() {
+        assertThat(facadeWithAiService().isAiEnabled()).isTrue();
+        assertThat(facade(new DisabledAiClient()).isAiEnabled()).isFalse();
+    }
+
+    @Test
+    void suggestBasePriceUsesTheAiServiceWithComparablesInTheAuctionCurrency() {
+        artwork.setShape(shape("bandeja"));
+        Artwork comparable = TestEntities.artwork(9, artwork.getStore(), ArtworkStatus.SOLD, "rojo");
+        comparable.setShape(shape("bandeja"));
+        comparable.setPrice(new BigDecimal("90"));
+        comparable.setCurrency("USD");
+        when(artworkRepository.findPriceComparables(eq("USD"), eq(3L), any())).thenReturn(List.of(comparable));
+        when(aiService.suggestPrice(any())).thenReturn(new AiPriceSuggestion(new BigDecimal("95"),
+                new BigDecimal("90"), new BigDecimal("115"), "USD", "comparables", "Basado en piezas parecidas"));
+        AiFacade facade = facadeWithAiService();
+
+        assertThat(facade.suggestBasePrice(artwork)).hasValueSatisfying(
+                price -> assertThat(price).isEqualByComparingTo("95.00"));
+        ArgumentCaptor<AiPricingRequest> request = ArgumentCaptor.forClass(AiPricingRequest.class);
+        verify(aiService).suggestPrice(request.capture());
+        assertThat(request.getValue().currency()).isEqualTo("USD");
+        assertThat(request.getValue().piece().shape()).isEqualTo("bandeja");
+        assertThat(request.getValue().comparables()).singleElement()
+                .satisfies(c -> assertThat(c.sold()).isTrue());
+    }
+
+    @Test
+    void suggestBasePriceIsEmptyWhenTheAiServiceHasNotEnoughData() {
+        artwork.setShape(shape("bandeja"));
+        when(aiService.suggestPrice(any()))
+                .thenThrow(new AiServiceException(422, "not_enough_data", "Se necesitan al menos 3 piezas"));
+
+        assertThat(facadeWithAiService().suggestBasePrice(artwork)).isEmpty();
+    }
+
+    @Test
+    void suggestBasePriceIsEmptyWhenTheAiServiceTimesOut() {
+        artwork.setShape(shape("bandeja"));
+        when(aiService.suggestPrice(any()))
+                .thenThrow(new AiServiceException(503, "service_unreachable", "No answer"));
+
+        assertThat(facadeWithAiService().suggestBasePrice(artwork)).isEmpty();
+    }
+
+    @Test
+    void artworkWithoutShapeIsNotSentToTheAiService() {
+        assertThat(facadeWithAiService().suggestBasePrice(artwork)).isEmpty();
+        verify(aiService, never()).suggestPrice(any());
     }
 
     @Test
