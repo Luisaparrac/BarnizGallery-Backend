@@ -34,7 +34,7 @@ class AuctionBuilderTest {
             ArtworkStatus.EXHIBITED);
 
     private AuctionBuilder builder() {
-        return new AuctionBuilder(auctionRepository, clock);
+        return new AuctionBuilder(auctionRepository, clock).currency("usd");
     }
 
     @Test
@@ -109,5 +109,17 @@ class AuctionBuilderTest {
                 .startsAt(NOW.plusHours(1)).endsAt(NOW.plusDays(1)).build();
 
         assertThat(auction.getBasePrice()).isEqualByComparingTo("750");
+    }
+
+    @Test
+    void currencyIsRequiredAndStoredInUpperCase() {
+        Auction auction = builder().forArtwork(artwork).basePrice(new BigDecimal("500"))
+                .startsAt(NOW.plusDays(1)).endsAt(NOW.plusDays(3)).build();
+
+        assertThat(auction.getCurrency()).isEqualTo("USD");
+        assertThatThrownBy(() -> builder().currency(null).forArtwork(artwork).basePrice(BigDecimal.TEN)
+                .startsAt(NOW.plusDays(1)).endsAt(NOW.plusDays(3)).build())
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessageContaining("currency");
     }
 }

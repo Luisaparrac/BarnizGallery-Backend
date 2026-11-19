@@ -65,7 +65,8 @@ public class BidService {
      * <ol>
      * <li>the auction is locked and synced with the clock;</li>
      * <li>the State decides if bids are allowed (only active auctions);</li>
-     * <li>currency must be the configured one and the amount must beat
+     * <li>the auction must have a currency (historical ones do not: 409), the bid must use it and the
+     * amount must beat
      * max(highest bid, base price) by at least the minimum increment (HTTP 422);</li>
      * <li>the AI Facade reviews it: flooding is rejected (HTTP 429), huge amounts are accepted
      * but reported to {@code /topic/admin/anomalies};</li>
@@ -78,7 +79,11 @@ public class BidService {
         auctionService.contextFor(auction).placeBid(request);
         User user = userService.getUser(request.userId());
 
-        String currency = auctionProperties.currency().toUpperCase(Locale.ROOT);
+        String currency = auction.getCurrency();
+        if (currency == null) {
+            throw new BusinessRuleException("Auction " + auctionId
+                    + " has no currency configured yet, so it does not accept bids");
+        }
         if (!currency.equals(request.currency().trim().toUpperCase(Locale.ROOT))) {
             throw BusinessRuleException.unprocessable("Currency must be " + currency);
         }

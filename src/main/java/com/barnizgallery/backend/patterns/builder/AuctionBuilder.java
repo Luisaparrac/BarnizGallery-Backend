@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.EnumSet;
+import java.util.Locale;
 import java.util.Optional;
 
 import com.barnizgallery.backend.entity.Artwork;
@@ -25,6 +26,7 @@ import com.barnizgallery.backend.repository.AuctionRepository;
  * Auction auction = new AuctionBuilder(auctionRepository, clock)
  *         .forArtwork(artwork)
  *         .basePrice(new BigDecimal("500"))
+ *         .currency("USD")
  *         .startsAt(start)
  *         .endsAt(end)
  *         .build();
@@ -38,6 +40,7 @@ public class AuctionBuilder {
     private Artwork artwork;
     private BigDecimal basePrice;
     private AiFacade priceAdvisor;
+    private String currency;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
 
@@ -59,6 +62,12 @@ public class AuctionBuilder {
     /** If no base price is given, ask the AI for one when building. */
     public AuctionBuilder useSuggestedBasePrice(AiFacade aiFacade) {
         this.priceAdvisor = aiFacade;
+        return this;
+    }
+
+    /** ISO 4217 code of the base price and of every bid. */
+    public AuctionBuilder currency(String currency) {
+        this.currency = currency;
         return this;
     }
 
@@ -89,6 +98,9 @@ public class AuctionBuilder {
             throw new BusinessRuleException("Artwork " + artwork.getArtworkId()
                     + " already has a scheduled or active auction");
         }
+        if (currency == null || !currency.matches("[A-Za-z]{3}")) {
+            throw BusinessRuleException.unprocessable("A three-letter currency is required");
+        }
         if (startDate == null || endDate == null) {
             throw BusinessRuleException.unprocessable("startDate and endDate are required");
         }
@@ -108,6 +120,7 @@ public class AuctionBuilder {
         Auction auction = new Auction();
         auction.setArtwork(artwork);
         auction.setBasePrice(price);
+        auction.setCurrency(currency.toUpperCase(Locale.ROOT));
         auction.setStartDate(startDate);
         auction.setEndDate(endDate);
         auction.setStatus(startDate.isAfter(now) ? AuctionStatus.SCHEDULED : AuctionStatus.ACTIVE);

@@ -95,6 +95,7 @@ public final class TestEntities {
         auction.setStartDate(start);
         auction.setEndDate(end);
         auction.setBasePrice(new BigDecimal(basePrice));
+        auction.setCurrency("USD");
         return auction;
     }
 }

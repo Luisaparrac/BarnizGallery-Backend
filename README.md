@@ -76,7 +76,7 @@ Requirements: Java 21 and access to the database.
 | `DB_USERNAME` / `DB_PASSWORD` | Database credentials | – |
 | `PORT` | HTTP port (set by Render) | `8080` |
 | `CORS_ALLOWED_ORIGINS` | Comma-separated frontend origins (REST and WebSocket) | `http://localhost:5173,http://localhost:3000` |
-| `AUCTION_CURRENCY` | Single auction currency | `USD` |
+| `AUCTION_CURRENCY` | Currency of new auctions | `USD` |
 | `AUCTION_SCHEDULER_ENABLED` | Run the 60-second auction scheduler | `true` |
 | `AI_PROVIDER` | AI provider (not chosen yet; `none` disables AI) | `none` |
 | `AI_API_KEY` | Not used yet: it will be added together with the adapter when the AI provider is chosen | – |
@@ -138,7 +138,8 @@ Dates are ISO-8601 (UTC). Enum values are in English (`EXHIBITED`, `ACTIVE`, `PE
 | GET | `/api/auctions/{id}/bids` | Bids, highest first |
 | POST | `/api/auctions/{id}/bids` | `{ userId, amount, currency }` |
 
-Bid rules: only in `ACTIVE` auctions; `currency` must equal `AUCTION_CURRENCY`; `amount` must be at least
+Bid rules: only in `ACTIVE` auctions; `currency` must equal the auction currency (new auctions use
+`AUCTION_CURRENCY`; historical auctions have none yet and answer 409); `amount` must be at least
 max(highest bid, base price) + `app.auction.min-increment` (422 otherwise); more than 5 bids per minute
 from the same visitor → 429; an amount above 10 × the reference is accepted but reported to
 `/topic/admin/anomalies`.

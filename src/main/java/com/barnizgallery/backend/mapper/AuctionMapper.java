@@ -16,15 +16,13 @@ public final class AuctionMapper {
     }
 
     /**
-     * @param currency   currency of the auction (single currency configured in the app)
      * @param highestBid highest bid amount, or null if there are no bids
      * @param bidCount   number of bids
      */
-    public static AuctionResponse toResponse(Auction auction, String currency, BigDecimal highestBid,
-            long bidCount) {
+    public static AuctionResponse toResponse(Auction auction, BigDecimal highestBid, long bidCount) {
         return new AuctionResponse(auction.getAuctionId(), auction.getArtwork().getArtworkId(),
                 auction.getArtwork().getTitleEs(), auction.getArtwork().getTitleEn(), auction.getBasePrice(),
-                currency, auction.getStartDate(), auction.getEndDate(), auction.getStatus(), highestBid, bidCount);
+                auction.getCurrency(), auction.getStartDate(), auction.getEndDate(), auction.getStatus(), highestBid, bidCount);
     }
 
     public static BidResponse toResponse(Bid bid) {

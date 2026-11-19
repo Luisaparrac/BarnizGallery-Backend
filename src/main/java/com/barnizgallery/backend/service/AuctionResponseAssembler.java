@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.barnizgallery.backend.config.AuctionProperties;
 import com.barnizgallery.backend.dto.AuctionResponse;
 import com.barnizgallery.backend.entity.Auction;
 import com.barnizgallery.backend.mapper.AuctionMapper;
@@ -16,24 +15,22 @@ import com.barnizgallery.backend.repository.AuctionBidStats;
 import com.barnizgallery.backend.repository.BidRepository;
 
 /**
- * Builds {@link AuctionResponse} objects, adding the highest bid, the number of bids
- * and the configured currency. Must be called inside a transaction.
+ * Builds {@link AuctionResponse} objects, adding the highest bid and the number of bids.
+ * Must be called inside a transaction.
  */
 @Component
 public class AuctionResponseAssembler {
 
     private final BidRepository bidRepository;
-    private final AuctionProperties auctionProperties;
 
-    public AuctionResponseAssembler(BidRepository bidRepository, AuctionProperties auctionProperties) {
+    public AuctionResponseAssembler(BidRepository bidRepository) {
         this.bidRepository = bidRepository;
-        this.auctionProperties = auctionProperties;
     }
 
     public AuctionResponse toResponse(Auction auction) {
         BigDecimal highest = bidRepository.findHighestAmount(auction.getAuctionId());
         long count = bidRepository.countByAuctionAuctionId(auction.getAuctionId());
-        return AuctionMapper.toResponse(auction, auctionProperties.currency(), highest, count);
+        return AuctionMapper.toResponse(auction, highest, count);
     }
 
     /** Same as {@link #toResponse(Auction)} for a list, with one query for all the bid stats. */
@@ -44,10 +41,9 @@ public class AuctionResponseAssembler {
         Map<Long, AuctionBidStats> stats = bidRepository
                 .findStats(auctions.stream().map(Auction::getAuctionId).toList()).stream()
                 .collect(Collectors.toMap(AuctionBidStats::getAuctionId, Function.identity()));
-        String currency = auctionProperties.currency();
         return auctions.stream().map(auction -> {
             AuctionBidStats s = stats.get(auction.getAuctionId());
-            return AuctionMapper.toResponse(auction, currency, s == null ? null : s.getHighest(),
+            return AuctionMapper.toResponse(auction, s == null ? null : s.getHighest(),
                     s == null ? 0 : s.getBidCount());
         }).toList();
     }

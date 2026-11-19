@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import com.barnizgallery.backend.TestEntities;
+import com.barnizgallery.backend.config.AuctionProperties;
 import com.barnizgallery.backend.dto.CreateAuctionRequest;
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Auction;
@@ -48,7 +49,8 @@ class AuctionServiceTest {
     @BeforeEach
     void setUp() {
         auctionService = new AuctionService(auctionRepository, bidRepository, artworkService, mock(AiFacade.class),
-                assembler, publisher, Clock.fixed(NOW.atZone(ZONE).toInstant(), ZONE));
+                assembler, publisher, new AuctionProperties("USD", BigDecimal.ONE, 5, BigDecimal.TEN, false),
+                Clock.fixed(NOW.atZone(ZONE).toInstant(), ZONE));
         artwork = TestEntities.artwork(5, TestEntities.store(1, TestEntities.master(1)), ArtworkStatus.EXHIBITED);
         when(artworkService.getArtwork(5L)).thenReturn(artwork);
         when(auctionRepository.existsByArtworkArtworkIdAndStatusIn(eq(5L), anyCollection())).thenReturn(false);

@@ -137,6 +137,17 @@ class BidServiceTest {
     }
 
     @Test
+    void historicalAuctionWithoutCurrencyRejectsBidsWithConflict() {
+        auction.setCurrency(null);
+
+        assertThatThrownBy(() -> bidService.placeBid(1L, bid("500", "COP")))
+                .isInstanceOfSatisfying(BusinessRuleException.class,
+                        ex -> assertThat(ex.getStatus()).isEqualTo(HttpStatus.CONFLICT))
+                .hasMessageContaining("no currency");
+        verify(bidRepository, never()).save(any());
+    }
+
+    @Test
     void bidFloodingIs429() {
         when(aiFacade.assessBid(any(), any(), eq(3L))).thenReturn(BidAssessment.rejected("Too many bids"));
 
