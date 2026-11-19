@@ -11,18 +11,15 @@ import com.barnizgallery.backend.dto.ArtworkRequest;
 import com.barnizgallery.backend.dto.ArtworkSummaryResponse;
 import com.barnizgallery.backend.dto.AuctionResponse;
 import com.barnizgallery.backend.dto.PhotoResponse;
-import com.barnizgallery.backend.dto.ThreeDModelResponse;
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Room;
 import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.enums.AuctionStatus;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.mapper.ArtworkMapper;
-import com.barnizgallery.backend.mapper.ThreeDModelMapper;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.AuctionRepository;
 import com.barnizgallery.backend.repository.PhotoRepository;
-import com.barnizgallery.backend.repository.ThreeDModelRepository;
 
 /**
  * Business logic for artworks. The status of an artwork is never changed here:
@@ -33,17 +30,15 @@ public class ArtworkService {
 
     private final ArtworkRepository artworkRepository;
     private final PhotoRepository photoRepository;
-    private final ThreeDModelRepository threeDModelRepository;
     private final AuctionRepository auctionRepository;
     private final AuctionResponseAssembler auctionAssembler;
     private final RoomService roomService;
 
     public ArtworkService(ArtworkRepository artworkRepository, PhotoRepository photoRepository,
-            ThreeDModelRepository threeDModelRepository, AuctionRepository auctionRepository,
-            AuctionResponseAssembler auctionAssembler, RoomService roomService) {
+            AuctionRepository auctionRepository, AuctionResponseAssembler auctionAssembler,
+            RoomService roomService) {
         this.artworkRepository = artworkRepository;
         this.photoRepository = photoRepository;
-        this.threeDModelRepository = threeDModelRepository;
         this.auctionRepository = auctionRepository;
         this.auctionAssembler = auctionAssembler;
         this.roomService = roomService;
@@ -65,22 +60,19 @@ public class ArtworkService {
         return artworks.stream().map(ArtworkMapper::toSummary).toList();
     }
 
-    /** Full detail: data, photos, 3D model and current (scheduled or active) auction. */
+    /** Full detail: data, photos and current (scheduled or active) auction. */
     @Transactional(readOnly = true)
     public ArtworkDetailResponse findById(Integer artworkId) {
         Artwork artwork = getArtwork(artworkId);
         List<PhotoResponse> photos = photoRepository.findByArtworkArtworkIdOrderByPhotoIdAsc(artworkId).stream()
                 .map(ArtworkMapper::toPhotoResponse)
                 .toList();
-        ThreeDModelResponse model = threeDModelRepository.findByArtworkArtworkId(artworkId)
-                .map(ThreeDModelMapper::toResponse)
-                .orElse(null);
         AuctionResponse currentAuction = auctionRepository
                 .findFirstByArtworkArtworkIdAndStatusInOrderByStartDateDesc(artworkId,
                         EnumSet.of(AuctionStatus.SCHEDULED, AuctionStatus.ACTIVE))
                 .map(auctionAssembler::toResponse)
                 .orElse(null);
-        return ArtworkMapper.toDetail(artwork, photos, model, currentAuction);
+        return ArtworkMapper.toDetail(artwork, photos, currentAuction);
     }
 
     @Transactional

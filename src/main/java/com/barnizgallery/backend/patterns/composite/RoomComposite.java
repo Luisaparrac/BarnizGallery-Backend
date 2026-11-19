@@ -12,16 +12,13 @@ public class RoomComposite extends CompositeGalleryComponent {
     private final Integer id;
     private final String nameEs;
     private final String nameEn;
-    private final String scene3dUrl;
     private final Integer masterId;
     private final String masterName;
 
-    public RoomComposite(Integer id, String nameEs, String nameEn, String scene3dUrl, Integer masterId,
-            String masterName) {
+    public RoomComposite(Integer id, String nameEs, String nameEn, Integer masterId, String masterName) {
         this.id = id;
         this.nameEs = nameEs;
         this.nameEn = nameEn;
-        this.scene3dUrl = scene3dUrl;
         this.masterId = masterId;
         this.masterName = masterName;
     }
@@ -49,6 +46,6 @@ public class RoomComposite extends CompositeGalleryComponent {
     @Override
     public GalleryNodeResponse toNode() {
         return new GalleryNodeResponse(id, getType(), nameEs, nameEn, countArtworks(), countAvailableForAuction(),
-                null, null, null, scene3dUrl, masterId, masterName, childNodes());
+                null, null, masterId, masterName, childNodes());
     }
 }

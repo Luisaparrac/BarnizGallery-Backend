@@ -7,8 +7,7 @@ import com.barnizgallery.backend.enums.ArtworkStatus;
  * <b>Composite pattern – Leaf.</b>
  * <p>
  * An artwork: the smallest element of the gallery. It has no children.
- * It carries what the 3D world needs to place it: status, URL of the GLB model
- * (if the model is completed) and a thumbnail (its first photo).
+ * It carries its status and a thumbnail (its first photo).
  */
 public class ArtworkLeaf implements GalleryComponent {
 
@@ -16,16 +15,14 @@ public class ArtworkLeaf implements GalleryComponent {
     private final String nameEs;
     private final String nameEn;
     private final ArtworkStatus status;
-    private final String glbFileUrl;
     private final String thumbnailUrl;
 
-    public ArtworkLeaf(Integer id, String nameEs, String nameEn, ArtworkStatus status, String glbFileUrl,
+    public ArtworkLeaf(Integer id, String nameEs, String nameEn, ArtworkStatus status,
             String thumbnailUrl) {
         this.id = id;
         this.nameEs = nameEs;
         this.nameEn = nameEn;
         this.status = status;
-        this.glbFileUrl = glbFileUrl;
         this.thumbnailUrl = thumbnailUrl;
     }
 
@@ -62,6 +59,6 @@ public class ArtworkLeaf implements GalleryComponent {
     @Override
     public GalleryNodeResponse toNode() {
         return new GalleryNodeResponse(id, getType(), nameEs, nameEn, countArtworks(), countAvailableForAuction(),
-                status.name(), glbFileUrl, thumbnailUrl, null, null, null, null);
+                status.name(), thumbnailUrl, null, null, null);
     }
 }

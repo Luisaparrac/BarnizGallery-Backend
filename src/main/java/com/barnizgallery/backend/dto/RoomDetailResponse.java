@@ -12,6 +12,5 @@ public record RoomDetailResponse(
         String nameEn,
         String descriptionEs,
         String descriptionEn,
-        String scene3dUrl,
         List<ArtworkSummaryResponse> artworks) {
 }

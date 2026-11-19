@@ -5,7 +5,7 @@ import java.util.List;
 import com.barnizgallery.backend.enums.ArtworkStatus;
 
 /**
- * Full artwork: data, photos, 3D model and current auction (null if none).
+ * Full artwork: data, photos and current auction (null if none).
  */
 public record ArtworkDetailResponse(
         Integer artworkId,
@@ -20,6 +20,5 @@ public record ArtworkDetailResponse(
         List<String> motifTags,
         ArtworkStatus status,
         List<PhotoResponse> photos,
-        ThreeDModelResponse model,
         AuctionResponse currentAuction) {
 }

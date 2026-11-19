@@ -11,6 +11,5 @@ public record RoomSummaryResponse(
         String nameEn,
         String descriptionEs,
         String descriptionEn,
-        String scene3dUrl,
         long artworkCount) {
 }

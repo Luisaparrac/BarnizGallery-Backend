@@ -93,7 +93,7 @@ class RoomServiceTest {
     }
 
     private static RoomRequest request(int masterId) {
-        return new RoomRequest(masterId, "Sala", "Room", null, null, null);
+        return new RoomRequest(masterId, "Sala", "Room", null, null);
     }
 
     private static RoomArtworkCount count(int roomId, long artworkCount) {

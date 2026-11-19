@@ -7,7 +7,6 @@ import com.barnizgallery.backend.dto.ArtworkRequest;
 import com.barnizgallery.backend.dto.ArtworkSummaryResponse;
 import com.barnizgallery.backend.dto.AuctionResponse;
 import com.barnizgallery.backend.dto.PhotoResponse;
-import com.barnizgallery.backend.dto.ThreeDModelResponse;
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Photo;
 
@@ -26,11 +25,11 @@ public final class ArtworkMapper {
     }
 
     public static ArtworkDetailResponse toDetail(Artwork artwork, List<PhotoResponse> photos,
-            ThreeDModelResponse model, AuctionResponse currentAuction) {
+            AuctionResponse currentAuction) {
         return new ArtworkDetailResponse(artwork.getArtworkId(), artwork.getRoom().getRoomId(), artwork.getTitleEs(),
                 artwork.getTitleEn(), artwork.getHistoryEs(), artwork.getHistoryEn(), artwork.getTechnique(),
                 artwork.getDimensions(), artwork.getColorTags(), artwork.getMotifTags(), artwork.getStatus(),
-                photos, model, currentAuction);
+                photos, currentAuction);
     }
 
     /** Copies the request fields into the entity. The room and status are set by the service. */

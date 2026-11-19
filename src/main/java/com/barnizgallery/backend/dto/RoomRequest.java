@@ -12,6 +12,5 @@ public record RoomRequest(
         @NotBlank @Size(max = 150) String nameEs,
         @NotBlank @Size(max = 150) String nameEn,
         String descriptionEs,
-        String descriptionEn,
-        @Size(max = 255) String scene3dUrl) {
+        String descriptionEn) {
 }

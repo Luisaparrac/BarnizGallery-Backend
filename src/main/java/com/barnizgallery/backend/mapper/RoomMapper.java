@@ -20,13 +20,12 @@ public final class RoomMapper {
     public static RoomSummaryResponse toSummary(Room room, long artworkCount) {
         Master master = room.getMaster();
         return new RoomSummaryResponse(room.getRoomId(), master.getMasterId(), master.getName(), room.getNameEs(),
-                room.getNameEn(), room.getDescriptionEs(), room.getDescriptionEn(), room.getScene3dUrl(),
-                artworkCount);
+                room.getNameEn(), room.getDescriptionEs(), room.getDescriptionEn(), artworkCount);
     }
 
     public static RoomDetailResponse toDetail(Room room, List<ArtworkSummaryResponse> artworks) {
         return new RoomDetailResponse(room.getRoomId(), MasterMapper.toResponse(room.getMaster()), room.getNameEs(),
-                room.getNameEn(), room.getDescriptionEs(), room.getDescriptionEn(), room.getScene3dUrl(), artworks);
+                room.getNameEn(), room.getDescriptionEs(), room.getDescriptionEn(), artworks);
     }
 
     /** Copies the request fields into the entity. The master is set by the service. */
@@ -35,6 +34,5 @@ public final class RoomMapper {
         room.setNameEn(request.nameEn());
         room.setDescriptionEs(request.descriptionEs());
         room.setDescriptionEn(request.descriptionEn());
-        room.setScene3dUrl(request.scene3dUrl());
     }
 }

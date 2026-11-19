@@ -36,6 +36,6 @@ public class GalleryComposite extends CompositeGalleryComponent {
     @Override
     public GalleryNodeResponse toNode() {
         return new GalleryNodeResponse(null, getType(), NAME_ES, NAME_EN, countArtworks(),
-                countAvailableForAuction(), null, null, null, null, null, null, childNodes());
+                countAvailableForAuction(), null, null, null, null, childNodes());
     }
 }

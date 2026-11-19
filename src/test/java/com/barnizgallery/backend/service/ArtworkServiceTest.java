@@ -28,7 +28,6 @@ import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.AuctionRepository;
 import com.barnizgallery.backend.repository.PhotoRepository;
-import com.barnizgallery.backend.repository.ThreeDModelRepository;
 
 @ExtendWith(MockitoExtension.class)
 class ArtworkServiceTest {
@@ -37,8 +36,6 @@ class ArtworkServiceTest {
     private ArtworkRepository artworkRepository;
     @Mock
     private PhotoRepository photoRepository;
-    @Mock
-    private ThreeDModelRepository threeDModelRepository;
     @Mock
     private AuctionRepository auctionRepository;
     @Mock
@@ -72,19 +69,17 @@ class ArtworkServiceTest {
     }
 
     @Test
-    void detailIncludesPhotosAndNoModelOrAuctionWhenAbsent() {
+    void detailIncludesPhotosAndNoAuctionWhenAbsent() {
         Artwork artwork = TestEntities.artwork(3, room, ArtworkStatus.EXHIBITED);
         when(artworkRepository.findById(3)).thenReturn(Optional.of(artwork));
         when(photoRepository.findByArtworkArtworkIdOrderByPhotoIdAsc(3))
                 .thenReturn(List.of(TestEntities.photo(1, artwork, "https://img/1.jpg")));
-        when(threeDModelRepository.findByArtworkArtworkId(3)).thenReturn(Optional.empty());
         when(auctionRepository.findFirstByArtworkArtworkIdAndStatusInOrderByStartDateDesc(eq(3), anyCollection()))
                 .thenReturn(Optional.empty());
 
         ArtworkDetailResponse detail = artworkService.findById(3);
 
         assertThat(detail.photos()).hasSize(1);
-        assertThat(detail.model()).isNull();
         assertThat(detail.currentAuction()).isNull();
     }
 
