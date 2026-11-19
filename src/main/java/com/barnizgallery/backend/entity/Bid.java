@@ -3,7 +3,11 @@ package com.barnizgallery.backend.entity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import com.barnizgallery.backend.converter.BidReviewStatusConverter;
+import com.barnizgallery.backend.enums.BidReviewStatus;
+
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -15,7 +19,8 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 /**
- * A bid placed by a user in an auction. Maps the existing table {@code bids}.
+ * A bid placed by a user in an auction, with its optional review result (valid or suspicious).
+ * Maps the table {@code museo.bids}.
  */
 @Entity
 @Table(name = "bids")
@@ -37,13 +42,20 @@ public class Bid {
     @Column(name = "amount", nullable = false, precision = 14, scale = 2)
     private BigDecimal amount;
 
-    @Column(name = "currency", nullable = false, length = 10)
+    @Column(name = "currency", nullable = false, length = 3)
     private String currency;
 
     @Column(name = "bid_date")
     private LocalDateTime bidDate;
 
-    /** The column has a DB default, but the value is set from Java so we do not depend on it. */
+    @Convert(converter = BidReviewStatusConverter.class)
+    @Column(name = "review_status", length = 20)
+    private BidReviewStatus reviewStatus;
+
+    @Column(name = "review_reason")
+    private String reviewReason;
+
+    /** The column has no default, so the moment is set from Java when it is missing. */
     @PrePersist
     void onCreate() {
         if (bidDate == null) {
@@ -97,5 +109,21 @@ public class Bid {
 
     public void setBidDate(LocalDateTime bidDate) {
         this.bidDate = bidDate;
+    }
+
+    public BidReviewStatus getReviewStatus() {
+        return reviewStatus;
+    }
+
+    public void setReviewStatus(BidReviewStatus reviewStatus) {
+        this.reviewStatus = reviewStatus;
+    }
+
+    public String getReviewReason() {
+        return reviewReason;
+    }
+
+    public void setReviewReason(String reviewReason) {
+        this.reviewReason = reviewReason;
     }
 }
