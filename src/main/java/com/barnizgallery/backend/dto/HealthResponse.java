@@ -6,6 +6,5 @@ package com.barnizgallery.backend.dto;
 public record HealthResponse(
         String status,
         boolean aiEnabled,
-        boolean hyper3dEnabled,
         boolean storageEnabled) {
 }
