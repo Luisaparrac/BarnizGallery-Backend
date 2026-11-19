@@ -11,16 +11,21 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import com.barnizgallery.backend.config.AuctionProperties;
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Auction;
 import com.barnizgallery.backend.entity.User;
+import com.barnizgallery.backend.exception.AiServiceException;
+import com.barnizgallery.backend.mapper.AiRequestMapper;
 import com.barnizgallery.backend.mapper.ArtworkMapper;
+import com.barnizgallery.backend.patterns.adapter.AiServiceGateway;
 import com.barnizgallery.backend.patterns.adapter.AiTextClient;
 import com.barnizgallery.backend.patterns.strategy.RecommendationResult;
 import com.barnizgallery.backend.patterns.strategy.RecommendationStrategyResolver;
+import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.BidRepository;
 
 /**
@@ -28,9 +33,9 @@ import com.barnizgallery.backend.repository.BidRepository;
  * <p>
  * Single entry point for everything related to AI: store recommendations, base price
  * suggestions and bid review. Behind it there are several subsystems (the recommendation
- * strategies, the AI adapter, the bid repository and the auction settings); the rest of
- * the system only calls these four simple methods and does not know whether AI is enabled
- * or which provider is used.
+ * strategies, the AI text adapter, the separate AI service, the repositories and the auction
+ * settings); the rest of the system only calls these simple methods and does not know whether
+ * AI is enabled or which provider is used.
  */
 @Component
 public class AiFacade {
@@ -46,21 +51,28 @@ public class AiFacade {
             You review bids of an online art auction to detect anomalies.
             Answer with OK, or with SUSPICIOUS: <short reason>.""";
 
+    static final int MAX_PRICE_COMPARABLES = 500;
+
     private final RecommendationStrategyResolver strategyResolver;
     private final AiTextClient aiClient;
+    private final AiServiceGateway aiService;
     private final BidRepository bidRepository;
+    private final ArtworkRepository artworkRepository;
     private final AuctionProperties auctionProperties;
 
-    public AiFacade(RecommendationStrategyResolver strategyResolver, AiTextClient aiClient,
-            BidRepository bidRepository, AuctionProperties auctionProperties) {
+    public AiFacade(RecommendationStrategyResolver strategyResolver, AiTextClient aiClient, AiServiceGateway aiService,
+            BidRepository bidRepository, ArtworkRepository artworkRepository, AuctionProperties auctionProperties) {
         this.strategyResolver = strategyResolver;
         this.aiClient = aiClient;
+        this.aiService = aiService;
         this.bidRepository = bidRepository;
+        this.artworkRepository = artworkRepository;
         this.auctionProperties = auctionProperties;
     }
 
+    /** True when the AI text client or the separate AI service is available. */
     public boolean isAiEnabled() {
-        return aiClient.isEnabled();
+        return aiClient.isEnabled() || aiService.isAvailable();
     }
 
     /** Recommends stores with the default strategy (hybrid). */
@@ -74,12 +86,14 @@ public class AiFacade {
     }
 
     /**
-     * Base price suggested by the AI. Returns empty when AI is disabled or the answer
-     * is not a valid price: a price is never invented.
+     * Base price suggested by the AI, in the auction currency. The AI service is tried first, then the AI text
+     * client. Returns empty when neither gives a valid price (AI disabled, fewer than 3 comparables, errors or
+     * timeouts): a price is never invented.
      */
     public Optional<BigDecimal> suggestBasePrice(Artwork artwork) {
-        if (!aiClient.isEnabled()) {
-            return Optional.empty();
+        Optional<BigDecimal> fromService = suggestWithAiService(artwork);
+        if (fromService.isPresent() || !aiClient.isEnabled()) {
+            return fromService;
         }
         String prompt = "Currency: " + auctionProperties.currency()
                 + "\nTitle: " + artwork.getTitleEn() + " / " + artwork.getTitleEs()
@@ -93,6 +107,24 @@ public class AiFacade {
             return parsePrice(aiClient.complete(PRICE_SYSTEM_PROMPT, prompt));
         } catch (RuntimeException ex) {
             log.warn("AI price suggestion failed for artwork {}: {}", artwork.getArtworkId(), ex.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    private Optional<BigDecimal> suggestWithAiService(Artwork artwork) {
+        if (!aiService.isAvailable() || artwork.getShape() == null) {
+            return Optional.empty();
+        }
+        String currency = auctionProperties.currency();
+        List<Artwork> comparables = artworkRepository.findPriceComparables(currency, artwork.getArtworkId(),
+                PageRequest.of(0, MAX_PRICE_COMPARABLES));
+        try {
+            BigDecimal price = aiService.suggestPrice(
+                    AiRequestMapper.toPricingRequest(artwork, comparables, currency)).suggestedPrice();
+            return price != null && price.signum() > 0 ? Optional.of(price.setScale(2, RoundingMode.HALF_UP))
+                    : Optional.empty();
+        } catch (AiServiceException ex) {
+            log.info("AI service gave no price for artwork {}: {}", artwork.getArtworkId(), ex.getCode());
             return Optional.empty();
         }
     }

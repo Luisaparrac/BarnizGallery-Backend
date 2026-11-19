@@ -141,7 +141,7 @@ Dates are ISO-8601 (UTC). Enum values are in English (`EXHIBITED`, `ACTIVE`, `PE
 | GET | `/api/auctions?status=` | List with highest bid and bid count |
 | GET | `/api/auctions/{id}` | Detail |
 | POST | `/api/auctions` | `{ artworkId, basePrice?, startDate, endDate }` (Builder) |
-| GET | `/api/artworks/{id}/suggested-price` | AI price suggestion (503 while AI is disabled) |
+| GET | `/api/artworks/{id}/suggested-price` | Price suggested by the AI service from at least 3 comparable priced artworks in the auction currency (503 when AI is disabled or cannot suggest one) |
 | POST | `/api/auctions/{id}/start` · `/finish` · `/cancel` | Lifecycle (State) |
 | GET | `/api/auctions/{id}/bids` | Bids, highest first |
 | POST | `/api/auctions/{id}/bids` | `{ userId, amount, currency }` |
@@ -198,7 +198,8 @@ action changes their status.
 
 | Integration | Status | How to enable |
 |---|---|---|
-| AI (recommendation strategy `ai`, price suggestions, AI bid review) | Disabled – provider not chosen | When the provider is chosen: add an adapter implementing `AiTextClient`, add the `AI_API_KEY` property, and set `AI_PROVIDER` |
+| AI service (price suggestions) | Enabled when configured | Set `AI_SERVICE_URL` and `AI_SERVICE_KEY` |
+| AI text model (recommendation strategy `ai`, AI bid review) | Disabled – provider not chosen | When the provider is chosen: add an adapter implementing `AiTextClient`, add the `AI_API_KEY` property, and set `AI_PROVIDER` |
 | Photo storage | Disabled – provider not chosen | Add an adapter implementing `StorageService` and set `STORAGE_PROVIDER` |
 
 While an integration is disabled its endpoints answer **503** and nothing is invented: recommendations

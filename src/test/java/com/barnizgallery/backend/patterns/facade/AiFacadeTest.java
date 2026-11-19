@@ -22,7 +22,9 @@ import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.enums.AuctionStatus;
 import com.barnizgallery.backend.patterns.adapter.AiTextClient;
 import com.barnizgallery.backend.patterns.adapter.DisabledAiClient;
+import com.barnizgallery.backend.patterns.adapter.DisabledAiServiceGateway;
 import com.barnizgallery.backend.patterns.strategy.RecommendationStrategyResolver;
+import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.BidRepository;
 
 class AiFacadeTest {
@@ -38,7 +40,8 @@ class AiFacadeTest {
             LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(1), "100");
 
     private AiFacade facade(AiTextClient client) {
-        return new AiFacade(resolver, client, bidRepository, properties);
+        return new AiFacade(resolver, client, new DisabledAiServiceGateway(), bidRepository,
+                mock(ArtworkRepository.class), properties);
     }
 
     @Test

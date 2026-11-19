@@ -2,6 +2,7 @@ package com.barnizgallery.backend.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -22,6 +23,11 @@ public interface ArtworkRepository extends JpaRepository<Artwork, Long> {
     List<Artwork> findByStoreStoreIdAndStatusOrderByArtworkIdAsc(Long storeId, ArtworkStatus status);
 
     long countByStoreStoreId(Long storeId);
+
+    /** Priced artworks with a shape in a currency, except one, to compare prices with (newest first). */
+    @Query("select a from Artwork a where a.deletedAt is null and a.price is not null and a.shape is not null "
+            + "and a.currency = :currency and a.artworkId <> :artworkId order by a.artworkId desc")
+    List<Artwork> findPriceComparables(String currency, Long artworkId, Pageable page);
 
     /** Artwork count of every store in a single query. */
     @Query("select a.store.storeId as storeId, count(a) as artworkCount from Artwork a group by a.store.storeId")
