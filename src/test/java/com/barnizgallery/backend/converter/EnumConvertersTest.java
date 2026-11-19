@@ -16,6 +16,7 @@ import com.barnizgallery.backend.enums.AuthTokenPurpose;
 import com.barnizgallery.backend.enums.BidReviewStatus;
 import com.barnizgallery.backend.enums.CameraMode;
 import com.barnizgallery.backend.enums.InteractionAction;
+import com.barnizgallery.backend.enums.InventoryReservationStatus;
 import com.barnizgallery.backend.enums.Language;
 import com.barnizgallery.backend.enums.MasterVerificationStatus;
 import com.barnizgallery.backend.enums.OrderStatus;
@@ -103,6 +104,10 @@ class EnumConvertersTest {
                 Arguments.of(new PaymentObligationStatusConverter(), PaymentObligationStatus.PAID, "pagada"),
                 Arguments.of(new PaymentObligationStatusConverter(), PaymentObligationStatus.CANCELLED, "cancelada"),
                 Arguments.of(new PaymentObligationStatusConverter(), PaymentObligationStatus.OVERDUE, "vencida"),
+                Arguments.of(new InventoryReservationStatusConverter(), InventoryReservationStatus.ACTIVE, "activa"),
+                Arguments.of(new InventoryReservationStatusConverter(), InventoryReservationStatus.RELEASED, "liberada"),
+                Arguments.of(new InventoryReservationStatusConverter(), InventoryReservationStatus.CONSUMED, "consumida"),
+                Arguments.of(new InventoryReservationStatusConverter(), InventoryReservationStatus.EXPIRED, "expirada"),
                 Arguments.of(new LanguageConverter(), Language.ES, "es"),
                 Arguments.of(new LanguageConverter(), Language.EN, "en"));
     }
