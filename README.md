@@ -145,10 +145,8 @@ from the same visitor → 429; an amount above 10 × the reference is accepted b
 `/topic/admin/anomalies`.
 
 ### Contact
-| Method | Path | Description |
-|---|---|---|
-| POST | `/api/contact-messages` | `{ userId, masterId, artworkId?, content }` – the artwork must belong to the master's store |
-| GET | `/api/masters/{id}/messages` | Messages received by a master |
+The v1 contact messages were migrated by the database to conversations and messages. The old
+`/api/contact-messages` endpoints were removed; the conversation endpoints replace them.
 
 ### Errors
 Every error has the same shape:
