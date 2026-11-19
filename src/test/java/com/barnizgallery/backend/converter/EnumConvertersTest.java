@@ -19,6 +19,7 @@ import com.barnizgallery.backend.enums.Language;
 import com.barnizgallery.backend.enums.MasterVerificationStatus;
 import com.barnizgallery.backend.enums.UserRole;
 import com.barnizgallery.backend.enums.UserStatus;
+import com.barnizgallery.backend.enums.VerificationStep;
 
 class EnumConvertersTest {
 
@@ -51,6 +52,11 @@ class EnumConvertersTest {
                 Arguments.of(new MasterVerificationStatusConverter(), MasterVerificationStatus.IN_REVIEW, "en_revision"),
                 Arguments.of(new MasterVerificationStatusConverter(), MasterVerificationStatus.APPROVED, "aprobado"),
                 Arguments.of(new MasterVerificationStatusConverter(), MasterVerificationStatus.REJECTED, "rechazado"),
+                Arguments.of(new VerificationStepConverter(), VerificationStep.EMAIL, "correo"),
+                Arguments.of(new VerificationStepConverter(), VerificationStep.IDENTITY, "identidad"),
+                Arguments.of(new VerificationStepConverter(), VerificationStep.WORKSHOP, "taller"),
+                Arguments.of(new VerificationStepConverter(), VerificationStep.SAMPLES, "muestras"),
+                Arguments.of(new VerificationStepConverter(), VerificationStep.ADMIN_APPROVAL, "aprobacion_admin"),
                 Arguments.of(new LanguageConverter(), Language.ES, "es"),
                 Arguments.of(new LanguageConverter(), Language.EN, "en"));
     }
