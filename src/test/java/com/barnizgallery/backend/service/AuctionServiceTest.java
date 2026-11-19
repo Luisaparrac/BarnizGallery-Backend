@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -88,7 +89,7 @@ class AuctionServiceTest {
     void cancellingPublishesAuctionCancelled() {
         Auction scheduled = TestEntities.auction(1, artwork, AuctionStatus.SCHEDULED, NOW.plusDays(1),
                 NOW.plusDays(2), "100");
-        when(auctionRepository.findByIdWithArtwork(1L)).thenReturn(Optional.of(scheduled));
+        when(auctionRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(scheduled));
 
         auctionService.cancel(1L);
 
@@ -99,14 +100,31 @@ class AuctionServiceTest {
     }
 
     @Test
-    void readingAnExpiredActiveAuctionFinishesIt() {
+    void readingAnExpiredActiveAuctionDoesNotChangeIt() {
         artwork.setStatus(ArtworkStatus.IN_AUCTION);
         Auction expired = TestEntities.auction(1, artwork, AuctionStatus.ACTIVE, NOW.minusDays(3),
                 NOW.minusDays(1), "100");
         when(auctionRepository.findByIdWithArtwork(1L)).thenReturn(Optional.of(expired));
+        when(auctionRepository.findAllWithArtwork()).thenReturn(List.of(expired));
+
+        auctionService.findById(1L);
+        auctionService.findAll(null);
+
+        assertThat(expired.getStatus()).isEqualTo(AuctionStatus.ACTIVE);
+        assertThat(artwork.getStatus()).isEqualTo(ArtworkStatus.IN_AUCTION);
+        verify(auctionRepository, never()).findDueForTransition(any());
+        verify(publisher, never()).publish(any());
+    }
+
+    @Test
+    void writeActionSyncsAnExpiredActiveAuctionFirst() {
+        artwork.setStatus(ArtworkStatus.IN_AUCTION);
+        Auction expired = TestEntities.auction(1, artwork, AuctionStatus.ACTIVE, NOW.minusDays(3),
+                NOW.minusDays(1), "100");
+        when(auctionRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(expired));
         when(bidRepository.countByAuctionAuctionId(1L)).thenReturn(2L);
 
-        auctionService.getSyncedAuction(1L);
+        auctionService.getSyncedAuctionForUpdate(1L);
 
         assertThat(expired.getStatus()).isEqualTo(AuctionStatus.FINISHED);
         assertThat(artwork.getStatus()).isEqualTo(ArtworkStatus.SOLD);

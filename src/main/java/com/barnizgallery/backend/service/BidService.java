@@ -124,9 +124,9 @@ public class BidService {
     }
 
     /** Bids of an auction, highest first. */
-    @Transactional
+    @Transactional(readOnly = true)
     public List<BidResponse> findByAuction(Long auctionId) {
-        auctionService.getSyncedAuction(auctionId);
+        auctionService.requireExists(auctionId);
         return bidRepository.findByAuctionWithUser(auctionId).stream()
                 .map(AuctionMapper::toResponse)
                 .toList();

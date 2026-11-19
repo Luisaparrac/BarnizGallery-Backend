@@ -28,9 +28,9 @@ import com.barnizgallery.backend.repository.BidRepository;
  * Auction lifecycle: creation with the Builder pattern, status changes with the State pattern
  * and notifications with the Observer pattern.
  * <p>
- * Reading an auction first syncs its status with the current time, because Render's free plan
- * sleeps and the scheduler does not run while it sleeps. That is why the read methods here use
- * a read-write transaction.
+ * Read requests never write: auction statuses are synced with the clock only by the scheduler and by
+ * write actions (bid, start, finish, cancel). When the service wakes up after sleeping, the scheduler
+ * catches up on its next run.
  */
 @Service
 public class AuctionService {
@@ -57,18 +57,17 @@ public class AuctionService {
         this.clock = clock;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<AuctionResponse> findAll(AuctionStatus status) {
-        syncDueAuctions();
         List<Auction> auctions = status == null
                 ? auctionRepository.findAllWithArtwork()
                 : auctionRepository.findByStatusWithArtwork(status);
         return assembler.toResponses(auctions);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public AuctionResponse findById(Long auctionId) {
-        return assembler.toResponse(getSyncedAuction(auctionId));
+        return assembler.toResponse(getAuction(auctionId));
     }
 
     /**
@@ -101,7 +100,7 @@ public class AuctionService {
 
     @Transactional
     public AuctionResponse start(Long auctionId) {
-        AuctionContext context = contextFor(getAuction(auctionId));
+        AuctionContext context = contextFor(getSyncedAuctionForUpdate(auctionId));
         context.start();
         publish(context.getAuction(), context.getStatus());
         return assembler.toResponse(context.getAuction());
@@ -109,7 +108,7 @@ public class AuctionService {
 
     @Transactional
     public AuctionResponse finish(Long auctionId) {
-        AuctionContext context = contextFor(getAuction(auctionId));
+        AuctionContext context = contextFor(getSyncedAuctionForUpdate(auctionId));
         context.finish();
         publish(context.getAuction(), context.getStatus());
         return assembler.toResponse(context.getAuction());
@@ -117,7 +116,7 @@ public class AuctionService {
 
     @Transactional
     public AuctionResponse cancel(Long auctionId) {
-        AuctionContext context = contextFor(getAuction(auctionId));
+        AuctionContext context = contextFor(getSyncedAuctionForUpdate(auctionId));
         context.cancel();
         publish(context.getAuction(), context.getStatus());
         return assembler.toResponse(context.getAuction());
@@ -125,7 +124,7 @@ public class AuctionService {
 
     /**
      * Starts scheduled auctions whose start date arrived and finishes active ones whose end
-     * date passed. Called by the scheduler every 60 s and before listing auctions.
+     * date passed. Called by the scheduler every 60 s.
      *
      * @return number of auctions that changed
      */
@@ -141,15 +140,18 @@ public class AuctionService {
         return changed;
     }
 
-    /** Loads an auction and brings its status up to date with the current time. */
-    @Transactional
-    public Auction getSyncedAuction(Long auctionId) {
-        Auction auction = getAuction(auctionId);
-        sync(auction, LocalDateTime.now(clock));
-        return auction;
+    /** Fails with 404 if the auction does not exist. Never changes it. */
+    @Transactional(readOnly = true)
+    public void requireExists(Long auctionId) {
+        if (!auctionRepository.existsById(auctionId)) {
+            throw new ResourceNotFoundException("Auction", auctionId);
+        }
     }
 
-    /** Same as {@link #getSyncedAuction} but locks the auction row until the transaction ends. */
+    /**
+     * Loads an auction for a write action: locks its row until the transaction ends and brings its status up
+     * to date with the current time.
+     */
     @Transactional
     public Auction getSyncedAuctionForUpdate(Long auctionId) {
         Auction auction = auctionRepository.findByIdForUpdate(auctionId)
