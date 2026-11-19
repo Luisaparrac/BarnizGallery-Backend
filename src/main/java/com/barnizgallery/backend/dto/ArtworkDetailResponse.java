@@ -1,11 +1,15 @@
 package com.barnizgallery.backend.dto;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.barnizgallery.backend.enums.ArtworkStatus;
+import com.barnizgallery.backend.enums.SaleMode;
 
 /**
  * Full artwork: data, photos and current auction (null if none).
+ *
+ * @param dimensionsLegacy free-text dimensions kept from v1 (null for new artworks)
  */
 public record ArtworkDetailResponse(
         Long artworkId,
@@ -15,10 +19,18 @@ public record ArtworkDetailResponse(
         String historyEs,
         String historyEn,
         String technique,
-        String dimensions,
+        String dimensionsLegacy,
+        BigDecimal widthCm,
+        BigDecimal heightCm,
+        BigDecimal depthCm,
+        BigDecimal weightG,
         List<String> colorTags,
         List<String> motifTags,
         ArtworkStatus status,
+        SaleMode saleMode,
+        BigDecimal price,
+        String currency,
+        Integer stock,
         List<PhotoResponse> photos,
         AuctionResponse currentAuction) {
 }

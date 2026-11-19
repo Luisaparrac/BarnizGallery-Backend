@@ -1,11 +1,13 @@
 package com.barnizgallery.backend.dto;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.barnizgallery.backend.enums.ArtworkStatus;
+import com.barnizgallery.backend.enums.SaleMode;
 
 /**
- * Main data of an artwork, used in lists.
+ * Short view of an artwork, used in lists.
  */
 public record ArtworkSummaryResponse(
         Long artworkId,
@@ -13,8 +15,11 @@ public record ArtworkSummaryResponse(
         String titleEs,
         String titleEn,
         String technique,
-        String dimensions,
         List<String> colorTags,
         List<String> motifTags,
-        ArtworkStatus status) {
+        ArtworkStatus status,
+        SaleMode saleMode,
+        BigDecimal price,
+        String currency,
+        Integer stock) {
 }

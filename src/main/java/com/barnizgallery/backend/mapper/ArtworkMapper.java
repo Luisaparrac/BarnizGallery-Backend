@@ -20,16 +20,19 @@ public final class ArtworkMapper {
 
     public static ArtworkSummaryResponse toSummary(Artwork artwork) {
         return new ArtworkSummaryResponse(artwork.getArtworkId(), artwork.getStore().getStoreId(), artwork.getTitleEs(),
-                artwork.getTitleEn(), artwork.getTechnique(), artwork.getDimensions(), artwork.getColorTags(),
-                artwork.getMotifTags(), artwork.getStatus());
+                artwork.getTitleEn(), artwork.getTechnique(), artwork.getColorTags(), artwork.getMotifTags(),
+                artwork.getStatus(), artwork.getSaleMode(), artwork.getPrice(), artwork.getCurrency(),
+                artwork.getStock());
     }
 
     public static ArtworkDetailResponse toDetail(Artwork artwork, List<PhotoResponse> photos,
             AuctionResponse currentAuction) {
         return new ArtworkDetailResponse(artwork.getArtworkId(), artwork.getStore().getStoreId(), artwork.getTitleEs(),
                 artwork.getTitleEn(), artwork.getHistoryEs(), artwork.getHistoryEn(), artwork.getTechnique(),
-                artwork.getDimensions(), artwork.getColorTags(), artwork.getMotifTags(), artwork.getStatus(),
-                photos, currentAuction);
+                artwork.getDimensionsLegacy(), artwork.getWidthCm(), artwork.getHeightCm(), artwork.getDepthCm(),
+                artwork.getWeightG(), artwork.getColorTags(), artwork.getMotifTags(), artwork.getStatus(),
+                artwork.getSaleMode(), artwork.getPrice(), artwork.getCurrency(), artwork.getStock(), photos,
+                currentAuction);
     }
 
     /** Copies the request fields into the entity. The store and status are set by the service. */
@@ -39,7 +42,14 @@ public final class ArtworkMapper {
         artwork.setHistoryEs(request.historyEs());
         artwork.setHistoryEn(request.historyEn());
         artwork.setTechnique(request.technique());
-        artwork.setDimensions(request.dimensions());
+        artwork.setWidthCm(request.widthCm());
+        artwork.setHeightCm(request.heightCm());
+        artwork.setDepthCm(request.depthCm());
+        artwork.setWeightG(request.weightG());
+        artwork.setSaleMode(request.saleMode());
+        artwork.setPrice(request.price());
+        artwork.setCurrency(request.currency());
+        artwork.setStock(request.stock());
         artwork.setColorTags(request.colorTags());
         artwork.setMotifTags(request.motifTags());
     }

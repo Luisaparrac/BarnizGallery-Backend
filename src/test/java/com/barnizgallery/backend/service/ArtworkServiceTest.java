@@ -89,7 +89,8 @@ class ArtworkServiceTest {
         when(artworkRepository.save(any(Artwork.class))).thenAnswer(inv -> inv.getArgument(0));
 
         ArtworkSummaryResponse created = artworkService.create(
-                new ArtworkRequest(1L, "Obra", "Artwork", null, null, null, null, List.of("red"), List.of()));
+                new ArtworkRequest(1L, "Obra", "Artwork", null, null, null, null, null, null, null,
+                        null, null, null, null, List.of("red"), List.of()));
 
         assertThat(created.status()).isEqualTo(ArtworkStatus.EXHIBITED);
         assertThat(created.colorTags()).containsExactly("red");
@@ -101,7 +102,8 @@ class ArtworkServiceTest {
         when(artworkRepository.findById(3L)).thenReturn(Optional.of(artwork));
 
         ArtworkSummaryResponse updated = artworkService.update(3L,
-                new ArtworkRequest(1L, "Nuevo", "New", null, null, null, null, null, null));
+                new ArtworkRequest(1L, "Nuevo", "New", null, null, null, null, null, null, null,
+                        null, null, null, null, null, null));
 
         assertThat(updated.titleEn()).isEqualTo("New");
         assertThat(updated.status()).isEqualTo(ArtworkStatus.IN_AUCTION);

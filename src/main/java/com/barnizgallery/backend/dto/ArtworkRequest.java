@@ -1,13 +1,20 @@
 package com.barnizgallery.backend.dto;
 
+import java.math.BigDecimal;
 import java.util.List;
+
+import com.barnizgallery.backend.enums.SaleMode;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
 /**
  * Body to create or update an artwork. The status is managed by auctions.
+ *
+ * @param currency ISO 4217 code of the price (for example USD)
  */
 public record ArtworkRequest(
         @NotNull Long storeId,
@@ -16,7 +23,14 @@ public record ArtworkRequest(
         String historyEs,
         String historyEn,
         @Size(max = 150) String technique,
-        @Size(max = 100) String dimensions,
+        @PositiveOrZero BigDecimal widthCm,
+        @PositiveOrZero BigDecimal heightCm,
+        @PositiveOrZero BigDecimal depthCm,
+        @PositiveOrZero BigDecimal weightG,
+        SaleMode saleMode,
+        @PositiveOrZero BigDecimal price,
+        @Pattern(regexp = "[A-Z]{3}") String currency,
+        @PositiveOrZero Integer stock,
         List<String> colorTags,
         List<String> motifTags) {
 }

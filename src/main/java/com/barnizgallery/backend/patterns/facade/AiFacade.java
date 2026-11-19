@@ -83,7 +83,9 @@ public class AiFacade {
         String prompt = "Currency: " + auctionProperties.currency()
                 + "\nTitle: " + artwork.getTitleEn() + " / " + artwork.getTitleEs()
                 + "\nTechnique: " + artwork.getTechnique()
-                + "\nDimensions: " + artwork.getDimensions()
+                + "\nDimensions (cm): " + artwork.getWidthCm() + " x " + artwork.getHeightCm() + " x "
+                + artwork.getDepthCm() + (artwork.getDimensionsLegacy() == null ? ""
+                        : " (" + artwork.getDimensionsLegacy() + ")")
                 + "\nColors: " + artwork.getColorTags()
                 + "\nMotifs: " + artwork.getMotifTags();
         try {
