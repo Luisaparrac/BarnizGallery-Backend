@@ -51,15 +51,12 @@ public class UserService {
         return UserMapper.toResponse(getUser(userId));
     }
 
-    /** Changes the language and/or camera mode. Null fields are left as they are. */
+    /** Changes the preferred language. A null value is left as it is. */
     @Transactional
     public UserResponse updatePreferences(Long userId, UserPreferencesRequest request) {
         User user = getUser(userId);
         if (request.preferredLanguage() != null) {
             user.setPreferredLanguage(request.preferredLanguage());
-        }
-        if (request.cameraMode() != null) {
-            user.setCameraMode(request.cameraMode());
         }
         return UserMapper.toResponse(user);
     }

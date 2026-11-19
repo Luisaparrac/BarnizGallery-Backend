@@ -16,8 +16,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import com.barnizgallery.backend.dto.IdentifyUserRequest;
 import com.barnizgallery.backend.dto.IdentifyUserResponse;
 import com.barnizgallery.backend.dto.UserResponse;
-import com.barnizgallery.backend.enums.CameraMode;
 import com.barnizgallery.backend.enums.Language;
+import com.barnizgallery.backend.enums.UserRole;
+import com.barnizgallery.backend.enums.UserStatus;
 import com.barnizgallery.backend.exception.GlobalExceptionHandler;
 import com.barnizgallery.backend.service.UserService;
 
@@ -30,8 +31,8 @@ class UserControllerTest {
     private MockMvc mockMvc;
 
     private static final String BODY = """
-            {"email":"ana@mail.com","name":"Ana","country":"Colombia",
-             "preferredLanguage":"ES","cameraMode":"FIRST_PERSON"}
+            {"email":"ana@mail.com","name":"Ana","countryCode":"CO",
+             "preferredLanguage":"ES"}
             """;
 
     @BeforeEach
@@ -70,7 +71,8 @@ class UserControllerTest {
 
     private static IdentifyUserResponse response(boolean isNew) {
         return new IdentifyUserResponse(
-                new UserResponse(1L, "Ana", "ana@mail.com", "Colombia", Language.ES, CameraMode.FIRST_PERSON),
+                new UserResponse(1L, "Ana", "ana@mail.com", UserRole.CUSTOMER, UserStatus.PENDING, "CO",
+                        Language.ES),
                 isNew);
     }
 }

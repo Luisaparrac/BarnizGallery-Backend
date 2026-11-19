@@ -14,7 +14,6 @@ import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.enums.AuctionStatus;
 import com.barnizgallery.backend.enums.AuthTokenPurpose;
 import com.barnizgallery.backend.enums.BidReviewStatus;
-import com.barnizgallery.backend.enums.CameraMode;
 import com.barnizgallery.backend.enums.InteractionAction;
 import com.barnizgallery.backend.enums.InventoryReservationStatus;
 import com.barnizgallery.backend.enums.Language;
@@ -50,8 +49,6 @@ class EnumConvertersTest {
                 Arguments.of(new InteractionActionConverter(), InteractionAction.VIEW, "ver"),
                 Arguments.of(new InteractionActionConverter(), InteractionAction.ZOOM, "ampliar"),
                 Arguments.of(new InteractionActionConverter(), InteractionAction.BID, "ofertar"),
-                Arguments.of(new CameraModeConverter(), CameraMode.FIRST_PERSON, "primera_persona"),
-                Arguments.of(new CameraModeConverter(), CameraMode.THIRD_PERSON, "tercera_persona"),
                 Arguments.of(new UserRoleConverter(), UserRole.ADMIN, "administrador"),
                 Arguments.of(new UserRoleConverter(), UserRole.ARTISAN, "artesano"),
                 Arguments.of(new UserRoleConverter(), UserRole.CUSTOMER, "cliente"),

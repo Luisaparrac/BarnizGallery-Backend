@@ -1,16 +1,18 @@
 package com.barnizgallery.backend.dto;
 
-import com.barnizgallery.backend.enums.CameraMode;
 import com.barnizgallery.backend.enums.Language;
+import com.barnizgallery.backend.enums.UserRole;
+import com.barnizgallery.backend.enums.UserStatus;
 
 /**
- * A user.
+ * A user account (never includes the password hash).
  */
 public record UserResponse(
         Long userId,
         String name,
         String email,
-        String country,
-        Language preferredLanguage,
-        CameraMode cameraMode) {
+        UserRole role,
+        UserStatus status,
+        String countryCode,
+        Language preferredLanguage) {
 }

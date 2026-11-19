@@ -26,8 +26,9 @@ import com.barnizgallery.backend.dto.UserPreferencesRequest;
 import com.barnizgallery.backend.dto.UserResponse;
 import com.barnizgallery.backend.entity.TasteProfile;
 import com.barnizgallery.backend.entity.User;
-import com.barnizgallery.backend.enums.CameraMode;
 import com.barnizgallery.backend.enums.Language;
+import com.barnizgallery.backend.enums.UserRole;
+import com.barnizgallery.backend.enums.UserStatus;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.repository.TasteProfileRepository;
 import com.barnizgallery.backend.repository.UserRepository;
@@ -42,8 +43,8 @@ class UserServiceTest {
     @InjectMocks
     private UserService userService;
 
-    private final IdentifyUserRequest request = new IdentifyUserRequest("  Ana@Mail.COM ", "Ana", "Colombia",
-            Language.ES, CameraMode.THIRD_PERSON);
+    private final IdentifyUserRequest request = new IdentifyUserRequest("  Ana@Mail.COM ", "Ana", "CO",
+            Language.ES);
 
     @Test
     void identifyReturnsExistingUserWithoutCreatingIt() {
@@ -70,18 +71,19 @@ class UserServiceTest {
 
         assertThat(response.isNew()).isTrue();
         assertThat(response.user().email()).isEqualTo("ana@mail.com");
-        assertThat(response.user().cameraMode()).isEqualTo(CameraMode.THIRD_PERSON);
+        assertThat(response.user().role()).isEqualTo(UserRole.CUSTOMER);
+        assertThat(response.user().status()).isEqualTo(UserStatus.PENDING);
+        assertThat(response.user().countryCode()).isEqualTo("CO");
     }
 
     @Test
-    void updatePreferencesOnlyChangesGivenFields() {
+    void updatePreferencesChangesTheLanguage() {
         User user = TestEntities.user(1, Language.ES);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
-        UserResponse updated = userService.updatePreferences(1L, new UserPreferencesRequest(Language.EN, null));
+        UserResponse updated = userService.updatePreferences(1L, new UserPreferencesRequest(Language.EN));
 
         assertThat(updated.preferredLanguage()).isEqualTo(Language.EN);
-        assertThat(updated.cameraMode()).isEqualTo(CameraMode.FIRST_PERSON);
     }
 
     @Test

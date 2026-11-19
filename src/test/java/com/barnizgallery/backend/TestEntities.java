@@ -12,8 +12,9 @@ import com.barnizgallery.backend.entity.Room;
 import com.barnizgallery.backend.entity.User;
 import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.enums.AuctionStatus;
-import com.barnizgallery.backend.enums.CameraMode;
 import com.barnizgallery.backend.enums.Language;
+import com.barnizgallery.backend.enums.UserRole;
+import com.barnizgallery.backend.enums.UserStatus;
 
 /**
  * In-memory entities for unit tests. Nothing here is ever saved to a database.
@@ -64,7 +65,8 @@ public final class TestEntities {
         user.setName("User " + id);
         user.setEmail("user" + id + "@test.local");
         user.setPreferredLanguage(language);
-        user.setCameraMode(CameraMode.FIRST_PERSON);
+        user.setRole(UserRole.CUSTOMER);
+        user.setStatus(UserStatus.ACTIVE);
         return user;
     }
 

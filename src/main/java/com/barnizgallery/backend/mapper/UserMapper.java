@@ -6,6 +6,8 @@ import com.barnizgallery.backend.dto.TasteProfileResponse;
 import com.barnizgallery.backend.dto.UserResponse;
 import com.barnizgallery.backend.entity.TasteProfile;
 import com.barnizgallery.backend.entity.User;
+import com.barnizgallery.backend.enums.UserRole;
+import com.barnizgallery.backend.enums.UserStatus;
 
 /**
  * Converts between {@link User} / {@link TasteProfile} and their DTOs.
@@ -16,18 +18,22 @@ public final class UserMapper {
     }
 
     public static UserResponse toResponse(User user) {
-        return new UserResponse(user.getUserId(), user.getName(), user.getEmail(),
-                user.getCountry(), user.getPreferredLanguage(), user.getCameraMode());
+        return new UserResponse(user.getUserId(), user.getName(), user.getEmail(), user.getRole(), user.getStatus(),
+                user.getCountryCode(), user.getPreferredLanguage());
     }
 
-    /** Builds a new user from the identification request. The email is normalized by the service. */
+    /**
+     * Builds a new customer from the identification request. The email is normalized by the service.
+     * The account stays pending and without password until it gets one.
+     */
     public static User toNewUser(IdentifyUserRequest request, String normalizedEmail) {
         User user = new User();
         user.setEmail(normalizedEmail);
         user.setName(request.name());
-        user.setCountry(request.country());
+        user.setCountryCode(request.countryCode());
         user.setPreferredLanguage(request.preferredLanguage());
-        user.setCameraMode(request.cameraMode());
+        user.setRole(UserRole.CUSTOMER);
+        user.setStatus(UserStatus.PENDING);
         return user;
     }
 
