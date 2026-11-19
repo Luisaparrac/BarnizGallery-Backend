@@ -28,9 +28,12 @@ class EnumConvertersTest {
 
     static Stream<Arguments> mappings() {
         return Stream.of(
+                Arguments.of(new ArtworkStatusConverter(), ArtworkStatus.DRAFT, "borrador"),
                 Arguments.of(new ArtworkStatusConverter(), ArtworkStatus.EXHIBITED, "exhibida"),
                 Arguments.of(new ArtworkStatusConverter(), ArtworkStatus.IN_AUCTION, "subasta"),
+                Arguments.of(new ArtworkStatusConverter(), ArtworkStatus.RESERVED, "reservada"),
                 Arguments.of(new ArtworkStatusConverter(), ArtworkStatus.SOLD, "vendida"),
+                Arguments.of(new ArtworkStatusConverter(), ArtworkStatus.ARCHIVED, "archivada"),
                 Arguments.of(new AuctionStatusConverter(), AuctionStatus.SCHEDULED, "programada"),
                 Arguments.of(new AuctionStatusConverter(), AuctionStatus.ACTIVE, "activa"),
                 Arguments.of(new AuctionStatusConverter(), AuctionStatus.FINISHED, "finalizada"),

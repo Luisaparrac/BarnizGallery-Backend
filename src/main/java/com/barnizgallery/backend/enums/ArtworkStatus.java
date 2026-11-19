@@ -5,9 +5,12 @@ package com.barnizgallery.backend.enums;
  */
 public enum ArtworkStatus implements DbValueEnum {
 
+    DRAFT("borrador"),
     EXHIBITED("exhibida"),
     IN_AUCTION("subasta"),
-    SOLD("vendida");
+    RESERVED("reservada"),
+    SOLD("vendida"),
+    ARCHIVED("archivada");
 
     private final String dbValue;
 
