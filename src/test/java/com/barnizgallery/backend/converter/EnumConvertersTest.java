@@ -13,7 +13,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.enums.AuctionStatus;
 import com.barnizgallery.backend.enums.CameraMode;
-import com.barnizgallery.backend.enums.GenerationStatus;
 import com.barnizgallery.backend.enums.InteractionAction;
 import com.barnizgallery.backend.enums.Language;
 
@@ -32,10 +31,6 @@ class EnumConvertersTest {
                 Arguments.of(new InteractionActionConverter(), InteractionAction.TOUCH, "tocar"),
                 Arguments.of(new InteractionActionConverter(), InteractionAction.ROTATE, "girar"),
                 Arguments.of(new InteractionActionConverter(), InteractionAction.BID, "ofertar"),
-                Arguments.of(new GenerationStatusConverter(), GenerationStatus.PENDING, "pendiente"),
-                Arguments.of(new GenerationStatusConverter(), GenerationStatus.PROCESSING, "procesando"),
-                Arguments.of(new GenerationStatusConverter(), GenerationStatus.COMPLETED, "completado"),
-                Arguments.of(new GenerationStatusConverter(), GenerationStatus.FAILED, "fallido"),
                 Arguments.of(new CameraModeConverter(), CameraMode.FIRST_PERSON, "primera_persona"),
                 Arguments.of(new CameraModeConverter(), CameraMode.THIRD_PERSON, "tercera_persona"),
                 Arguments.of(new LanguageConverter(), Language.ES, "es"),
