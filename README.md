@@ -80,8 +80,6 @@ Requirements: Java 21 and access to the database.
 | `AUCTION_SCHEDULER_ENABLED` | Run the 60-second auction scheduler | `true` |
 | `AI_PROVIDER` | AI provider (not chosen yet; `none` disables AI) | `none` |
 | `AI_API_KEY` | Not used yet: it will be added together with the adapter when the AI provider is chosen | – |
-| `HYPER3D_API_KEY` | Hyper3D Rodin key; empty disables 3D generation | empty |
-| `HYPER3D_BASE_URL` | Hyper3D API base URL | `https://api.hyper3d.com` |
 | `STORAGE_PROVIDER` | Photo storage provider (not chosen yet) | `none` |
 | `JAVA_TOOL_OPTIONS` | `-XX:MaxRAMPercentage=75 -XX:+UseSerialGC -Xss512k` (already set in the Dockerfile) | – |
 
@@ -93,7 +91,7 @@ Dates are ISO-8601 (UTC). Enum values are in English (`EXHIBITED`, `ACTIVE`, `FI
 ### System
 | Method | Path | Description |
 |---|---|---|
-| GET | `/api/health` | `{ status, aiEnabled, hyper3dEnabled, storageEnabled }` |
+| GET | `/api/health` | `{ status, aiEnabled, storageEnabled }` |
 
 ### Catalog
 | Method | Path | Description |
@@ -106,19 +104,12 @@ Dates are ISO-8601 (UTC). Enum values are in English (`EXHIBITED`, `ACTIVE`, `FI
 | GET | `/api/rooms/{id}` | Room + artworks |
 | POST / PUT | `/api/rooms`, `/api/rooms/{id}` | Create / update room (one room per master) |
 | GET | `/api/artworks?roomId=&status=` | Filterable list |
-| GET | `/api/artworks/{id}` | Artwork + photos + 3D model + current auction |
+| GET | `/api/artworks/{id}` | Artwork + photos + current auction |
 | POST / PUT | `/api/artworks`, `/api/artworks/{id}` | Create / update artwork (status is managed by auctions) |
 | GET | `/api/artworks/{id}/photos` | Photos |
 | POST | `/api/artworks/{id}/photos` | Register photo by URL `{ fileUrl, angle }` |
 | POST | `/api/artworks/{id}/photos/upload` | Multipart upload (503 while storage is disabled) |
 | DELETE | `/api/photos/{id}` | Delete a photo |
-
-### 3D models
-| Method | Path | Description |
-|---|---|---|
-| GET | `/api/artworks/{id}/model` | 3D model (404 if none) |
-| POST | `/api/artworks/{id}/model/generate` | Send photos to Hyper3D (needs ≥ 1 photo with an absolute URL; 503 if disabled; 409 if already completed) |
-| POST | `/api/artworks/{id}/model/refresh` | Check Hyper3D and save the GLB URL when done |
 
 ### Visitors
 | Method | Path | Description |
@@ -199,7 +190,6 @@ auction is read or receives a bid, not only by the scheduler.
 | Integration | Status | How to enable |
 |---|---|---|
 | AI (recommendation strategy `ai`, price suggestions, AI bid review) | Disabled – provider not chosen | When the provider is chosen: add an adapter implementing `AiTextClient`, add the `AI_API_KEY` property, and set `AI_PROVIDER` |
-| Hyper3D Rodin (photos → GLB) | Implemented, disabled without key | Set `HYPER3D_API_KEY`. Photos must have absolute public URLs. The GLB URL returned by Hyper3D may be temporary |
 | Photo storage | Disabled – provider not chosen | Add an adapter implementing `StorageService` and set `STORAGE_PROVIDER` |
 
 While an integration is disabled its endpoints answer **503** and nothing is invented: recommendations
