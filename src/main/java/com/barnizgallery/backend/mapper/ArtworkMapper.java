@@ -69,6 +69,6 @@ public final class ArtworkMapper {
 
     public static PhotoResponse toPhotoResponse(Photo photo) {
         return new PhotoResponse(photo.getPhotoId(), photo.getArtwork().getArtworkId(), photo.getFileUrl(),
-                photo.getAngle());
+                photo.getAngle(), photo.getAltEs(), photo.getAltEn(), photo.getSortOrder(), photo.isPrimary());
     }
 }
