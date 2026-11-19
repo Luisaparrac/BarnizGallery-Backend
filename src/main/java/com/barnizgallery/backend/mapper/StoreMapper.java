@@ -20,15 +20,15 @@ public final class StoreMapper {
     public static StoreSummaryResponse toSummary(Store store, long artworkCount) {
         Master master = store.getMaster();
         return new StoreSummaryResponse(store.getStoreId(), master.getMasterId(), master.getName(), store.getNameEs(),
-                store.getNameEn(), store.getDescriptionEs(), store.getDescriptionEn(), artworkCount);
+                store.getNameEn(), store.getDescriptionEs(), store.getDescriptionEn(), store.getStatus(), artworkCount);
     }
 
     public static StoreDetailResponse toDetail(Store store, List<ArtworkSummaryResponse> artworks) {
         return new StoreDetailResponse(store.getStoreId(), MasterMapper.toResponse(store.getMaster()), store.getNameEs(),
-                store.getNameEn(), store.getDescriptionEs(), store.getDescriptionEn(), artworks);
+                store.getNameEn(), store.getDescriptionEs(), store.getDescriptionEn(), store.getStatus(), artworks);
     }
 
-    /** Copies the request fields into the entity. The master is set by the service. */
+    /** Copies the request fields into the entity. The master and template are set by the service. */
     public static void apply(StoreRequest request, Store store) {
         store.setNameEs(request.nameEs());
         store.setNameEn(request.nameEn());

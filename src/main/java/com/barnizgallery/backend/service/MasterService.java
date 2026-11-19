@@ -46,7 +46,7 @@ public class MasterService {
     @Transactional(readOnly = true)
     public MasterDetailResponse findById(Long masterId) {
         Master master = getMaster(masterId);
-        StoreSummaryResponse store = storeRepository.findByMasterMasterId(masterId)
+        StoreSummaryResponse store = storeRepository.findFirstByMasterMasterIdOrderByStoreIdAsc(masterId)
                 .map(r -> StoreMapper.toSummary(r, artworkRepository.countByStoreStoreId(r.getStoreId())))
                 .orElse(null);
         return MasterMapper.toDetail(master, store);

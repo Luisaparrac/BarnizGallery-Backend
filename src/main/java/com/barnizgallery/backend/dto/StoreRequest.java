@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Size;
  */
 public record StoreRequest(
         @NotNull Long masterId,
+        @NotNull Long templateId,
         @NotBlank @Size(max = 150) String nameEs,
         @NotBlank @Size(max = 150) String nameEn,
         String descriptionEs,

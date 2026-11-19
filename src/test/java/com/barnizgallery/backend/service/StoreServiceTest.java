@@ -22,16 +22,20 @@ import com.barnizgallery.backend.dto.StoreRequest;
 import com.barnizgallery.backend.dto.StoreSummaryResponse;
 import com.barnizgallery.backend.entity.Master;
 import com.barnizgallery.backend.entity.Store;
+import com.barnizgallery.backend.enums.StoreStatus;
 import com.barnizgallery.backend.exception.BusinessRuleException;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.StoreArtworkCount;
 import com.barnizgallery.backend.repository.StoreRepository;
+import com.barnizgallery.backend.repository.StoreTemplateRepository;
 
 @ExtendWith(MockitoExtension.class)
 class StoreServiceTest {
 
     @Mock
     private StoreRepository storeRepository;
+    @Mock
+    private StoreTemplateRepository templateRepository;
     @Mock
     private ArtworkRepository artworkRepository;
     @Mock
@@ -70,6 +74,7 @@ class StoreServiceTest {
         Master master = TestEntities.master(1);
         when(masterService.getMaster(1L)).thenReturn(master);
         when(storeRepository.existsByMasterMasterId(1L)).thenReturn(false);
+        when(templateRepository.findById(1L)).thenReturn(Optional.of(TestEntities.template(1)));
         when(storeRepository.save(any(Store.class))).thenAnswer(inv -> {
             Store saved = inv.getArgument(0);
             saved.setStoreId(5L);
@@ -81,6 +86,7 @@ class StoreServiceTest {
         assertThat(created.storeId()).isEqualTo(5);
         assertThat(created.masterId()).isEqualTo(1);
         assertThat(created.nameEn()).isEqualTo("Store");
+        assertThat(created.status()).isEqualTo(StoreStatus.DRAFT);
     }
 
     @Test
@@ -95,7 +101,7 @@ class StoreServiceTest {
     }
 
     private static StoreRequest request(long masterId) {
-        return new StoreRequest(masterId, "Tienda", "Store", null, null);
+        return new StoreRequest(masterId, 1L, "Tienda", "Store", null, null);
     }
 
     private static StoreArtworkCount count(long storeId, long artworkCount) {

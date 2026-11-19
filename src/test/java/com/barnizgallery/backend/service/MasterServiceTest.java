@@ -50,7 +50,7 @@ class MasterServiceTest {
         Master master = TestEntities.master(1);
         Store store = TestEntities.store(10, master);
         when(masterRepository.findById(1L)).thenReturn(Optional.of(master));
-        when(storeRepository.findByMasterMasterId(1L)).thenReturn(Optional.of(store));
+        when(storeRepository.findFirstByMasterMasterIdOrderByStoreIdAsc(1L)).thenReturn(Optional.of(store));
         when(artworkRepository.countByStoreStoreId(10L)).thenReturn(4L);
 
         MasterDetailResponse detail = masterService.findById(1L);
@@ -63,7 +63,7 @@ class MasterServiceTest {
     @Test
     void findByIdWithoutStoreReturnsNullStore() {
         when(masterRepository.findById(1L)).thenReturn(Optional.of(TestEntities.master(1)));
-        when(storeRepository.findByMasterMasterId(1L)).thenReturn(Optional.empty());
+        when(storeRepository.findFirstByMasterMasterIdOrderByStoreIdAsc(1L)).thenReturn(Optional.empty());
 
         assertThat(masterService.findById(1L).store()).isNull();
     }

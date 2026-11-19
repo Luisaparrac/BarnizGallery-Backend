@@ -9,6 +9,7 @@ import com.barnizgallery.backend.entity.Auction;
 import com.barnizgallery.backend.entity.Master;
 import com.barnizgallery.backend.entity.Photo;
 import com.barnizgallery.backend.entity.Store;
+import com.barnizgallery.backend.entity.StoreTemplate;
 import com.barnizgallery.backend.entity.User;
 import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.enums.AuctionStatus;
@@ -38,6 +39,13 @@ public final class TestEntities {
         store.setNameEs("Tienda " + id);
         store.setNameEn("Store " + id);
         return store;
+    }
+
+    public static StoreTemplate template(long id) {
+        StoreTemplate template = new StoreTemplate();
+        template.setTemplateId(id);
+        template.setCode("template-" + id);
+        return template;
     }
 
     public static Artwork artwork(long id, Store store, ArtworkStatus status, String... colorTags) {

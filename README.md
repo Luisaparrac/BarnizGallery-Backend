@@ -102,7 +102,7 @@ Dates are ISO-8601 (UTC). Enum values are in English (`EXHIBITED`, `ACTIVE`, `PE
 | POST / PUT | `/api/masters`, `/api/masters/{id}` | Create / update master |
 | GET | `/api/rooms` | Stores with master and artwork count (legacy path) |
 | GET | `/api/rooms/{id}` | Store + artworks (legacy path) |
-| POST / PUT | `/api/rooms`, `/api/rooms/{id}` | Create / update store (one store per master) |
+| POST / PUT | `/api/rooms`, `/api/rooms/{id}` | Create / update store `{ masterId, templateId, nameEs, nameEn, … }` (one store per master) |
 | GET | `/api/artworks?storeId=&status=` | Filterable list |
 | GET | `/api/artworks/{id}` | Artwork + photos + current auction |
 | POST / PUT | `/api/artworks`, `/api/artworks/{id}` | Create / update artwork (status is managed by auctions) |

@@ -20,7 +20,7 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
     @Query("select r from Store r join fetch r.master where r.storeId = :storeId")
     Optional<Store> findByIdWithMaster(Long storeId);
 
-    Optional<Store> findByMasterMasterId(Long masterId);
+    Optional<Store> findFirstByMasterMasterIdOrderByStoreIdAsc(Long masterId);
 
     boolean existsByMasterMasterId(Long masterId);
 }

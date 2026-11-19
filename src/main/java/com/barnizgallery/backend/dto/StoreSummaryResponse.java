@@ -1,5 +1,7 @@
 package com.barnizgallery.backend.dto;
 
+import com.barnizgallery.backend.enums.StoreStatus;
+
 /**
  * A store with its master name and number of artworks.
  */
@@ -11,5 +13,6 @@ public record StoreSummaryResponse(
         String nameEn,
         String descriptionEs,
         String descriptionEn,
+        StoreStatus status,
         long artworkCount) {
 }

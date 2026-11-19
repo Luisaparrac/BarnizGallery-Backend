@@ -13,6 +13,7 @@ import com.barnizgallery.backend.dto.StoreRequest;
 import com.barnizgallery.backend.dto.StoreSummaryResponse;
 import com.barnizgallery.backend.entity.Master;
 import com.barnizgallery.backend.entity.Store;
+import com.barnizgallery.backend.entity.StoreTemplate;
 import com.barnizgallery.backend.exception.BusinessRuleException;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.mapper.ArtworkMapper;
@@ -20,6 +21,7 @@ import com.barnizgallery.backend.mapper.StoreMapper;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.StoreArtworkCount;
 import com.barnizgallery.backend.repository.StoreRepository;
+import com.barnizgallery.backend.repository.StoreTemplateRepository;
 
 /**
  * Business logic for stores. Each master has at most one store (1:1).
@@ -29,12 +31,14 @@ import com.barnizgallery.backend.repository.StoreRepository;
 public class StoreService {
 
     private final StoreRepository storeRepository;
+    private final StoreTemplateRepository templateRepository;
     private final ArtworkRepository artworkRepository;
     private final MasterService masterService;
 
-    public StoreService(StoreRepository storeRepository, ArtworkRepository artworkRepository,
-            MasterService masterService) {
+    public StoreService(StoreRepository storeRepository, StoreTemplateRepository templateRepository,
+            ArtworkRepository artworkRepository, MasterService masterService) {
         this.storeRepository = storeRepository;
+        this.templateRepository = templateRepository;
         this.artworkRepository = artworkRepository;
         this.masterService = masterService;
     }
@@ -67,6 +71,7 @@ public class StoreService {
         }
         Store store = new Store();
         store.setMaster(master);
+        store.setTemplate(getTemplate(request.templateId()));
         StoreMapper.apply(request, store);
         return StoreMapper.toSummary(storeRepository.save(store), 0);
     }
@@ -81,8 +86,16 @@ public class StoreService {
             }
             store.setMaster(newMaster);
         }
+        if (!store.getTemplate().getTemplateId().equals(request.templateId())) {
+            store.setTemplate(getTemplate(request.templateId()));
+        }
         StoreMapper.apply(request, store);
         return StoreMapper.toSummary(store, artworkRepository.countByStoreStoreId(storeId));
+    }
+
+    private StoreTemplate getTemplate(Long templateId) {
+        return templateRepository.findById(templateId)
+                .orElseThrow(() -> new ResourceNotFoundException("Store template", templateId));
     }
 
     /** Loads a store or throws 404. Used by other services too. */
