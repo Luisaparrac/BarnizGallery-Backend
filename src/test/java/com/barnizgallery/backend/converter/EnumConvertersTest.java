@@ -13,6 +13,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.enums.AuctionStatus;
 import com.barnizgallery.backend.enums.AuthTokenPurpose;
+import com.barnizgallery.backend.enums.BidReviewStatus;
 import com.barnizgallery.backend.enums.CameraMode;
 import com.barnizgallery.backend.enums.InteractionAction;
 import com.barnizgallery.backend.enums.Language;
@@ -91,6 +92,8 @@ class EnumConvertersTest {
                 Arguments.of(new PaymentStatusConverter(), PaymentStatus.DECLINED, "rechazado"),
                 Arguments.of(new PaymentStatusConverter(), PaymentStatus.EXPIRED, "expirado"),
                 Arguments.of(new PaymentStatusConverter(), PaymentStatus.REFUNDED, "reembolsado"),
+                Arguments.of(new BidReviewStatusConverter(), BidReviewStatus.VALID, "valida"),
+                Arguments.of(new BidReviewStatusConverter(), BidReviewStatus.SUSPICIOUS, "sospechosa"),
                 Arguments.of(new LanguageConverter(), Language.ES, "es"),
                 Arguments.of(new LanguageConverter(), Language.EN, "en"));
     }
