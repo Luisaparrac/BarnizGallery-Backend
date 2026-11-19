@@ -16,12 +16,14 @@ public final class MasterMapper {
 
     public static MasterResponse toResponse(Master master) {
         return new MasterResponse(master.getMasterId(), master.getName(), master.getBiographyEs(),
-                master.getBiographyEn(), master.getWorkshop(), master.getContactInfo());
+                master.getBiographyEn(), master.getWorkshop(), master.getContactInfo(),
+                master.getVerificationStatus());
     }
 
     public static MasterDetailResponse toDetail(Master master, RoomSummaryResponse room) {
         return new MasterDetailResponse(master.getMasterId(), master.getName(), master.getBiographyEs(),
-                master.getBiographyEn(), master.getWorkshop(), master.getContactInfo(), room);
+                master.getBiographyEn(), master.getWorkshop(), master.getContactInfo(),
+                master.getVerificationStatus(), room);
     }
 
     /** Copies the request fields into the entity (used for create and update). */
