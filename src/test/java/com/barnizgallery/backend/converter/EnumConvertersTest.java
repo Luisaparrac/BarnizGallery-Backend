@@ -20,6 +20,8 @@ import com.barnizgallery.backend.enums.Language;
 import com.barnizgallery.backend.enums.MasterVerificationStatus;
 import com.barnizgallery.backend.enums.OrderStatus;
 import com.barnizgallery.backend.enums.OrderType;
+import com.barnizgallery.backend.enums.PaymentObligationStage;
+import com.barnizgallery.backend.enums.PaymentObligationStatus;
 import com.barnizgallery.backend.enums.PaymentStatus;
 import com.barnizgallery.backend.enums.SaleMode;
 import com.barnizgallery.backend.enums.StoreStatus;
@@ -94,6 +96,13 @@ class EnumConvertersTest {
                 Arguments.of(new PaymentStatusConverter(), PaymentStatus.REFUNDED, "reembolsado"),
                 Arguments.of(new BidReviewStatusConverter(), BidReviewStatus.VALID, "valida"),
                 Arguments.of(new BidReviewStatusConverter(), BidReviewStatus.SUSPICIOUS, "sospechosa"),
+                Arguments.of(new PaymentObligationStageConverter(), PaymentObligationStage.SINGLE_PAYMENT, "pago_unico"),
+                Arguments.of(new PaymentObligationStageConverter(), PaymentObligationStage.DEPOSIT, "anticipo"),
+                Arguments.of(new PaymentObligationStageConverter(), PaymentObligationStage.BALANCE, "saldo"),
+                Arguments.of(new PaymentObligationStatusConverter(), PaymentObligationStatus.PENDING, "pendiente"),
+                Arguments.of(new PaymentObligationStatusConverter(), PaymentObligationStatus.PAID, "pagada"),
+                Arguments.of(new PaymentObligationStatusConverter(), PaymentObligationStatus.CANCELLED, "cancelada"),
+                Arguments.of(new PaymentObligationStatusConverter(), PaymentObligationStatus.OVERDUE, "vencida"),
                 Arguments.of(new LanguageConverter(), Language.ES, "es"),
                 Arguments.of(new LanguageConverter(), Language.EN, "en"));
     }
