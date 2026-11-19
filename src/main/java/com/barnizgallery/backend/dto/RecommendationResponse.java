@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 public record RecommendationResponse(
         Long recommendationId,
         Long userId,
+        Long artworkId,
         Long storeId,
         String storeNameEs,
         String storeNameEn,

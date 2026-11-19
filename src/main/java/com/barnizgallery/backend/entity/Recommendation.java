@@ -15,7 +15,8 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 /**
- * A store recommended to a user with a score from 0 to 100. Maps the existing table {@code recommendations}.
+ * An artwork or a store (exactly one of them) recommended to a user with a score from 0 to 100,
+ * and the strategy that produced it. Maps the table {@code museo.recommendations}.
  */
 @Entity
 @Table(name = "recommendations")
@@ -30,20 +31,27 @@ public class Recommendation {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "store_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "artwork_id")
+    private Artwork artwork;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_id")
     private Store store;
 
     @Column(name = "score", precision = 5, scale = 2)
     private BigDecimal score;
 
-    @Column(name = "reason", columnDefinition = "text")
+    @Column(name = "reason")
     private String reason;
+
+    @Column(name = "strategy")
+    private String strategy;
 
     @Column(name = "recommendation_date")
     private LocalDateTime recommendationDate;
 
-    /** The column has a DB default, but the value is set from Java so we do not depend on it. */
+    /** The column has no default, so the moment is set from Java when it is missing. */
     @PrePersist
     void onCreate() {
         if (recommendationDate == null) {
@@ -65,6 +73,14 @@ public class Recommendation {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Artwork getArtwork() {
+        return artwork;
+    }
+
+    public void setArtwork(Artwork artwork) {
+        this.artwork = artwork;
     }
 
     public Store getStore() {
@@ -89,6 +105,14 @@ public class Recommendation {
 
     public void setReason(String reason) {
         this.reason = reason;
+    }
+
+    public String getStrategy() {
+        return strategy;
+    }
+
+    public void setStrategy(String strategy) {
+        this.strategy = strategy;
     }
 
     public LocalDateTime getRecommendationDate() {
