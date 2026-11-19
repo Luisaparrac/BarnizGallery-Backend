@@ -2,14 +2,13 @@ package com.barnizgallery.backend.dto;
 
 import java.util.List;
 
-import jakarta.validation.constraints.Size;
-
 /**
- * Answers of the initial questionnaire.
+ * Answers of the initial questionnaire, as catalog codes. Every field is optional.
  */
 public record TasteProfileRequest(
-        List<String> preferredColors,
-        List<String> preferredTypes,
-        List<String> preferredStyles,
-        @Size(max = 100) String budgetRange) {
+        List<String> colorCodes,
+        List<String> shapeCodes,
+        List<String> styleCodes,
+        List<String> motifCodes,
+        String budgetRangeCode) {
 }

@@ -1,9 +1,14 @@
 package com.barnizgallery.backend.mapper;
 
+import java.util.List;
+
 import com.barnizgallery.backend.dto.IdentifyUserRequest;
-import com.barnizgallery.backend.dto.TasteProfileRequest;
 import com.barnizgallery.backend.dto.TasteProfileResponse;
 import com.barnizgallery.backend.dto.UserResponse;
+import com.barnizgallery.backend.entity.Color;
+import com.barnizgallery.backend.entity.Motif;
+import com.barnizgallery.backend.entity.Shape;
+import com.barnizgallery.backend.entity.Style;
 import com.barnizgallery.backend.entity.TasteProfile;
 import com.barnizgallery.backend.entity.User;
 import com.barnizgallery.backend.enums.UserRole;
@@ -38,16 +43,17 @@ public final class UserMapper {
     }
 
     public static TasteProfileResponse toResponse(TasteProfile profile) {
-        return new TasteProfileResponse(profile.getProfileId(), profile.getUser().getUserId(),
-                profile.getPreferredColors(), profile.getPreferredTypes(), profile.getPreferredStyles(),
-                profile.getBudgetRange(), profile.getUpdatedAt());
+        String budgetRangeCode = profile.getBudgetRange() == null ? null : profile.getBudgetRange().getCode();
+        return new TasteProfileResponse(profile.getProfileId(), profile.getUser().getUserId(), colorCodes(profile),
+                profile.getShapes().stream().map(Shape::getCode).sorted().toList(),
+                profile.getStyles().stream().map(Style::getCode).sorted().toList(),
+                profile.getMotifs().stream().map(Motif::getCode).sorted().toList(),
+                budgetRangeCode, profile.getUpdatedAt());
     }
 
-    /** Copies the questionnaire answers into the profile. */
-    public static void apply(TasteProfileRequest request, TasteProfile profile) {
-        profile.setPreferredColors(request.preferredColors());
-        profile.setPreferredTypes(request.preferredTypes());
-        profile.setPreferredStyles(request.preferredStyles());
-        profile.setBudgetRange(request.budgetRange());
+    /** Preferred color codes of the profile, sorted. */
+    public static List<String> colorCodes(TasteProfile profile) {
+        return profile.getColors().stream().map(Color::getCode).sorted().toList();
     }
+
 }

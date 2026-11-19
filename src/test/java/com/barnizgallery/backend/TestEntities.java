@@ -48,6 +48,12 @@ public final class TestEntities {
         return template;
     }
 
+    public static Color color(String code) {
+        Color color = new Color();
+        color.setCode(code);
+        return color;
+    }
+
     public static Artwork artwork(long id, Store store, ArtworkStatus status, String... colorCodes) {
         Artwork artwork = new Artwork();
         artwork.setArtworkId(id);
@@ -56,9 +62,7 @@ public final class TestEntities {
         artwork.setTitleEn("Artwork " + id);
         artwork.setStatus(status);
         for (String code : colorCodes) {
-            Color color = new Color();
-            color.setCode(code);
-            artwork.getColors().add(color);
+            artwork.getColors().add(color(code));
         }
         return artwork;
     }

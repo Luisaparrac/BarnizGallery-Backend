@@ -68,7 +68,9 @@ class RecommendationStrategiesTest {
 
     private void givenPreferredColors(String... colors) {
         TasteProfile profile = new TasteProfile();
-        profile.setPreferredColors(List.of(colors));
+        for (String color : colors) {
+            profile.getColors().add(TestEntities.color(color));
+        }
         when(tasteProfileRepository.findByUserUserId(1L)).thenReturn(Optional.of(profile));
     }
 

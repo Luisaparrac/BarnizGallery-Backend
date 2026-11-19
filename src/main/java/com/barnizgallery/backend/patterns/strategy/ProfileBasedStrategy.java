@@ -16,6 +16,7 @@ import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.TasteProfile;
 import com.barnizgallery.backend.entity.User;
 import com.barnizgallery.backend.mapper.ArtworkMapper;
+import com.barnizgallery.backend.mapper.UserMapper;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.TasteProfileRepository;
 
@@ -46,7 +47,7 @@ public class ProfileBasedStrategy implements RecommendationStrategy {
     public List<RecommendationResult> recommend(User user) {
         // TODO: use piece_type/style when the columns exist (preferred_types / preferred_styles)
         Optional<TasteProfile> profile = tasteProfileRepository.findByUserUserId(user.getUserId());
-        Set<String> preferred = normalize(profile.map(TasteProfile::getPreferredColors).orElse(null));
+        Set<String> preferred = normalize(profile.map(UserMapper::colorCodes).orElse(null));
         if (preferred.isEmpty()) {
             return List.of();
         }

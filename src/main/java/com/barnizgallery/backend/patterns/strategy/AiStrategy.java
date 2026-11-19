@@ -19,6 +19,7 @@ import com.barnizgallery.backend.entity.User;
 import com.barnizgallery.backend.enums.Language;
 import com.barnizgallery.backend.exception.FeatureDisabledException;
 import com.barnizgallery.backend.mapper.ArtworkMapper;
+import com.barnizgallery.backend.mapper.UserMapper;
 import com.barnizgallery.backend.patterns.adapter.AiTextClient;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.StoreRepository;
@@ -84,10 +85,7 @@ public class AiStrategy implements RecommendationStrategy {
         prompt.append("Language: ").append(user.getPreferredLanguage() == Language.EN ? "English" : "Spanish")
                 .append('\n');
         tasteProfileRepository.findByUserUserId(user.getUserId()).ifPresent((TasteProfile p) -> prompt
-                .append("User preferences: colors=").append(p.getPreferredColors())
-                .append(", types=").append(p.getPreferredTypes())
-                .append(", styles=").append(p.getPreferredStyles())
-                .append(", budget=").append(p.getBudgetRange()).append('\n'));
+                .append("User preferences: ").append(UserMapper.toResponse(p)).append('\n'));
         prompt.append("Stores:\n");
         for (Store store : storeRepository.findAllWithMaster()) {
             prompt.append(store.getStoreId()).append(" | ").append(store.getNameEn())

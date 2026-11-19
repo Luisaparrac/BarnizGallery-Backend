@@ -8,18 +8,24 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
 import com.barnizgallery.backend.entity.Color;
 import com.barnizgallery.backend.exception.BusinessRuleException;
+import com.barnizgallery.backend.repository.BudgetRangeRepository;
 import com.barnizgallery.backend.repository.ColorRepository;
 import com.barnizgallery.backend.repository.MotifRepository;
+import com.barnizgallery.backend.repository.ShapeRepository;
+import com.barnizgallery.backend.repository.StyleRepository;
 
 class CatalogCodeResolverTest {
 
     private final ColorRepository colorRepository = mock(ColorRepository.class);
-    private final CatalogCodeResolver resolver = new CatalogCodeResolver(colorRepository, mock(MotifRepository.class));
+    private final BudgetRangeRepository budgetRangeRepository = mock(BudgetRangeRepository.class);
+    private final CatalogCodeResolver resolver = new CatalogCodeResolver(colorRepository, mock(MotifRepository.class),
+            mock(ShapeRepository.class), mock(StyleRepository.class), budgetRangeRepository);
 
     private static Color color(String code) {
         Color color = new Color();
@@ -49,5 +55,15 @@ class CatalogCodeResolverTest {
         assertThat(resolver.colors(null)).isEmpty();
         assertThat(resolver.colors(List.of())).isEmpty();
         verifyNoInteractions(colorRepository);
+    }
+
+    @Test
+    void budgetRangeIsOptionalButMustExist() {
+        when(budgetRangeRepository.findByCode("999+")).thenReturn(Optional.empty());
+
+        assertThat(resolver.budgetRange(null)).isNull();
+        assertThatThrownBy(() -> resolver.budgetRange("999+"))
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessageContaining("999+");
     }
 }

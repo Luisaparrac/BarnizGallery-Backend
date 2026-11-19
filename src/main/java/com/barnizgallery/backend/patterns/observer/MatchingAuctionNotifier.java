@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import com.barnizgallery.backend.dto.UserNotification;
 import com.barnizgallery.backend.entity.TasteProfile;
 import com.barnizgallery.backend.mapper.ArtworkMapper;
+import com.barnizgallery.backend.mapper.UserMapper;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.TasteProfileRepository;
 
@@ -46,7 +47,7 @@ public class MatchingAuctionNotifier implements AuctionObserver {
                 return;
             }
             for (TasteProfile profile : tasteProfileRepository.findAll()) {
-                boolean matches = normalize(profile.getPreferredColors()).stream().anyMatch(artworkColors::contains);
+                boolean matches = normalize(UserMapper.colorCodes(profile)).stream().anyMatch(artworkColors::contains);
                 if (matches) {
                     UserNotification notification = new UserNotification(
                             UserNotification.MATCHING_AUCTION, event.auctionId(), event.artworkId(),

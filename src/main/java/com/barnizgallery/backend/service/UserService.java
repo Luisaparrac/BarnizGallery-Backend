@@ -28,10 +28,13 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final TasteProfileRepository tasteProfileRepository;
+    private final CatalogCodeResolver catalogResolver;
 
-    public UserService(UserRepository userRepository, TasteProfileRepository tasteProfileRepository) {
+    public UserService(UserRepository userRepository, TasteProfileRepository tasteProfileRepository,
+            CatalogCodeResolver catalogResolver) {
         this.userRepository = userRepository;
         this.tasteProfileRepository = tasteProfileRepository;
+        this.catalogResolver = catalogResolver;
     }
 
     /** Finds the user by email; if it does not exist, creates it. */
@@ -70,7 +73,7 @@ public class UserService {
                         + " not found"));
     }
 
-    /** Creates the taste profile or replaces its answers, and refreshes updated_at. */
+    /** Creates the taste profile or replaces its answers (catalog codes), and refreshes updated_at. */
     @Transactional
     public TasteProfileResponse saveTasteProfile(Long userId, TasteProfileRequest request) {
         User user = getUser(userId);
@@ -79,7 +82,11 @@ public class UserService {
             created.setUser(user);
             return created;
         });
-        UserMapper.apply(request, profile);
+        profile.setColors(catalogResolver.colors(request.colorCodes()));
+        profile.setShapes(catalogResolver.shapes(request.shapeCodes()));
+        profile.setStyles(catalogResolver.styles(request.styleCodes()));
+        profile.setMotifs(catalogResolver.motifs(request.motifCodes()));
+        profile.setBudgetRange(catalogResolver.budgetRange(request.budgetRangeCode()));
         profile.setUpdatedAt(LocalDateTime.now());
         return UserMapper.toResponse(tasteProfileRepository.save(profile));
     }

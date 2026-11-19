@@ -9,11 +9,17 @@ import java.util.function.Function;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.barnizgallery.backend.entity.BudgetRange;
 import com.barnizgallery.backend.entity.Color;
 import com.barnizgallery.backend.entity.Motif;
+import com.barnizgallery.backend.entity.Shape;
+import com.barnizgallery.backend.entity.Style;
 import com.barnizgallery.backend.exception.BusinessRuleException;
+import com.barnizgallery.backend.repository.BudgetRangeRepository;
 import com.barnizgallery.backend.repository.ColorRepository;
 import com.barnizgallery.backend.repository.MotifRepository;
+import com.barnizgallery.backend.repository.ShapeRepository;
+import com.barnizgallery.backend.repository.StyleRepository;
 
 /**
  * Turns catalog codes sent by the clients (for example {@code "rojo"}) into catalog entities.
@@ -24,10 +30,18 @@ public class CatalogCodeResolver {
 
     private final ColorRepository colorRepository;
     private final MotifRepository motifRepository;
+    private final ShapeRepository shapeRepository;
+    private final StyleRepository styleRepository;
+    private final BudgetRangeRepository budgetRangeRepository;
 
-    public CatalogCodeResolver(ColorRepository colorRepository, MotifRepository motifRepository) {
+    public CatalogCodeResolver(ColorRepository colorRepository, MotifRepository motifRepository,
+            ShapeRepository shapeRepository, StyleRepository styleRepository,
+            BudgetRangeRepository budgetRangeRepository) {
         this.colorRepository = colorRepository;
         this.motifRepository = motifRepository;
+        this.shapeRepository = shapeRepository;
+        this.styleRepository = styleRepository;
+        this.budgetRangeRepository = budgetRangeRepository;
     }
 
     @Transactional(readOnly = true)
@@ -38,6 +52,26 @@ public class CatalogCodeResolver {
     @Transactional(readOnly = true)
     public Set<Motif> motifs(Collection<String> codes) {
         return resolve("motif", codes, motifRepository::findByCodeIn, Motif::getCode);
+    }
+
+    @Transactional(readOnly = true)
+    public Set<Shape> shapes(Collection<String> codes) {
+        return resolve("shape", codes, shapeRepository::findByCodeIn, Shape::getCode);
+    }
+
+    @Transactional(readOnly = true)
+    public Set<Style> styles(Collection<String> codes) {
+        return resolve("style", codes, styleRepository::findByCodeIn, Style::getCode);
+    }
+
+    /** Budget range with this code, or null when no code is given. */
+    @Transactional(readOnly = true)
+    public BudgetRange budgetRange(String code) {
+        if (code == null || code.isBlank()) {
+            return null;
+        }
+        return budgetRangeRepository.findByCode(code)
+                .orElseThrow(() -> BusinessRuleException.unprocessable("Unknown budget range code: " + code));
     }
 
     private static <T> Set<T> resolve(String kind, Collection<String> codes,

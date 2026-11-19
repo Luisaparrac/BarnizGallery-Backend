@@ -115,7 +115,9 @@ class AuctionObserversTest {
     private static TasteProfile profile(int userId, String... colors) {
         TasteProfile profile = new TasteProfile();
         profile.setUser(TestEntities.user(userId, Language.ES));
-        profile.setPreferredColors(List.of(colors));
+        for (String color : colors) {
+            profile.getColors().add(TestEntities.color(color));
+        }
         return profile;
     }
 }

@@ -1,10 +1,8 @@
 package com.barnizgallery.backend.entity;
 
 import java.time.LocalDateTime;
-import java.util.List;
-
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,12 +11,16 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 /**
- * Taste profile of a user (1:1), filled from the initial questionnaire. Maps the existing table {@code taste_profiles}.
+ * Taste profile of a user (1:1), filled from the initial questionnaire with catalog values.
+ * v1 answers without a catalog match are kept by the database in {@code legacy_taste_profile_values}.
+ * Maps the table {@code museo.taste_profiles}.
  */
 @Entity
 @Table(name = "taste_profiles")
@@ -33,31 +35,28 @@ public class TasteProfile {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    @JdbcTypeCode(SqlTypes.ARRAY)
-    @Column(name = "preferred_colors", columnDefinition = "text[]")
-    private List<String> preferredColors;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "budget_range_id")
+    private BudgetRange budgetRange;
 
-    @JdbcTypeCode(SqlTypes.ARRAY)
-    @Column(name = "preferred_types", columnDefinition = "text[]")
-    private List<String> preferredTypes;
+    @ManyToMany
+    @JoinTable(name = "taste_profile_colors", joinColumns = @JoinColumn(name = "profile_id"), inverseJoinColumns = @JoinColumn(name = "color_id"))
+    private Set<Color> colors = new LinkedHashSet<>();
 
-    @JdbcTypeCode(SqlTypes.ARRAY)
-    @Column(name = "preferred_styles", columnDefinition = "text[]")
-    private List<String> preferredStyles;
+    @ManyToMany
+    @JoinTable(name = "taste_profile_shapes", joinColumns = @JoinColumn(name = "profile_id"), inverseJoinColumns = @JoinColumn(name = "shape_id"))
+    private Set<Shape> shapes = new LinkedHashSet<>();
 
-    @Column(name = "budget_range", length = 100)
-    private String budgetRange;
+    @ManyToMany
+    @JoinTable(name = "taste_profile_styles", joinColumns = @JoinColumn(name = "profile_id"), inverseJoinColumns = @JoinColumn(name = "style_id"))
+    private Set<Style> styles = new LinkedHashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "taste_profile_motifs", joinColumns = @JoinColumn(name = "profile_id"), inverseJoinColumns = @JoinColumn(name = "motif_id"))
+    private Set<Motif> motifs = new LinkedHashSet<>();
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-    /** The column has a DB default, but the value is set from Java so we do not depend on it. */
-    @PrePersist
-    void onCreate() {
-        if (updatedAt == null) {
-            updatedAt = LocalDateTime.now();
-        }
-    }
 
     public Long getProfileId() {
         return profileId;
@@ -75,36 +74,44 @@ public class TasteProfile {
         this.user = user;
     }
 
-    public List<String> getPreferredColors() {
-        return preferredColors;
-    }
-
-    public void setPreferredColors(List<String> preferredColors) {
-        this.preferredColors = preferredColors;
-    }
-
-    public List<String> getPreferredTypes() {
-        return preferredTypes;
-    }
-
-    public void setPreferredTypes(List<String> preferredTypes) {
-        this.preferredTypes = preferredTypes;
-    }
-
-    public List<String> getPreferredStyles() {
-        return preferredStyles;
-    }
-
-    public void setPreferredStyles(List<String> preferredStyles) {
-        this.preferredStyles = preferredStyles;
-    }
-
-    public String getBudgetRange() {
+    public BudgetRange getBudgetRange() {
         return budgetRange;
     }
 
-    public void setBudgetRange(String budgetRange) {
+    public void setBudgetRange(BudgetRange budgetRange) {
         this.budgetRange = budgetRange;
+    }
+
+    public Set<Color> getColors() {
+        return colors;
+    }
+
+    public void setColors(Set<Color> colors) {
+        this.colors = colors;
+    }
+
+    public Set<Shape> getShapes() {
+        return shapes;
+    }
+
+    public void setShapes(Set<Shape> shapes) {
+        this.shapes = shapes;
+    }
+
+    public Set<Style> getStyles() {
+        return styles;
+    }
+
+    public void setStyles(Set<Style> styles) {
+        this.styles = styles;
+    }
+
+    public Set<Motif> getMotifs() {
+        return motifs;
+    }
+
+    public void setMotifs(Set<Motif> motifs) {
+        this.motifs = motifs;
     }
 
     public LocalDateTime getUpdatedAt() {

@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,6 +41,8 @@ class UserServiceTest {
     private UserRepository userRepository;
     @Mock
     private TasteProfileRepository tasteProfileRepository;
+    @Mock
+    private CatalogCodeResolver catalogResolver;
     @InjectMocks
     private UserService userService;
 
@@ -103,11 +106,13 @@ class UserServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(tasteProfileRepository.findByUserUserId(1L)).thenReturn(Optional.of(profile));
         when(tasteProfileRepository.save(profile)).thenReturn(profile);
+        when(catalogResolver.colors(List.of("rojo"))).thenReturn(Set.of(TestEntities.color("rojo")));
 
         TasteProfileResponse saved = userService.saveTasteProfile(1L,
-                new TasteProfileRequest(List.of("rojo"), null, null, "low"));
+                new TasteProfileRequest(List.of("rojo"), null, null, null, null));
 
-        assertThat(saved.preferredColors()).containsExactly("rojo");
+        assertThat(saved.colorCodes()).containsExactly("rojo");
+        assertThat(saved.budgetRangeCode()).isNull();
         assertThat(saved.updatedAt()).isAfter(LocalDateTime.of(2020, 1, 1, 0, 0));
     }
 
