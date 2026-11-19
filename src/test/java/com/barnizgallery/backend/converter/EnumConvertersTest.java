@@ -15,6 +15,7 @@ import com.barnizgallery.backend.enums.AuctionStatus;
 import com.barnizgallery.backend.enums.CameraMode;
 import com.barnizgallery.backend.enums.InteractionAction;
 import com.barnizgallery.backend.enums.Language;
+import com.barnizgallery.backend.enums.UserRole;
 
 class EnumConvertersTest {
 
@@ -33,6 +34,9 @@ class EnumConvertersTest {
                 Arguments.of(new InteractionActionConverter(), InteractionAction.BID, "ofertar"),
                 Arguments.of(new CameraModeConverter(), CameraMode.FIRST_PERSON, "primera_persona"),
                 Arguments.of(new CameraModeConverter(), CameraMode.THIRD_PERSON, "tercera_persona"),
+                Arguments.of(new UserRoleConverter(), UserRole.ADMIN, "administrador"),
+                Arguments.of(new UserRoleConverter(), UserRole.ARTISAN, "artesano"),
+                Arguments.of(new UserRoleConverter(), UserRole.CUSTOMER, "cliente"),
                 Arguments.of(new LanguageConverter(), Language.ES, "es"),
                 Arguments.of(new LanguageConverter(), Language.EN, "en"));
     }
