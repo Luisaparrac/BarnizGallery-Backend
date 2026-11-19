@@ -189,7 +189,8 @@ reconnect (for example with `@stomp/stompjs` `reconnectDelay`) and re-subscribe.
 The free plan has 512 MB of RAM (hence the JVM flags) and an ephemeral disk (uploaded files are never
 stored on the server). Read requests never change data: auction statuses are synced by the scheduler and
 by write actions (bid, start, finish, cancel), so after the service wakes up the scheduler catches up on
-its next run.
+its next run. Historical auctions without currency are frozen: neither the scheduler nor any automatic
+action changes their status.
 
 ## Integrations status
 

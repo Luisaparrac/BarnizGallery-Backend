@@ -43,9 +43,12 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
     @Query("select a from Auction a join fetch a.artwork where a.auctionId = :auctionId")
     Optional<Auction> findByIdForUpdate(Long auctionId);
 
-    /** Scheduled auctions whose start date has arrived, or active ones whose end date has passed. */
-    @Query("select a from Auction a join fetch a.artwork where "
+    /**
+     * Scheduled auctions whose start date has arrived, or active ones whose end date has passed. Historical
+     * auctions without currency are left out: they stay frozen until an administrator decides on them.
+     */
+    @Query("select a from Auction a join fetch a.artwork where a.currency is not null and ("
             + "(a.status = com.barnizgallery.backend.enums.AuctionStatus.SCHEDULED and a.startDate <= :now) "
-            + "or (a.status = com.barnizgallery.backend.enums.AuctionStatus.ACTIVE and a.endDate <= :now)")
+            + "or (a.status = com.barnizgallery.backend.enums.AuctionStatus.ACTIVE and a.endDate <= :now))")
     List<Auction> findDueForTransition(LocalDateTime now);
 }

@@ -86,6 +86,20 @@ class AuctionServiceTest {
     }
 
     @Test
+    void writeActionLeavesAnExpiredAuctionWithoutCurrencyFrozen() {
+        Auction historical = TestEntities.auction(1, artwork, AuctionStatus.SCHEDULED, NOW.minusDays(3),
+                NOW.minusDays(1), "100");
+        historical.setCurrency(null);
+        when(auctionRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(historical));
+
+        auctionService.getSyncedAuctionForUpdate(1L);
+
+        assertThat(historical.getStatus()).isEqualTo(AuctionStatus.SCHEDULED);
+        assertThat(artwork.getStatus()).isEqualTo(ArtworkStatus.EXHIBITED);
+        verify(publisher, never()).publish(any());
+    }
+
+    @Test
     void cancellingPublishesAuctionCancelled() {
         Auction scheduled = TestEntities.auction(1, artwork, AuctionStatus.SCHEDULED, NOW.plusDays(1),
                 NOW.plusDays(2), "100");

@@ -30,7 +30,7 @@ import com.barnizgallery.backend.repository.BidRepository;
  * <p>
  * Read requests never write: auction statuses are synced with the clock only by the scheduler and by
  * write actions (bid, start, finish, cancel). When the service wakes up after sleeping, the scheduler
- * catches up on its next run.
+ * catches up on its next run. Historical auctions without currency are never changed automatically.
  */
 @Service
 public class AuctionService {
@@ -165,7 +165,11 @@ public class AuctionService {
         return new AuctionContext(auction, () -> bidRepository.countByAuctionAuctionId(auction.getAuctionId()));
     }
 
+    /** Historical auctions without currency are frozen: no automatic transition changes them. */
     private boolean sync(Auction auction, LocalDateTime now) {
+        if (auction.getCurrency() == null) {
+            return false;
+        }
         List<AuctionStatus> reached = contextFor(auction).syncWithClock(now);
         reached.forEach(status -> publish(auction, status));
         return !reached.isEmpty();
