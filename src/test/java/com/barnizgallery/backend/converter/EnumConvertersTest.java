@@ -17,6 +17,7 @@ import com.barnizgallery.backend.enums.CameraMode;
 import com.barnizgallery.backend.enums.InteractionAction;
 import com.barnizgallery.backend.enums.Language;
 import com.barnizgallery.backend.enums.MasterVerificationStatus;
+import com.barnizgallery.backend.enums.SaleMode;
 import com.barnizgallery.backend.enums.StoreStatus;
 import com.barnizgallery.backend.enums.UserRole;
 import com.barnizgallery.backend.enums.UserStatus;
@@ -67,6 +68,9 @@ class EnumConvertersTest {
                 Arguments.of(new StoreStatusConverter(), StoreStatus.DRAFT, "borrador"),
                 Arguments.of(new StoreStatusConverter(), StoreStatus.PUBLISHED, "publicada"),
                 Arguments.of(new StoreStatusConverter(), StoreStatus.SUSPENDED, "suspendida"),
+                Arguments.of(new SaleModeConverter(), SaleMode.EXHIBITION, "exhibicion"),
+                Arguments.of(new SaleModeConverter(), SaleMode.SALE, "venta"),
+                Arguments.of(new SaleModeConverter(), SaleMode.AUCTION, "subasta"),
                 Arguments.of(new LanguageConverter(), Language.ES, "es"),
                 Arguments.of(new LanguageConverter(), Language.EN, "en"));
     }
