@@ -12,6 +12,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.enums.AuctionStatus;
+import com.barnizgallery.backend.enums.AuthTokenPurpose;
 import com.barnizgallery.backend.enums.CameraMode;
 import com.barnizgallery.backend.enums.InteractionAction;
 import com.barnizgallery.backend.enums.Language;
@@ -42,6 +43,9 @@ class EnumConvertersTest {
                 Arguments.of(new UserStatusConverter(), UserStatus.ACTIVE, "activo"),
                 Arguments.of(new UserStatusConverter(), UserStatus.SUSPENDED, "suspendido"),
                 Arguments.of(new UserStatusConverter(), UserStatus.DELETED, "eliminado"),
+                Arguments.of(new AuthTokenPurposeConverter(), AuthTokenPurpose.EMAIL_VERIFICATION, "verificar_correo"),
+                Arguments.of(new AuthTokenPurposeConverter(), AuthTokenPurpose.PASSWORD_RESET, "recuperar_clave"),
+                Arguments.of(new AuthTokenPurposeConverter(), AuthTokenPurpose.REFRESH, "refresco"),
                 Arguments.of(new LanguageConverter(), Language.ES, "es"),
                 Arguments.of(new LanguageConverter(), Language.EN, "en"));
     }
