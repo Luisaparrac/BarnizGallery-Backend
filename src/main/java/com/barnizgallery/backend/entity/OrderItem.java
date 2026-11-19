@@ -47,8 +47,9 @@ public class OrderItem {
     @JoinColumn(name = "auction_id")
     private Auction auction;
 
-    @Column(name = "custom_offer_id")
-    private Long customOfferId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "custom_offer_id")
+    private CustomOffer customOffer;
 
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
@@ -128,12 +129,12 @@ public class OrderItem {
         this.auction = auction;
     }
 
-    public Long getCustomOfferId() {
-        return customOfferId;
+    public CustomOffer getCustomOffer() {
+        return customOffer;
     }
 
-    public void setCustomOfferId(Long customOfferId) {
-        this.customOfferId = customOfferId;
+    public void setCustomOffer(CustomOffer customOffer) {
+        this.customOffer = customOffer;
     }
 
     public Integer getQuantity() {

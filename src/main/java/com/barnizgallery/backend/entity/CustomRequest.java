@@ -70,8 +70,9 @@ public class CustomRequest {
     @Column(name = "status", nullable = false, length = 30)
     private String status;
 
-    @Column(name = "accepted_offer_id")
-    private Long acceptedOfferId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "accepted_offer_id")
+    private CustomOffer acceptedOffer;
 
     @Column(name = "expires_at")
     private Instant expiresAt;
@@ -188,12 +189,12 @@ public class CustomRequest {
         this.status = status;
     }
 
-    public Long getAcceptedOfferId() {
-        return acceptedOfferId;
+    public CustomOffer getAcceptedOffer() {
+        return acceptedOffer;
     }
 
-    public void setAcceptedOfferId(Long acceptedOfferId) {
-        this.acceptedOfferId = acceptedOfferId;
+    public void setAcceptedOffer(CustomOffer acceptedOffer) {
+        this.acceptedOffer = acceptedOffer;
     }
 
     public Instant getExpiresAt() {
