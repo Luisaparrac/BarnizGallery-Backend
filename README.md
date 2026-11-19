@@ -85,6 +85,8 @@ Requirements: Java 21 and a local PostgreSQL 18.
 | `AUCTION_CURRENCY` | Currency of new auctions | `USD` |
 | `AUCTION_SCHEDULER_ENABLED` | Run the 60-second auction scheduler | `true` |
 | `AI_PROVIDER` | AI provider (not chosen yet; `none` disables AI) | `none` |
+| `AI_SERVICE_URL` | Base URL of the MUSEO AI service, without a trailing `/` (empty disables it) | – |
+| `AI_SERVICE_KEY` | Shared key sent in the `X-API-Key` header to the AI service (empty disables it) | – |
 | `AI_API_KEY` | Not used yet: it will be added together with the adapter when the AI provider is chosen | – |
 | `STORAGE_PROVIDER` | Photo storage provider (not chosen yet) | `none` |
 | `JAVA_TOOL_OPTIONS` | `-XX:MaxRAMPercentage=75 -XX:+UseSerialGC -Xss512k` (already set in the Dockerfile) | – |
