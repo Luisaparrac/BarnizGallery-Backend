@@ -19,6 +19,7 @@ import com.barnizgallery.backend.enums.InteractionAction;
 import com.barnizgallery.backend.enums.InventoryReservationStatus;
 import com.barnizgallery.backend.enums.Language;
 import com.barnizgallery.backend.enums.MasterVerificationStatus;
+import com.barnizgallery.backend.enums.OfferType;
 import com.barnizgallery.backend.enums.OrderStatus;
 import com.barnizgallery.backend.enums.OrderType;
 import com.barnizgallery.backend.enums.PaymentObligationStage;
@@ -108,6 +109,8 @@ class EnumConvertersTest {
                 Arguments.of(new InventoryReservationStatusConverter(), InventoryReservationStatus.RELEASED, "liberada"),
                 Arguments.of(new InventoryReservationStatusConverter(), InventoryReservationStatus.CONSUMED, "consumida"),
                 Arguments.of(new InventoryReservationStatusConverter(), InventoryReservationStatus.EXPIRED, "expirada"),
+                Arguments.of(new OfferTypeConverter(), OfferType.ACCEPTS_PRICE, "acepta_precio"),
+                Arguments.of(new OfferTypeConverter(), OfferType.COUNTER_OFFER, "contraoferta"),
                 Arguments.of(new LanguageConverter(), Language.ES, "es"),
                 Arguments.of(new LanguageConverter(), Language.EN, "en"));
     }
