@@ -16,6 +16,7 @@ import com.barnizgallery.backend.enums.AuthTokenPurpose;
 import com.barnizgallery.backend.enums.CameraMode;
 import com.barnizgallery.backend.enums.InteractionAction;
 import com.barnizgallery.backend.enums.Language;
+import com.barnizgallery.backend.enums.MasterVerificationStatus;
 import com.barnizgallery.backend.enums.UserRole;
 import com.barnizgallery.backend.enums.UserStatus;
 
@@ -46,6 +47,10 @@ class EnumConvertersTest {
                 Arguments.of(new AuthTokenPurposeConverter(), AuthTokenPurpose.EMAIL_VERIFICATION, "verificar_correo"),
                 Arguments.of(new AuthTokenPurposeConverter(), AuthTokenPurpose.PASSWORD_RESET, "recuperar_clave"),
                 Arguments.of(new AuthTokenPurposeConverter(), AuthTokenPurpose.REFRESH, "refresco"),
+                Arguments.of(new MasterVerificationStatusConverter(), MasterVerificationStatus.PENDING, "pendiente"),
+                Arguments.of(new MasterVerificationStatusConverter(), MasterVerificationStatus.IN_REVIEW, "en_revision"),
+                Arguments.of(new MasterVerificationStatusConverter(), MasterVerificationStatus.APPROVED, "aprobado"),
+                Arguments.of(new MasterVerificationStatusConverter(), MasterVerificationStatus.REJECTED, "rechazado"),
                 Arguments.of(new LanguageConverter(), Language.ES, "es"),
                 Arguments.of(new LanguageConverter(), Language.EN, "en"));
     }
