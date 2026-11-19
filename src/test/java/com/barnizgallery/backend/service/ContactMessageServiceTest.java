@@ -46,7 +46,7 @@ class ContactMessageServiceTest {
         when(userService.getUser(5L)).thenReturn(TestEntities.user(5, Language.ES));
         when(masterService.getMaster(1L)).thenReturn(master1);
         when(artworkService.getArtwork(30L)).thenReturn(
-                TestEntities.artwork(30, TestEntities.room(2, master2), ArtworkStatus.EXHIBITED));
+                TestEntities.artwork(30, TestEntities.store(2, master2), ArtworkStatus.EXHIBITED));
 
         assertThatThrownBy(() -> contactMessageService.send(new ContactMessageRequest(5L, 1L, 30L, "Hello")))
                 .isInstanceOfSatisfying(BusinessRuleException.class,
@@ -59,7 +59,7 @@ class ContactMessageServiceTest {
         when(userService.getUser(5L)).thenReturn(TestEntities.user(5, Language.ES));
         when(masterService.getMaster(1L)).thenReturn(master1);
         when(artworkService.getArtwork(30L)).thenReturn(
-                TestEntities.artwork(30, TestEntities.room(1, master1), ArtworkStatus.EXHIBITED));
+                TestEntities.artwork(30, TestEntities.store(1, master1), ArtworkStatus.EXHIBITED));
         when(contactMessageRepository.save(any(ContactMessage.class))).thenAnswer(inv -> inv.getArgument(0));
 
         ContactMessageResponse sent = contactMessageService.send(new ContactMessageRequest(5L, 1L, 30L, " Hello "));

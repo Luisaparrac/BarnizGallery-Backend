@@ -22,7 +22,7 @@ import com.barnizgallery.backend.repository.TasteProfileRepository;
  * <b>Strategy pattern – ConcreteStrategy "profile".</b>
  * <p>
  * Compares the colors of the user's taste profile with the {@code color_tags} of the
- * artworks of each room. Score = 100 × (preferred colors found in the room) / (preferred colors).
+ * artworks of each store. Score = 100 × (preferred colors found in the store) / (preferred colors).
  */
 @Component
 public class ProfileBasedStrategy implements RecommendationStrategy {
@@ -50,22 +50,22 @@ public class ProfileBasedStrategy implements RecommendationStrategy {
             return List.of();
         }
 
-        Map<Long, Set<String>> tagsByRoom = new LinkedHashMap<>();
+        Map<Long, Set<String>> tagsByStore = new LinkedHashMap<>();
         for (Artwork artwork : artworkRepository.findAllByOrderByArtworkIdAsc()) {
-            tagsByRoom.computeIfAbsent(artwork.getRoom().getRoomId(), id -> new LinkedHashSet<>())
+            tagsByStore.computeIfAbsent(artwork.getStore().getStoreId(), id -> new LinkedHashSet<>())
                     .addAll(normalize(artwork.getColorTags()));
         }
 
         List<RecommendationResult> results = new ArrayList<>();
-        tagsByRoom.forEach((roomId, roomTags) -> {
-            List<String> matched = preferred.stream().filter(roomTags::contains).toList();
+        tagsByStore.forEach((storeId, storeTags) -> {
+            List<String> matched = preferred.stream().filter(storeTags::contains).toList();
             if (!matched.isEmpty()) {
                 double score = 100.0 * matched.size() / preferred.size();
                 String colors = String.join(", ", matched);
                 String reason = LocalizedText.pick(user,
                         "Coincide con tus colores preferidos: " + colors,
                         "Matches your preferred colors: " + colors);
-                results.add(RecommendationResult.of(roomId, score, reason));
+                results.add(RecommendationResult.of(storeId, score, reason));
             }
         });
         results.sort(Comparator.comparing(RecommendationResult::score).reversed());

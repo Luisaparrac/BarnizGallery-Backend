@@ -6,7 +6,7 @@ import com.barnizgallery.backend.dto.GalleryNodeResponse;
  * <b>Composite pattern – Component.</b>
  * <p>
  * Common interface for every element of the gallery tree: the whole gallery,
- * a room and an artwork. Thanks to it the client (the service and the frontend)
+ * a store and an artwork. Thanks to it the client (the service and the frontend)
  * treats a single artwork and a group of artworks in the same way: for example,
  * {@link #countArtworks()} works for a leaf (returns 1) and for a composite
  * (adds the counts of its children).
@@ -16,7 +16,7 @@ public interface GalleryComponent {
     /** Database id, or null for the gallery root. */
     Long getId();
 
-    /** GALLERY, ROOM or ARTWORK. */
+    /** GALLERY, STORE or ARTWORK. */
     String getType();
 
     String getNameEs();

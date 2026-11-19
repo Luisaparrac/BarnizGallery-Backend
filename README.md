@@ -86,7 +86,7 @@ Requirements: Java 21 and access to the database.
 ## REST API
 
 All JSON. DTOs expose both languages (`titleEs`, `titleEn`, …) so the frontend chooses which one to show.
-Dates are ISO-8601 (UTC). Enum values are in English (`EXHIBITED`, `ACTIVE`, `FIRST_PERSON`, …).
+Dates are ISO-8601 (UTC). Enum values are in English (`EXHIBITED`, `ACTIVE`, `PENDING_PAYMENT`, …).
 
 ### System
 | Method | Path | Description |
@@ -96,14 +96,14 @@ Dates are ISO-8601 (UTC). Enum values are in English (`EXHIBITED`, `ACTIVE`, `FI
 ### Catalog
 | Method | Path | Description |
 |---|---|---|
-| GET | `/api/gallery` | Full tree Gallery → Rooms → Artworks (Composite) |
+| GET | `/api/gallery` | Full tree Gallery → Stores → Artworks (Composite) |
 | GET | `/api/masters` | Masters |
-| GET | `/api/masters/{id}` | Master + its room |
+| GET | `/api/masters/{id}` | Master + its store |
 | POST / PUT | `/api/masters`, `/api/masters/{id}` | Create / update master |
-| GET | `/api/rooms` | Rooms with master and artwork count |
-| GET | `/api/rooms/{id}` | Room + artworks |
-| POST / PUT | `/api/rooms`, `/api/rooms/{id}` | Create / update room (one room per master) |
-| GET | `/api/artworks?roomId=&status=` | Filterable list |
+| GET | `/api/rooms` | Stores with master and artwork count (legacy path) |
+| GET | `/api/rooms/{id}` | Store + artworks (legacy path) |
+| POST / PUT | `/api/rooms`, `/api/rooms/{id}` | Create / update store (one store per master) |
+| GET | `/api/artworks?storeId=&status=` | Filterable list |
 | GET | `/api/artworks/{id}` | Artwork + photos + current auction |
 | POST / PUT | `/api/artworks`, `/api/artworks/{id}` | Create / update artwork (status is managed by auctions) |
 | GET | `/api/artworks/{id}/photos` | Photos |
@@ -146,7 +146,7 @@ from the same visitor → 429; an amount above 10 × the reference is accepted b
 ### Contact
 | Method | Path | Description |
 |---|---|---|
-| POST | `/api/contact-messages` | `{ userId, masterId, artworkId?, content }` – the artwork must belong to the master's room |
+| POST | `/api/contact-messages` | `{ userId, masterId, artworkId?, content }` – the artwork must belong to the master's store |
 | GET | `/api/masters/{id}/messages` | Messages received by a master |
 
 ### Errors

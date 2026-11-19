@@ -21,8 +21,8 @@ public final class InteractionMapper {
 
     public static RecommendationResponse toResponse(Recommendation recommendation) {
         return new RecommendationResponse(recommendation.getRecommendationId(),
-                recommendation.getUser().getUserId(), recommendation.getRoom().getRoomId(),
-                recommendation.getRoom().getNameEs(), recommendation.getRoom().getNameEn(),
+                recommendation.getUser().getUserId(), recommendation.getStore().getStoreId(),
+                recommendation.getStore().getNameEs(), recommendation.getStore().getNameEn(),
                 recommendation.getScore(), recommendation.getReason(), recommendation.getRecommendationDate());
     }
 }

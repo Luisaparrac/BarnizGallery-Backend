@@ -12,46 +12,46 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.barnizgallery.backend.dto.RoomDetailResponse;
-import com.barnizgallery.backend.dto.RoomRequest;
-import com.barnizgallery.backend.dto.RoomSummaryResponse;
-import com.barnizgallery.backend.service.RoomService;
+import com.barnizgallery.backend.dto.StoreDetailResponse;
+import com.barnizgallery.backend.dto.StoreRequest;
+import com.barnizgallery.backend.dto.StoreSummaryResponse;
+import com.barnizgallery.backend.service.StoreService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 /**
- * Rooms of the gallery (one per master). There is no DELETE endpoint on purpose.
+ * Stores of the gallery (one per master). There is no DELETE endpoint on purpose.
  */
 @RestController
 @RequestMapping("/api/rooms")
-@Tag(name = "Rooms")
+@Tag(name = "Stores")
 public class RoomController {
 
-    private final RoomService roomService;
+    private final StoreService storeService;
 
-    public RoomController(RoomService roomService) {
-        this.roomService = roomService;
+    public RoomController(StoreService storeService) {
+        this.storeService = storeService;
     }
 
     @GetMapping
-    public List<RoomSummaryResponse> findAll() {
-        return roomService.findAll();
+    public List<StoreSummaryResponse> findAll() {
+        return storeService.findAll();
     }
 
     @GetMapping("/{id}")
-    public RoomDetailResponse findById(@PathVariable Long id) {
-        return roomService.findById(id);
+    public StoreDetailResponse findById(@PathVariable Long id) {
+        return storeService.findById(id);
     }
 
     @PostMapping
-    public ResponseEntity<RoomSummaryResponse> create(@Valid @RequestBody RoomRequest request) {
-        RoomSummaryResponse created = roomService.create(request);
-        return ResponseEntity.created(URI.create("/api/rooms/" + created.roomId())).body(created);
+    public ResponseEntity<StoreSummaryResponse> create(@Valid @RequestBody StoreRequest request) {
+        StoreSummaryResponse created = storeService.create(request);
+        return ResponseEntity.created(URI.create("/api/rooms/" + created.storeId())).body(created);
     }
 
     @PutMapping("/{id}")
-    public RoomSummaryResponse update(@PathVariable Long id, @Valid @RequestBody RoomRequest request) {
-        return roomService.update(id, request);
+    public StoreSummaryResponse update(@PathVariable Long id, @Valid @RequestBody StoreRequest request) {
+        return storeService.update(id, request);
     }
 }

@@ -51,7 +51,7 @@ class InteractionServiceTest {
     void recordUsesTheFactoryOfTheAction() {
         when(userService.getUser(1L)).thenReturn(TestEntities.user(1, Language.ES));
         when(artworkService.getArtwork(2L)).thenReturn(
-                TestEntities.artwork(2, TestEntities.room(1, TestEntities.master(1)), ArtworkStatus.EXHIBITED));
+                TestEntities.artwork(2, TestEntities.store(1, TestEntities.master(1)), ArtworkStatus.EXHIBITED));
         when(interactionRepository.save(any(Interaction.class))).thenAnswer(inv -> inv.getArgument(0));
 
         InteractionResponse response = interactionService.record(

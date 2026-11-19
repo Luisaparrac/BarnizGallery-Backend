@@ -13,22 +13,22 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.barnizgallery.backend.entity.Artwork;
-import com.barnizgallery.backend.entity.Room;
+import com.barnizgallery.backend.entity.Store;
 import com.barnizgallery.backend.entity.TasteProfile;
 import com.barnizgallery.backend.entity.User;
 import com.barnizgallery.backend.enums.Language;
 import com.barnizgallery.backend.exception.FeatureDisabledException;
 import com.barnizgallery.backend.patterns.adapter.AiTextClient;
 import com.barnizgallery.backend.repository.ArtworkRepository;
-import com.barnizgallery.backend.repository.RoomRepository;
+import com.barnizgallery.backend.repository.StoreRepository;
 import com.barnizgallery.backend.repository.TasteProfileRepository;
 
 /**
  * <b>Strategy pattern – ConcreteStrategy "ai".</b>
  * <p>
- * Asks the AI model (through the {@link AiTextClient} adapter) to rank the rooms.
+ * Asks the AI model (through the {@link AiTextClient} adapter) to rank the stores.
  * Only available when an AI provider is configured. Answers that cannot be parsed
- * or that mention unknown rooms are ignored: nothing is invented.
+ * or that mention unknown stores are ignored: nothing is invented.
  */
 @Component
 public class AiStrategy implements RecommendationStrategy {
@@ -36,20 +36,20 @@ public class AiStrategy implements RecommendationStrategy {
     private static final Logger log = LoggerFactory.getLogger(AiStrategy.class);
 
     static final String SYSTEM_PROMPT = """
-            You recommend rooms of a virtual museum of Barniz de Pasto Mopa-Mopa.
-            Answer ONLY with lines in the format roomId|score|reason
+            You recommend stores of a virtual museum of Barniz de Pasto Mopa-Mopa.
+            Answer ONLY with lines in the format storeId|score|reason
             where score is a number from 0 to 100 and reason is one short sentence
-            in the requested language. Use only the room ids you receive.""";
+            in the requested language. Use only the store ids you receive.""";
 
     private final AiTextClient aiClient;
-    private final RoomRepository roomRepository;
+    private final StoreRepository storeRepository;
     private final ArtworkRepository artworkRepository;
     private final TasteProfileRepository tasteProfileRepository;
 
-    public AiStrategy(AiTextClient aiClient, RoomRepository roomRepository, ArtworkRepository artworkRepository,
+    public AiStrategy(AiTextClient aiClient, StoreRepository storeRepository, ArtworkRepository artworkRepository,
             TasteProfileRepository tasteProfileRepository) {
         this.aiClient = aiClient;
-        this.roomRepository = roomRepository;
+        this.storeRepository = storeRepository;
         this.artworkRepository = artworkRepository;
         this.tasteProfileRepository = tasteProfileRepository;
     }
@@ -65,17 +65,17 @@ public class AiStrategy implements RecommendationStrategy {
             throw new FeatureDisabledException("The 'ai' recommendation strategy needs an AI provider");
         }
         String answer = aiClient.complete(SYSTEM_PROMPT, buildUserPrompt(user));
-        Set<Long> validRooms = new LinkedHashSet<>();
-        roomRepository.findAll().forEach(room -> validRooms.add(room.getRoomId()));
-        List<RecommendationResult> results = parse(answer, validRooms);
+        Set<Long> validStores = new LinkedHashSet<>();
+        storeRepository.findAll().forEach(store -> validStores.add(store.getStoreId()));
+        List<RecommendationResult> results = parse(answer, validStores);
         results.sort(Comparator.comparing(RecommendationResult::score).reversed());
         return results;
     }
 
     private String buildUserPrompt(User user) {
-        Map<Long, Set<String>> tagsByRoom = new LinkedHashMap<>();
+        Map<Long, Set<String>> tagsByStore = new LinkedHashMap<>();
         for (Artwork artwork : artworkRepository.findAllByOrderByArtworkIdAsc()) {
-            Set<String> tags = tagsByRoom.computeIfAbsent(artwork.getRoom().getRoomId(), id -> new LinkedHashSet<>());
+            Set<String> tags = tagsByStore.computeIfAbsent(artwork.getStore().getStoreId(), id -> new LinkedHashSet<>());
             if (artwork.getColorTags() != null) {
                 tags.addAll(artwork.getColorTags());
             }
@@ -91,16 +91,16 @@ public class AiStrategy implements RecommendationStrategy {
                 .append(", types=").append(p.getPreferredTypes())
                 .append(", styles=").append(p.getPreferredStyles())
                 .append(", budget=").append(p.getBudgetRange()).append('\n'));
-        prompt.append("Rooms:\n");
-        for (Room room : roomRepository.findAllWithMaster()) {
-            prompt.append(room.getRoomId()).append(" | ").append(room.getNameEn())
-                    .append(" | tags=").append(tagsByRoom.getOrDefault(room.getRoomId(), Set.of())).append('\n');
+        prompt.append("Stores:\n");
+        for (Store store : storeRepository.findAllWithMaster()) {
+            prompt.append(store.getStoreId()).append(" | ").append(store.getNameEn())
+                    .append(" | tags=").append(tagsByStore.getOrDefault(store.getStoreId(), Set.of())).append('\n');
         }
         return prompt.toString();
     }
 
-    /** Parses lines "roomId|score|reason". Invalid lines are skipped. */
-    static List<RecommendationResult> parse(String answer, Set<Long> validRooms) {
+    /** Parses lines "storeId|score|reason". Invalid lines are skipped. */
+    static List<RecommendationResult> parse(String answer, Set<Long> validStores) {
         List<RecommendationResult> results = new ArrayList<>();
         if (answer == null) {
             return results;
@@ -112,10 +112,10 @@ public class AiStrategy implements RecommendationStrategy {
                 continue;
             }
             try {
-                Long roomId = Long.valueOf(parts[0].trim());
+                Long storeId = Long.valueOf(parts[0].trim());
                 double score = Double.parseDouble(parts[1].trim());
-                if (validRooms.contains(roomId) && seen.add(roomId)) {
-                    results.add(RecommendationResult.of(roomId, score, parts[2].trim()));
+                if (validStores.contains(storeId) && seen.add(storeId)) {
+                    results.add(RecommendationResult.of(storeId, score, parts[2].trim()));
                 }
             } catch (NumberFormatException ex) {
                 log.debug("Ignoring AI line that cannot be parsed: {}", line);

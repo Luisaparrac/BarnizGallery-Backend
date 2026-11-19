@@ -25,7 +25,7 @@ import com.barnizgallery.backend.repository.BidRepository;
 /**
  * <b>Facade pattern – Facade.</b>
  * <p>
- * Single entry point for everything related to AI: room recommendations, base price
+ * Single entry point for everything related to AI: store recommendations, base price
  * suggestions and bid review. Behind it there are several subsystems (the recommendation
  * strategies, the AI adapter, the bid repository and the auction settings); the rest of
  * the system only calls these four simple methods and does not know whether AI is enabled
@@ -62,13 +62,13 @@ public class AiFacade {
         return aiClient.isEnabled();
     }
 
-    /** Recommends rooms with the default strategy (hybrid). */
-    public List<RecommendationResult> recommendRooms(User user) {
-        return recommendRooms(user, null);
+    /** Recommends stores with the default strategy (hybrid). */
+    public List<RecommendationResult> recommendStores(User user) {
+        return recommendStores(user, null);
     }
 
-    /** Recommends rooms with the strategy chosen by name (Strategy pattern). */
-    public List<RecommendationResult> recommendRooms(User user, String strategyName) {
+    /** Recommends stores with the strategy chosen by name (Strategy pattern). */
+    public List<RecommendationResult> recommendStores(User user, String strategyName) {
         return strategyResolver.resolve(strategyName).recommend(user);
     }
 

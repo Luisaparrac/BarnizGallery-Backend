@@ -5,9 +5,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 /**
- * Body to create or update a room (one room per master).
+ * Body to create or update a store (one store per master).
  */
-public record RoomRequest(
+public record StoreRequest(
         @NotNull Long masterId,
         @NotBlank @Size(max = 150) String nameEs,
         @NotBlank @Size(max = 150) String nameEn,

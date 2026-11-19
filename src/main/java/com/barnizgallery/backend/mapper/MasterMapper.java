@@ -3,7 +3,7 @@ package com.barnizgallery.backend.mapper;
 import com.barnizgallery.backend.dto.MasterDetailResponse;
 import com.barnizgallery.backend.dto.MasterRequest;
 import com.barnizgallery.backend.dto.MasterResponse;
-import com.barnizgallery.backend.dto.RoomSummaryResponse;
+import com.barnizgallery.backend.dto.StoreSummaryResponse;
 import com.barnizgallery.backend.entity.Master;
 
 /**
@@ -20,10 +20,10 @@ public final class MasterMapper {
                 master.getVerificationStatus());
     }
 
-    public static MasterDetailResponse toDetail(Master master, RoomSummaryResponse room) {
+    public static MasterDetailResponse toDetail(Master master, StoreSummaryResponse store) {
         return new MasterDetailResponse(master.getMasterId(), master.getName(), master.getBiographyEs(),
                 master.getBiographyEn(), master.getWorkshop(), master.getContactInfo(),
-                master.getVerificationStatus(), room);
+                master.getVerificationStatus(), store);
     }
 
     /** Copies the request fields into the entity (used for create and update). */

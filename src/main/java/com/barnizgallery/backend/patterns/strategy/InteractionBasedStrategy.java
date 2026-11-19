@@ -11,15 +11,15 @@ import org.springframework.stereotype.Component;
 import com.barnizgallery.backend.entity.User;
 import com.barnizgallery.backend.patterns.factorymethod.InteractionFactoryProvider;
 import com.barnizgallery.backend.repository.InteractionRepository;
-import com.barnizgallery.backend.repository.RoomInteraction;
+import com.barnizgallery.backend.repository.StoreInteraction;
 
 /**
  * <b>Strategy pattern – ConcreteStrategy "interactions".</b>
  * <p>
- * Adds, per room, the points of the user's interactions:
+ * Adds, per store, the points of the user's interactions:
  * weight of the action (from the Factory Method creators) × duration factor.
  * The duration factor goes from 1 (no duration) to 2 (5 minutes or more).
- * The room with most points gets 100 and the others are proportional.
+ * The store with most points gets 100 and the others are proportional.
  */
 @Component
 public class InteractionBasedStrategy implements RecommendationStrategy {
@@ -43,26 +43,26 @@ public class InteractionBasedStrategy implements RecommendationStrategy {
 
     @Override
     public List<RecommendationResult> recommend(User user) {
-        Map<Long, Double> pointsByRoom = new LinkedHashMap<>();
-        Map<Long, Integer> countByRoom = new LinkedHashMap<>();
-        for (RoomInteraction interaction : interactionRepository.findRoomInteractions(user.getUserId())) {
+        Map<Long, Double> pointsByStore = new LinkedHashMap<>();
+        Map<Long, Integer> countByStore = new LinkedHashMap<>();
+        for (StoreInteraction interaction : interactionRepository.findStoreInteractions(user.getUserId())) {
             double points = factoryProvider.weightOf(interaction.getAction())
                     * durationFactor(interaction.getDurationSeconds());
-            pointsByRoom.merge(interaction.getRoomId(), points, Double::sum);
-            countByRoom.merge(interaction.getRoomId(), 1, Integer::sum);
+            pointsByStore.merge(interaction.getStoreId(), points, Double::sum);
+            countByStore.merge(interaction.getStoreId(), 1, Integer::sum);
         }
-        double max = pointsByRoom.values().stream().mapToDouble(Double::doubleValue).max().orElse(0);
+        double max = pointsByStore.values().stream().mapToDouble(Double::doubleValue).max().orElse(0);
         if (max <= 0) {
             return List.of();
         }
 
         List<RecommendationResult> results = new ArrayList<>();
-        pointsByRoom.forEach((roomId, points) -> {
-            int count = countByRoom.get(roomId);
+        pointsByStore.forEach((storeId, points) -> {
+            int count = countByStore.get(storeId);
             String reason = LocalizedText.pick(user,
-                    "Interactuaste " + count + " veces con obras de esta sala",
-                    "You interacted " + count + " times with artworks in this room");
-            results.add(RecommendationResult.of(roomId, 100.0 * points / max, reason));
+                    "Interactuaste " + count + " veces con obras de esta tienda",
+                    "You interacted " + count + " times with artworks in this store");
+            results.add(RecommendationResult.of(storeId, 100.0 * points / max, reason));
         });
         results.sort(Comparator.comparing(RecommendationResult::score).reversed());
         return results;

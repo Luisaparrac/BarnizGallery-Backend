@@ -76,7 +76,7 @@ class BidServiceTest {
     }
 
     private void givenAuction(AuctionStatus status) {
-        Artwork artwork = TestEntities.artwork(7, TestEntities.room(1, TestEntities.master(1)),
+        Artwork artwork = TestEntities.artwork(7, TestEntities.store(1, TestEntities.master(1)),
                 ArtworkStatus.IN_AUCTION);
         auction = TestEntities.auction(1, artwork, status, NOW.minusDays(1), NOW.plusDays(1), "100");
         when(auctionService.getSyncedAuctionForUpdate(1L)).thenReturn(auction);

@@ -8,7 +8,7 @@ import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Auction;
 import com.barnizgallery.backend.entity.Master;
 import com.barnizgallery.backend.entity.Photo;
-import com.barnizgallery.backend.entity.Room;
+import com.barnizgallery.backend.entity.Store;
 import com.barnizgallery.backend.entity.User;
 import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.enums.AuctionStatus;
@@ -31,19 +31,19 @@ public final class TestEntities {
         return master;
     }
 
-    public static Room room(long id, Master master) {
-        Room room = new Room();
-        room.setRoomId(id);
-        room.setMaster(master);
-        room.setNameEs("Sala " + id);
-        room.setNameEn("Room " + id);
-        return room;
+    public static Store store(long id, Master master) {
+        Store store = new Store();
+        store.setStoreId(id);
+        store.setMaster(master);
+        store.setNameEs("Tienda " + id);
+        store.setNameEn("Store " + id);
+        return store;
     }
 
-    public static Artwork artwork(long id, Room room, ArtworkStatus status, String... colorTags) {
+    public static Artwork artwork(long id, Store store, ArtworkStatus status, String... colorTags) {
         Artwork artwork = new Artwork();
         artwork.setArtworkId(id);
-        artwork.setRoom(room);
+        artwork.setStore(store);
         artwork.setTitleEs("Obra " + id);
         artwork.setTitleEn("Artwork " + id);
         artwork.setStatus(status);

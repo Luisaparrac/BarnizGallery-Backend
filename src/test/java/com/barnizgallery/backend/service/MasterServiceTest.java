@@ -20,11 +20,11 @@ import com.barnizgallery.backend.dto.MasterDetailResponse;
 import com.barnizgallery.backend.dto.MasterRequest;
 import com.barnizgallery.backend.dto.MasterResponse;
 import com.barnizgallery.backend.entity.Master;
-import com.barnizgallery.backend.entity.Room;
+import com.barnizgallery.backend.entity.Store;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.MasterRepository;
-import com.barnizgallery.backend.repository.RoomRepository;
+import com.barnizgallery.backend.repository.StoreRepository;
 
 @ExtendWith(MockitoExtension.class)
 class MasterServiceTest {
@@ -32,7 +32,7 @@ class MasterServiceTest {
     @Mock
     private MasterRepository masterRepository;
     @Mock
-    private RoomRepository roomRepository;
+    private StoreRepository storeRepository;
     @Mock
     private ArtworkRepository artworkRepository;
     @InjectMocks
@@ -46,26 +46,26 @@ class MasterServiceTest {
     }
 
     @Test
-    void findByIdIncludesRoomWithArtworkCount() {
+    void findByIdIncludesStoreWithArtworkCount() {
         Master master = TestEntities.master(1);
-        Room room = TestEntities.room(10, master);
+        Store store = TestEntities.store(10, master);
         when(masterRepository.findById(1L)).thenReturn(Optional.of(master));
-        when(roomRepository.findByMasterMasterId(1L)).thenReturn(Optional.of(room));
-        when(artworkRepository.countByRoomRoomId(10L)).thenReturn(4L);
+        when(storeRepository.findByMasterMasterId(1L)).thenReturn(Optional.of(store));
+        when(artworkRepository.countByStoreStoreId(10L)).thenReturn(4L);
 
         MasterDetailResponse detail = masterService.findById(1L);
 
         assertThat(detail.masterId()).isEqualTo(1);
-        assertThat(detail.room().roomId()).isEqualTo(10);
-        assertThat(detail.room().artworkCount()).isEqualTo(4);
+        assertThat(detail.store().storeId()).isEqualTo(10);
+        assertThat(detail.store().artworkCount()).isEqualTo(4);
     }
 
     @Test
-    void findByIdWithoutRoomReturnsNullRoom() {
+    void findByIdWithoutStoreReturnsNullStore() {
         when(masterRepository.findById(1L)).thenReturn(Optional.of(TestEntities.master(1)));
-        when(roomRepository.findByMasterMasterId(1L)).thenReturn(Optional.empty());
+        when(storeRepository.findByMasterMasterId(1L)).thenReturn(Optional.empty());
 
-        assertThat(masterService.findById(1L).room()).isNull();
+        assertThat(masterService.findById(1L).store()).isNull();
     }
 
     @Test

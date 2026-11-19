@@ -32,7 +32,7 @@ class AiFacadeTest {
     private final AuctionProperties properties = new AuctionProperties("USD", BigDecimal.ONE, 5, BigDecimal.TEN,
             false);
 
-    private final Artwork artwork = TestEntities.artwork(3, TestEntities.room(1, TestEntities.master(1)),
+    private final Artwork artwork = TestEntities.artwork(3, TestEntities.store(1, TestEntities.master(1)),
             ArtworkStatus.IN_AUCTION);
     private final Auction auction = TestEntities.auction(7, artwork, AuctionStatus.ACTIVE,
             LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(1), "100");

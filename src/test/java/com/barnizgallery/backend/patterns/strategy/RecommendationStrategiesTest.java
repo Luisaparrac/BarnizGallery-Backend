@@ -14,7 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.barnizgallery.backend.TestEntities;
-import com.barnizgallery.backend.entity.Room;
+import com.barnizgallery.backend.entity.Store;
 import com.barnizgallery.backend.entity.TasteProfile;
 import com.barnizgallery.backend.entity.User;
 import com.barnizgallery.backend.enums.ArtworkStatus;
@@ -30,8 +30,8 @@ import com.barnizgallery.backend.patterns.factorymethod.ViewInteractionFactory;
 import com.barnizgallery.backend.patterns.factorymethod.ZoomInteractionFactory;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.InteractionRepository;
-import com.barnizgallery.backend.repository.RoomInteraction;
-import com.barnizgallery.backend.repository.RoomRepository;
+import com.barnizgallery.backend.repository.StoreInteraction;
+import com.barnizgallery.backend.repository.StoreRepository;
 import com.barnizgallery.backend.repository.TasteProfileRepository;
 
 /**
@@ -52,8 +52,8 @@ class RecommendationStrategiesTest {
 
     private final User userEs = TestEntities.user(1, Language.ES);
     private final User userEn = TestEntities.user(1, Language.EN);
-    private final Room room1 = TestEntities.room(1, TestEntities.master(1));
-    private final Room room2 = TestEntities.room(2, TestEntities.master(2));
+    private final Store store1 = TestEntities.store(1, TestEntities.master(1));
+    private final Store store2 = TestEntities.store(2, TestEntities.master(2));
 
     @BeforeEach
     void setUp() {
@@ -61,9 +61,9 @@ class RecommendationStrategiesTest {
         interactionStrategy = new InteractionBasedStrategy(interactionRepository, factoryProvider);
         hybridStrategy = new HybridStrategy(profileStrategy, interactionStrategy, interactionRepository);
         when(artworkRepository.findAllByOrderByArtworkIdAsc()).thenReturn(List.of(
-                TestEntities.artwork(10, room1, ArtworkStatus.EXHIBITED, "Rojo", "verde"),
-                TestEntities.artwork(11, room1, ArtworkStatus.EXHIBITED, "dorado"),
-                TestEntities.artwork(20, room2, ArtworkStatus.EXHIBITED, "azul", "rojo")));
+                TestEntities.artwork(10, store1, ArtworkStatus.EXHIBITED, "Rojo", "verde"),
+                TestEntities.artwork(11, store1, ArtworkStatus.EXHIBITED, "dorado"),
+                TestEntities.artwork(20, store2, ArtworkStatus.EXHIBITED, "azul", "rojo")));
     }
 
     private void givenPreferredColors(String... colors) {
@@ -72,8 +72,8 @@ class RecommendationStrategiesTest {
         when(tasteProfileRepository.findByUserUserId(1L)).thenReturn(Optional.of(profile));
     }
 
-    private void givenInteractions(RoomInteraction... interactions) {
-        when(interactionRepository.findRoomInteractions(1L)).thenReturn(List.of(interactions));
+    private void givenInteractions(StoreInteraction... interactions) {
+        when(interactionRepository.findStoreInteractions(1L)).thenReturn(List.of(interactions));
         when(interactionRepository.countByUserUserId(1L)).thenReturn((long) interactions.length);
     }
 
@@ -83,7 +83,7 @@ class RecommendationStrategiesTest {
 
         List<RecommendationResult> results = profileStrategy.recommend(userEs);
 
-        assertThat(results).extracting(RecommendationResult::roomId).containsExactly(1L, 2L);
+        assertThat(results).extracting(RecommendationResult::storeId).containsExactly(1L, 2L);
         assertThat(results.get(0).score()).isEqualByComparingTo("75.00");
         assertThat(results.get(1).score()).isEqualByComparingTo("25.00");
         assertThat(results.get(0).reason()).startsWith("Coincide con tus colores preferidos");
@@ -96,7 +96,7 @@ class RecommendationStrategiesTest {
         List<RecommendationResult> results = profileStrategy.recommend(userEn);
 
         assertThat(results).singleElement().satisfies(r -> {
-            assertThat(r.roomId()).isEqualTo(2);
+            assertThat(r.storeId()).isEqualTo(2);
             assertThat(r.score()).isEqualByComparingTo("100");
             assertThat(r.reason()).isEqualTo("Matches your preferred colors: azul");
         });
@@ -111,12 +111,12 @@ class RecommendationStrategiesTest {
 
     @Test
     void interactionsUseFactoryWeightsAndDuration() {
-        // room 1: ZOOM (3) with 300 s -> 3 x 2 = 6 points; room 2: VIEW (1) without duration bonus -> 1 point
+        // store 1: ZOOM (3) with 300 s -> 3 x 2 = 6 points; store 2: VIEW (1) without duration bonus -> 1 point
         givenInteractions(interaction(1, InteractionAction.ZOOM, 300), interaction(2, InteractionAction.VIEW, 0));
 
         List<RecommendationResult> results = interactionStrategy.recommend(userEs);
 
-        assertThat(results).extracting(RecommendationResult::roomId).containsExactly(1L, 2L);
+        assertThat(results).extracting(RecommendationResult::storeId).containsExactly(1L, 2L);
         assertThat(results.get(0).score()).isEqualByComparingTo("100");
         assertThat(results.get(1).score()).isEqualByComparingTo("16.67");
     }
@@ -136,7 +136,7 @@ class RecommendationStrategiesTest {
         List<RecommendationResult> results = hybridStrategy.recommend(userEs);
 
         assertThat(results).singleElement().satisfies(r -> {
-            assertThat(r.roomId()).isEqualTo(2);
+            assertThat(r.storeId()).isEqualTo(2);
             assertThat(r.score()).isEqualByComparingTo("100");
         });
     }
@@ -149,8 +149,8 @@ class RecommendationStrategiesTest {
 
         List<RecommendationResult> results = hybridStrategy.recommend(userEs);
 
-        // room 1: 0.6 x 100 + 0.4 x 0 = 60; room 2: 0.6 x 0 + 0.4 x 100 = 40
-        assertThat(results).extracting(RecommendationResult::roomId).containsExactly(1L, 2L);
+        // store 1: 0.6 x 100 + 0.4 x 0 = 60; store 2: 0.6 x 0 + 0.4 x 100 = 40
+        assertThat(results).extracting(RecommendationResult::storeId).containsExactly(1L, 2L);
         assertThat(results).extracting(RecommendationResult::score)
                 .usingElementComparator(BigDecimal::compareTo)
                 .containsExactly(new BigDecimal("60"), new BigDecimal("40"));
@@ -160,20 +160,20 @@ class RecommendationStrategiesTest {
     void aiStrategyParsesValidLinesOnly() {
         String answer = """
                 2|88|Great match
-                99|70|Unknown room
+                99|70|Unknown store
                 nonsense
                 1|abc|bad score
                 1|150|Clamped""";
 
         List<RecommendationResult> results = AiStrategy.parse(answer, Set.of(1L, 2L));
 
-        assertThat(results).extracting(RecommendationResult::roomId).containsExactly(2L, 1L);
+        assertThat(results).extracting(RecommendationResult::storeId).containsExactly(2L, 1L);
         assertThat(results.get(1).score()).isEqualByComparingTo("100");
     }
 
     @Test
     void aiStrategyRefusesToRunWhenAiIsDisabled() {
-        AiStrategy aiStrategy = new AiStrategy(new DisabledAiClient(), mock(RoomRepository.class), artworkRepository,
+        AiStrategy aiStrategy = new AiStrategy(new DisabledAiClient(), mock(StoreRepository.class), artworkRepository,
                 tasteProfileRepository);
 
         assertThatThrownBy(() -> aiStrategy.recommend(userEs)).isInstanceOf(FeatureDisabledException.class);
@@ -182,7 +182,7 @@ class RecommendationStrategiesTest {
     @Test
     void resolverPicksByNameAndDefaultsToHybrid() {
         AiTextClient ai = new DisabledAiClient();
-        AiStrategy aiStrategy = new AiStrategy(ai, mock(RoomRepository.class), artworkRepository,
+        AiStrategy aiStrategy = new AiStrategy(ai, mock(StoreRepository.class), artworkRepository,
                 tasteProfileRepository);
         RecommendationStrategyResolver resolver = new RecommendationStrategyResolver(
                 List.of(profileStrategy, interactionStrategy, hybridStrategy, aiStrategy), ai);
@@ -194,9 +194,9 @@ class RecommendationStrategiesTest {
         assertThatThrownBy(() -> resolver.resolve("magic")).isInstanceOf(BusinessRuleException.class);
     }
 
-    private static RoomInteraction interaction(long roomId, InteractionAction action, Integer duration) {
-        RoomInteraction interaction = mock(RoomInteraction.class);
-        when(interaction.getRoomId()).thenReturn(roomId);
+    private static StoreInteraction interaction(long storeId, InteractionAction action, Integer duration) {
+        StoreInteraction interaction = mock(StoreInteraction.class);
+        when(interaction.getStoreId()).thenReturn(storeId);
         when(interaction.getAction()).thenReturn(action);
         when(interaction.getDurationSeconds()).thenReturn(duration);
         return interaction;

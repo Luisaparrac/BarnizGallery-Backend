@@ -5,9 +5,9 @@ import com.barnizgallery.backend.dto.GalleryNodeResponse;
 /**
  * <b>Composite pattern – Composite.</b>
  * <p>
- * A room of the gallery. Its children are the artworks ({@link ArtworkLeaf}) of the room.
+ * A store of the gallery. Its children are the artworks ({@link ArtworkLeaf}) of the store.
  */
-public class RoomComposite extends CompositeGalleryComponent {
+public class StoreComposite extends CompositeGalleryComponent {
 
     private final Long id;
     private final String nameEs;
@@ -15,7 +15,7 @@ public class RoomComposite extends CompositeGalleryComponent {
     private final Long masterId;
     private final String masterName;
 
-    public RoomComposite(Long id, String nameEs, String nameEn, Long masterId, String masterName) {
+    public StoreComposite(Long id, String nameEs, String nameEn, Long masterId, String masterName) {
         this.id = id;
         this.nameEs = nameEs;
         this.nameEn = nameEn;
@@ -30,7 +30,7 @@ public class RoomComposite extends CompositeGalleryComponent {
 
     @Override
     public String getType() {
-        return "ROOM";
+        return "STORE";
     }
 
     @Override

@@ -20,7 +20,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 /**
- * A piece exhibited in a room. Maps the existing table {@code artworks}.
+ * A piece exhibited in a store. Maps the existing table {@code artworks}.
  */
 @Entity
 @Table(name = "artworks")
@@ -32,8 +32,8 @@ public class Artwork {
     private Long artworkId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "room_id", nullable = false)
-    private Room room;
+    @JoinColumn(name = "store_id", nullable = false)
+    private Store store;
 
     @Column(name = "title_es", nullable = false, length = 150)
     private String titleEs;
@@ -73,12 +73,12 @@ public class Artwork {
         this.artworkId = artworkId;
     }
 
-    public Room getRoom() {
-        return room;
+    public Store getStore() {
+        return store;
     }
 
-    public void setRoom(Room room) {
-        this.room = room;
+    public void setStore(Store store) {
+        this.store = store;
     }
 
     public String getTitleEs() {

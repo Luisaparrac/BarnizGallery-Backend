@@ -9,30 +9,30 @@ import org.springframework.transaction.annotation.Transactional;
 import com.barnizgallery.backend.dto.MasterDetailResponse;
 import com.barnizgallery.backend.dto.MasterRequest;
 import com.barnizgallery.backend.dto.MasterResponse;
-import com.barnizgallery.backend.dto.RoomSummaryResponse;
+import com.barnizgallery.backend.dto.StoreSummaryResponse;
 import com.barnizgallery.backend.entity.Master;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.mapper.MasterMapper;
-import com.barnizgallery.backend.mapper.RoomMapper;
+import com.barnizgallery.backend.mapper.StoreMapper;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.MasterRepository;
-import com.barnizgallery.backend.repository.RoomRepository;
+import com.barnizgallery.backend.repository.StoreRepository;
 
 /**
  * Business logic for masters. Masters cannot be deleted from the API
- * (the database cascades the delete to rooms, artworks, auctions and bids).
+ * (the database cascades the delete to stores, artworks, auctions and bids).
  */
 @Service
 public class MasterService {
 
     private final MasterRepository masterRepository;
-    private final RoomRepository roomRepository;
+    private final StoreRepository storeRepository;
     private final ArtworkRepository artworkRepository;
 
-    public MasterService(MasterRepository masterRepository, RoomRepository roomRepository,
+    public MasterService(MasterRepository masterRepository, StoreRepository storeRepository,
             ArtworkRepository artworkRepository) {
         this.masterRepository = masterRepository;
-        this.roomRepository = roomRepository;
+        this.storeRepository = storeRepository;
         this.artworkRepository = artworkRepository;
     }
 
@@ -46,10 +46,10 @@ public class MasterService {
     @Transactional(readOnly = true)
     public MasterDetailResponse findById(Long masterId) {
         Master master = getMaster(masterId);
-        RoomSummaryResponse room = roomRepository.findByMasterMasterId(masterId)
-                .map(r -> RoomMapper.toSummary(r, artworkRepository.countByRoomRoomId(r.getRoomId())))
+        StoreSummaryResponse store = storeRepository.findByMasterMasterId(masterId)
+                .map(r -> StoreMapper.toSummary(r, artworkRepository.countByStoreStoreId(r.getStoreId())))
                 .orElse(null);
-        return MasterMapper.toDetail(master, room);
+        return MasterMapper.toDetail(master, store);
     }
 
     @Transactional

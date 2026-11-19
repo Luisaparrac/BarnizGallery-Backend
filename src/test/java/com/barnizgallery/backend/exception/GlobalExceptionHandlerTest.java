@@ -37,7 +37,7 @@ class GlobalExceptionHandlerTest {
 
         @GetMapping("/conflict")
         void conflict() {
-            throw new BusinessRuleException("Room already exists");
+            throw new BusinessRuleException("Store already exists");
         }
 
         @GetMapping("/too-many")

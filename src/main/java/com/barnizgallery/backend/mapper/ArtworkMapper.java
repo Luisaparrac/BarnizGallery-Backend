@@ -19,20 +19,20 @@ public final class ArtworkMapper {
     }
 
     public static ArtworkSummaryResponse toSummary(Artwork artwork) {
-        return new ArtworkSummaryResponse(artwork.getArtworkId(), artwork.getRoom().getRoomId(), artwork.getTitleEs(),
+        return new ArtworkSummaryResponse(artwork.getArtworkId(), artwork.getStore().getStoreId(), artwork.getTitleEs(),
                 artwork.getTitleEn(), artwork.getTechnique(), artwork.getDimensions(), artwork.getColorTags(),
                 artwork.getMotifTags(), artwork.getStatus());
     }
 
     public static ArtworkDetailResponse toDetail(Artwork artwork, List<PhotoResponse> photos,
             AuctionResponse currentAuction) {
-        return new ArtworkDetailResponse(artwork.getArtworkId(), artwork.getRoom().getRoomId(), artwork.getTitleEs(),
+        return new ArtworkDetailResponse(artwork.getArtworkId(), artwork.getStore().getStoreId(), artwork.getTitleEs(),
                 artwork.getTitleEn(), artwork.getHistoryEs(), artwork.getHistoryEn(), artwork.getTechnique(),
                 artwork.getDimensions(), artwork.getColorTags(), artwork.getMotifTags(), artwork.getStatus(),
                 photos, currentAuction);
     }
 
-    /** Copies the request fields into the entity. The room and status are set by the service. */
+    /** Copies the request fields into the entity. The store and status are set by the service. */
     public static void apply(ArtworkRequest request, Artwork artwork) {
         artwork.setTitleEs(request.titleEs());
         artwork.setTitleEn(request.titleEn());

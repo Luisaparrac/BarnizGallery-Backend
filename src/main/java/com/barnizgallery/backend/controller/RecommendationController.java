@@ -16,7 +16,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
- * Room recommendations for a user (Strategy pattern through the AI Facade).
+ * Store recommendations for a user (Strategy pattern through the AI Facade).
  */
 @RestController
 @RequestMapping("/api/users/{id}/recommendations")

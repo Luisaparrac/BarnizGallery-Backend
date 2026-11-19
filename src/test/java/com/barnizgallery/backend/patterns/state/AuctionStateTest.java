@@ -29,7 +29,7 @@ class AuctionStateTest {
     private AuctionContext context(AuctionStatus status, long bids) {
         ArtworkStatus artworkStatus = status == AuctionStatus.ACTIVE ? ArtworkStatus.IN_AUCTION
                 : ArtworkStatus.EXHIBITED;
-        artwork = TestEntities.artwork(1, TestEntities.room(1, TestEntities.master(1)), artworkStatus);
+        artwork = TestEntities.artwork(1, TestEntities.store(1, TestEntities.master(1)), artworkStatus);
         Auction auction = TestEntities.auction(1, artwork, status, NOW.minusDays(1), NOW.plusDays(1), "100");
         return new AuctionContext(auction, () -> bids);
     }

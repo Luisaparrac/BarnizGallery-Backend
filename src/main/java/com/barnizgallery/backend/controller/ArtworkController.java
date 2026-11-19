@@ -50,9 +50,9 @@ public class ArtworkController {
     }
 
     @GetMapping
-    public List<ArtworkSummaryResponse> findAll(@RequestParam(required = false) Long roomId,
+    public List<ArtworkSummaryResponse> findAll(@RequestParam(required = false) Long storeId,
             @RequestParam(required = false) ArtworkStatus status) {
-        return artworkService.findAll(roomId, status);
+        return artworkService.findAll(storeId, status);
     }
 
     @GetMapping("/{id}")

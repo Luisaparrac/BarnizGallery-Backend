@@ -98,7 +98,7 @@ class AuctionObserversTest {
     void matchingNotifierWarnsUsersWithMatchingColors() {
         ArtworkRepository artworkRepository = mock(ArtworkRepository.class);
         TasteProfileRepository tasteProfileRepository = mock(TasteProfileRepository.class);
-        Artwork artwork = TestEntities.artwork(7, TestEntities.room(1, TestEntities.master(1)),
+        Artwork artwork = TestEntities.artwork(7, TestEntities.store(1, TestEntities.master(1)),
                 ArtworkStatus.IN_AUCTION, "Rojo", "dorado");
         when(artworkRepository.findById(7L)).thenReturn(Optional.of(artwork));
         when(tasteProfileRepository.findAll()).thenReturn(List.of(profile(1, "rojo"), profile(2, "azul"),

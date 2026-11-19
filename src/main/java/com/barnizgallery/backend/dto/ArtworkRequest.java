@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Size;
  * Body to create or update an artwork. The status is managed by auctions.
  */
 public record ArtworkRequest(
-        @NotNull Long roomId,
+        @NotNull Long storeId,
         @NotBlank @Size(max = 150) String titleEs,
         @NotBlank @Size(max = 150) String titleEn,
         String historyEs,

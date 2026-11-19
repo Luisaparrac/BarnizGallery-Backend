@@ -14,18 +14,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.barnizgallery.backend.TestEntities;
 import com.barnizgallery.backend.dto.GalleryNodeResponse;
 import com.barnizgallery.backend.entity.Artwork;
-import com.barnizgallery.backend.entity.Room;
+import com.barnizgallery.backend.entity.Store;
 import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.patterns.composite.GalleryComposite;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.PhotoRepository;
-import com.barnizgallery.backend.repository.RoomRepository;
+import com.barnizgallery.backend.repository.StoreRepository;
 
 @ExtendWith(MockitoExtension.class)
 class GalleryTreeBuilderTest {
 
     @Mock
-    private RoomRepository roomRepository;
+    private StoreRepository storeRepository;
     @Mock
     private ArtworkRepository artworkRepository;
     @Mock
@@ -34,13 +34,13 @@ class GalleryTreeBuilderTest {
     private GalleryTreeBuilder builder;
 
     @Test
-    void buildsRoomsWithTheirArtworksAndThumbnails() {
-        Room room1 = TestEntities.room(1, TestEntities.master(1));
-        Room room2 = TestEntities.room(2, TestEntities.master(2));
-        Artwork a1 = TestEntities.artwork(10, room1, ArtworkStatus.EXHIBITED);
-        Artwork a2 = TestEntities.artwork(11, room1, ArtworkStatus.IN_AUCTION);
-        Artwork a3 = TestEntities.artwork(12, room2, ArtworkStatus.SOLD);
-        when(roomRepository.findAllWithMaster()).thenReturn(List.of(room1, room2));
+    void buildsStoresWithTheirArtworksAndThumbnails() {
+        Store store1 = TestEntities.store(1, TestEntities.master(1));
+        Store store2 = TestEntities.store(2, TestEntities.master(2));
+        Artwork a1 = TestEntities.artwork(10, store1, ArtworkStatus.EXHIBITED);
+        Artwork a2 = TestEntities.artwork(11, store1, ArtworkStatus.IN_AUCTION);
+        Artwork a3 = TestEntities.artwork(12, store2, ArtworkStatus.SOLD);
+        when(storeRepository.findAllWithMaster()).thenReturn(List.of(store1, store2));
         when(artworkRepository.findAllByOrderByArtworkIdAsc()).thenReturn(List.of(a1, a2, a3));
         when(photoRepository.findFirstPhotoOfEachArtwork()).thenReturn(List.of(TestEntities.photo(1, a2, "a2.jpg")));
 
@@ -58,7 +58,7 @@ class GalleryTreeBuilderTest {
 
     @Test
     void emptyDatabaseGivesEmptyGallery() {
-        when(roomRepository.findAllWithMaster()).thenReturn(List.of());
+        when(storeRepository.findAllWithMaster()).thenReturn(List.of());
         when(artworkRepository.findAllByOrderByArtworkIdAsc()).thenReturn(List.of());
         when(photoRepository.findFirstPhotoOfEachArtwork()).thenReturn(List.of());
 

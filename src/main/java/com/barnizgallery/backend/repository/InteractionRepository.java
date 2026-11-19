@@ -17,10 +17,10 @@ public interface InteractionRepository extends JpaRepository<Interaction, Long> 
             + "order by i.interactionDate desc, i.interactionId desc")
     List<Interaction> findHistory(Long userId);
 
-    /** Interactions of a user with the room of each artwork, in a single query. */
-    @Query("select i.artwork.room.roomId as roomId, i.action as action, i.durationSeconds as durationSeconds "
+    /** Interactions of a user with the store of each artwork, in a single query. */
+    @Query("select i.artwork.store.storeId as storeId, i.action as action, i.durationSeconds as durationSeconds "
             + "from Interaction i where i.user.userId = :userId")
-    List<RoomInteraction> findRoomInteractions(Long userId);
+    List<StoreInteraction> findStoreInteractions(Long userId);
 
     long countByUserUserId(Long userId);
 }

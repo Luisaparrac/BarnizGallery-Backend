@@ -11,7 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
- * Full gallery tree used by the frontend to build the 3D world.
+ * Full gallery tree used by the frontend to build the gallery.
  */
 @RestController
 @RequestMapping("/api/gallery")
@@ -25,7 +25,7 @@ public class GalleryController {
     }
 
     @GetMapping
-    @Operation(summary = "Gallery tree: gallery → rooms → artworks (Composite pattern)")
+    @Operation(summary = "Gallery tree: gallery → stores → artworks (Composite pattern)")
     public GalleryNodeResponse getGallery() {
         return galleryService.getGallery();
     }

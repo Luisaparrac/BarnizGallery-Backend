@@ -39,7 +39,7 @@ class PhotoServiceTest {
 
     @Test
     void addByUrlLinksPhotoToArtwork() {
-        Artwork artwork = TestEntities.artwork(3, TestEntities.room(1, TestEntities.master(1)),
+        Artwork artwork = TestEntities.artwork(3, TestEntities.store(1, TestEntities.master(1)),
                 ArtworkStatus.EXHIBITED);
         when(artworkService.getArtwork(3L)).thenReturn(artwork);
         when(photoRepository.save(any(Photo.class))).thenAnswer(inv -> inv.getArgument(0));

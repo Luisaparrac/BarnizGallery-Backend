@@ -15,7 +15,7 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 /**
- * A room recommended to a user with a score from 0 to 100. Maps the existing table {@code recommendations}.
+ * A store recommended to a user with a score from 0 to 100. Maps the existing table {@code recommendations}.
  */
 @Entity
 @Table(name = "recommendations")
@@ -31,8 +31,8 @@ public class Recommendation {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "room_id", nullable = false)
-    private Room room;
+    @JoinColumn(name = "store_id", nullable = false)
+    private Store store;
 
     @Column(name = "score", precision = 5, scale = 2)
     private BigDecimal score;
@@ -67,12 +67,12 @@ public class Recommendation {
         this.user = user;
     }
 
-    public Room getRoom() {
-        return room;
+    public Store getStore() {
+        return store;
     }
 
-    public void setRoom(Room room) {
-        this.room = room;
+    public void setStore(Store store) {
+        this.store = store;
     }
 
     public BigDecimal getScore() {

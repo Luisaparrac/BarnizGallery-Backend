@@ -4,15 +4,15 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 /**
- * Result produced by every {@link RecommendationStrategy}: a room, a score from 0 to 100
+ * Result produced by every {@link RecommendationStrategy}: a store, a score from 0 to 100
  * and a reason written in the user's preferred language.
  */
-public record RecommendationResult(Long roomId, BigDecimal score, String reason) {
+public record RecommendationResult(Long storeId, BigDecimal score, String reason) {
 
     /** Creates a result, clamping the score to 0-100 with 2 decimals (column numeric(5,2)). */
-    public static RecommendationResult of(Long roomId, double score, String reason) {
+    public static RecommendationResult of(Long storeId, double score, String reason) {
         double clamped = Math.max(0, Math.min(100, score));
-        return new RecommendationResult(roomId, BigDecimal.valueOf(clamped).setScale(2, RoundingMode.HALF_UP),
+        return new RecommendationResult(storeId, BigDecimal.valueOf(clamped).setScale(2, RoundingMode.HALF_UP),
                 reason);
     }
 }

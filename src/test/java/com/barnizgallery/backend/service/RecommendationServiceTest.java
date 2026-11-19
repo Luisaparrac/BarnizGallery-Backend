@@ -21,7 +21,7 @@ import com.barnizgallery.backend.enums.Language;
 import com.barnizgallery.backend.patterns.facade.AiFacade;
 import com.barnizgallery.backend.patterns.strategy.RecommendationResult;
 import com.barnizgallery.backend.repository.RecommendationRepository;
-import com.barnizgallery.backend.repository.RoomRepository;
+import com.barnizgallery.backend.repository.StoreRepository;
 
 @ExtendWith(MockitoExtension.class)
 class RecommendationServiceTest {
@@ -31,7 +31,7 @@ class RecommendationServiceTest {
     @Mock
     private RecommendationRepository recommendationRepository;
     @Mock
-    private RoomRepository roomRepository;
+    private StoreRepository storeRepository;
     @Mock
     private UserService userService;
     @InjectMocks
@@ -41,16 +41,16 @@ class RecommendationServiceTest {
     void computeReplacesPreviousRecommendations() {
         User user = TestEntities.user(1, Language.ES);
         when(userService.getUser(1L)).thenReturn(user);
-        when(aiFacade.recommendRooms(user, "profile")).thenReturn(List.of(
+        when(aiFacade.recommendStores(user, "profile")).thenReturn(List.of(
                 RecommendationResult.of(2L, 80, "reason 2"), RecommendationResult.of(1L, 40, "reason 1")));
-        when(roomRepository.findAllById(List.of(2L, 1L))).thenReturn(List.of(
-                TestEntities.room(1, TestEntities.master(1)), TestEntities.room(2, TestEntities.master(2))));
+        when(storeRepository.findAllById(List.of(2L, 1L))).thenReturn(List.of(
+                TestEntities.store(1, TestEntities.master(1)), TestEntities.store(2, TestEntities.master(2))));
         when(recommendationRepository.saveAll(anyList())).thenAnswer(inv -> inv.getArgument(0));
 
         List<RecommendationResponse> saved = recommendationService.compute(1L, "profile");
 
-        assertThat(saved).extracting(RecommendationResponse::roomId).containsExactly(2L, 1L);
-        assertThat(saved.get(0).roomNameEn()).isEqualTo("Room 2");
+        assertThat(saved).extracting(RecommendationResponse::storeId).containsExactly(2L, 1L);
+        assertThat(saved.get(0).storeNameEn()).isEqualTo("Store 2");
         InOrder order = inOrder(recommendationRepository);
         order.verify(recommendationRepository).deleteByUserId(1L);
         order.verify(recommendationRepository).saveAll(anyList());

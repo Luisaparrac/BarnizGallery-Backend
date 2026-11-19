@@ -4,11 +4,11 @@ import com.barnizgallery.backend.enums.InteractionAction;
 
 /**
  * Projection: one interaction reduced to what the recommendation algorithms need
- * ({@link InteractionRepository#findRoomInteractions}).
+ * ({@link InteractionRepository#findStoreInteractions}).
  */
-public interface RoomInteraction {
+public interface StoreInteraction {
 
-    Long getRoomId();
+    Long getStoreId();
 
     InteractionAction getAction();
 

@@ -9,7 +9,7 @@ import com.barnizgallery.backend.enums.ArtworkStatus;
  */
 public record ArtworkSummaryResponse(
         Long artworkId,
-        Long roomId,
+        Long storeId,
         String titleEs,
         String titleEn,
         String technique,

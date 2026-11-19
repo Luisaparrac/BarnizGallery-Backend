@@ -30,7 +30,7 @@ class AuctionBuilderTest {
     private static final LocalDateTime NOW = LocalDateTime.of(2026, 10, 8, 12, 0);
     private final Clock clock = Clock.fixed(NOW.atZone(ZONE).toInstant(), ZONE);
     private final AuctionRepository auctionRepository = mock(AuctionRepository.class);
-    private final Artwork artwork = TestEntities.artwork(5, TestEntities.room(1, TestEntities.master(1)),
+    private final Artwork artwork = TestEntities.artwork(5, TestEntities.store(1, TestEntities.master(1)),
             ArtworkStatus.EXHIBITED);
 
     private AuctionBuilder builder() {

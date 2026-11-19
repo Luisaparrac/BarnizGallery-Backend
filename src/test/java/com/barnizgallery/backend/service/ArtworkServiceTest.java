@@ -22,7 +22,7 @@ import com.barnizgallery.backend.dto.ArtworkDetailResponse;
 import com.barnizgallery.backend.dto.ArtworkRequest;
 import com.barnizgallery.backend.dto.ArtworkSummaryResponse;
 import com.barnizgallery.backend.entity.Artwork;
-import com.barnizgallery.backend.entity.Room;
+import com.barnizgallery.backend.entity.Store;
 import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.repository.ArtworkRepository;
@@ -41,16 +41,16 @@ class ArtworkServiceTest {
     @Mock
     private AuctionResponseAssembler auctionAssembler;
     @Mock
-    private RoomService roomService;
+    private StoreService storeService;
     @InjectMocks
     private ArtworkService artworkService;
 
-    private final Room room = TestEntities.room(1, TestEntities.master(1));
+    private final Store store = TestEntities.store(1, TestEntities.master(1));
 
     @Test
     void findAllUsesTheRightFilter() {
-        when(artworkRepository.findByRoomRoomIdAndStatusOrderByArtworkIdAsc(1L, ArtworkStatus.SOLD))
-                .thenReturn(List.of(TestEntities.artwork(7, room, ArtworkStatus.SOLD)));
+        when(artworkRepository.findByStoreStoreIdAndStatusOrderByArtworkIdAsc(1L, ArtworkStatus.SOLD))
+                .thenReturn(List.of(TestEntities.artwork(7, store, ArtworkStatus.SOLD)));
 
         List<ArtworkSummaryResponse> result = artworkService.findAll(1L, ArtworkStatus.SOLD);
 
@@ -70,7 +70,7 @@ class ArtworkServiceTest {
 
     @Test
     void detailIncludesPhotosAndNoAuctionWhenAbsent() {
-        Artwork artwork = TestEntities.artwork(3, room, ArtworkStatus.EXHIBITED);
+        Artwork artwork = TestEntities.artwork(3, store, ArtworkStatus.EXHIBITED);
         when(artworkRepository.findById(3L)).thenReturn(Optional.of(artwork));
         when(photoRepository.findByArtworkArtworkIdOrderByPhotoIdAsc(3L))
                 .thenReturn(List.of(TestEntities.photo(1, artwork, "https://img/1.jpg")));
@@ -85,7 +85,7 @@ class ArtworkServiceTest {
 
     @Test
     void createStartsAsExhibited() {
-        when(roomService.getRoom(1L)).thenReturn(room);
+        when(storeService.getStore(1L)).thenReturn(store);
         when(artworkRepository.save(any(Artwork.class))).thenAnswer(inv -> inv.getArgument(0));
 
         ArtworkSummaryResponse created = artworkService.create(
@@ -97,7 +97,7 @@ class ArtworkServiceTest {
 
     @Test
     void updateDoesNotChangeStatus() {
-        Artwork artwork = TestEntities.artwork(3, room, ArtworkStatus.IN_AUCTION);
+        Artwork artwork = TestEntities.artwork(3, store, ArtworkStatus.IN_AUCTION);
         when(artworkRepository.findById(3L)).thenReturn(Optional.of(artwork));
 
         ArtworkSummaryResponse updated = artworkService.update(3L,

@@ -49,7 +49,7 @@ class AuctionServiceTest {
     void setUp() {
         auctionService = new AuctionService(auctionRepository, bidRepository, artworkService, mock(AiFacade.class),
                 assembler, publisher, Clock.fixed(NOW.atZone(ZONE).toInstant(), ZONE));
-        artwork = TestEntities.artwork(5, TestEntities.room(1, TestEntities.master(1)), ArtworkStatus.EXHIBITED);
+        artwork = TestEntities.artwork(5, TestEntities.store(1, TestEntities.master(1)), ArtworkStatus.EXHIBITED);
         when(artworkService.getArtwork(5L)).thenReturn(artwork);
         when(auctionRepository.existsByArtworkArtworkIdAndStatusIn(eq(5L), anyCollection())).thenReturn(false);
         when(auctionRepository.save(any(Auction.class))).thenAnswer(inv -> inv.getArgument(0));

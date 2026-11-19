@@ -10,7 +10,7 @@ import com.barnizgallery.backend.dto.GalleryNodeResponse;
  * <b>Composite pattern – Composite (shared base).</b>
  * <p>
  * Base class for nodes that contain children ({@link GalleryComposite} and
- * {@link RoomComposite}). The operations are recursive: a composite asks each
+ * {@link StoreComposite}). The operations are recursive: a composite asks each
  * child and adds the results, without knowing whether the child is a leaf or
  * another composite.
  */

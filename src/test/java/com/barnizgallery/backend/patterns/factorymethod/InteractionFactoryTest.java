@@ -23,7 +23,7 @@ import com.barnizgallery.backend.exception.BusinessRuleException;
 class InteractionFactoryTest {
 
     private final User user = TestEntities.user(1, Language.ES);
-    private final Artwork artwork = TestEntities.artwork(2, TestEntities.room(1, TestEntities.master(1)),
+    private final Artwork artwork = TestEntities.artwork(2, TestEntities.store(1, TestEntities.master(1)),
             ArtworkStatus.EXHIBITED);
 
     static Stream<Arguments> creators() {

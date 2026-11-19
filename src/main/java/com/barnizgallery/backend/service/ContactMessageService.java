@@ -33,7 +33,7 @@ public class ContactMessageService {
         this.artworkService = artworkService;
     }
 
-    /** Saves a message. If it is about an artwork, the artwork must be in the master's room. */
+    /** Saves a message. If it is about an artwork, the artwork must be in the master's store. */
     @Transactional
     public ContactMessageResponse send(ContactMessageRequest request) {
         ContactMessage message = new ContactMessage();
@@ -42,9 +42,9 @@ public class ContactMessageService {
         message.setMaster(master);
         if (request.artworkId() != null) {
             Artwork artwork = artworkService.getArtwork(request.artworkId());
-            if (!artwork.getRoom().getMaster().getMasterId().equals(master.getMasterId())) {
+            if (!artwork.getStore().getMaster().getMasterId().equals(master.getMasterId())) {
                 throw BusinessRuleException.unprocessable("Artwork " + artwork.getArtworkId()
-                        + " does not belong to the room of master " + master.getMasterId());
+                        + " does not belong to the store of master " + master.getMasterId());
             }
             message.setArtwork(artwork);
         }

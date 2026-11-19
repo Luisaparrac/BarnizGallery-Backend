@@ -3,10 +3,10 @@ package com.barnizgallery.backend.dto;
 import java.util.List;
 
 /**
- * A room with its master and its artworks.
+ * A store with its master and its artworks.
  */
-public record RoomDetailResponse(
-        Long roomId,
+public record StoreDetailResponse(
+        Long storeId,
         MasterResponse master,
         String nameEs,
         String nameEn,

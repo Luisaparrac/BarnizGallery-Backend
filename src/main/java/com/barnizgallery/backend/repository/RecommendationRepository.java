@@ -13,10 +13,10 @@ import com.barnizgallery.backend.entity.Recommendation;
  */
 public interface RecommendationRepository extends JpaRepository<Recommendation, Long> {
 
-    /** Saved recommendations of a user with their room, best score first. */
-    @Query("select r from Recommendation r join fetch r.room where r.user.userId = :userId "
+    /** Saved recommendations of a user with their store, best score first. */
+    @Query("select r from Recommendation r join fetch r.store where r.user.userId = :userId "
             + "order by r.score desc nulls last, r.recommendationId")
-    List<Recommendation> findByUserWithRoom(Long userId);
+    List<Recommendation> findByUserWithStore(Long userId);
 
     /** Removes the previous recommendations of a user before saving new ones. */
     @Modifying

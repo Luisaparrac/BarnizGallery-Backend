@@ -15,15 +15,15 @@ public interface ArtworkRepository extends JpaRepository<Artwork, Long> {
 
     List<Artwork> findAllByOrderByArtworkIdAsc();
 
-    List<Artwork> findByRoomRoomIdOrderByArtworkIdAsc(Long roomId);
+    List<Artwork> findByStoreStoreIdOrderByArtworkIdAsc(Long storeId);
 
     List<Artwork> findByStatusOrderByArtworkIdAsc(ArtworkStatus status);
 
-    List<Artwork> findByRoomRoomIdAndStatusOrderByArtworkIdAsc(Long roomId, ArtworkStatus status);
+    List<Artwork> findByStoreStoreIdAndStatusOrderByArtworkIdAsc(Long storeId, ArtworkStatus status);
 
-    long countByRoomRoomId(Long roomId);
+    long countByStoreStoreId(Long storeId);
 
-    /** Artwork count of every room in a single query. */
-    @Query("select a.room.roomId as roomId, count(a) as artworkCount from Artwork a group by a.room.roomId")
-    List<RoomArtworkCount> countGroupedByRoom();
+    /** Artwork count of every store in a single query. */
+    @Query("select a.store.storeId as storeId, count(a) as artworkCount from Artwork a group by a.store.storeId")
+    List<StoreArtworkCount> countGroupedByStore();
 }

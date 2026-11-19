@@ -19,38 +19,38 @@ class GalleryCompositeTest {
 
     @Test
     void compositesAddTheCountsOfTheirChildren() {
-        RoomComposite room1 = new RoomComposite(1L, "Sala 1", "Room 1", 1L, "Master 1");
-        room1.add(new ArtworkLeaf(1L, "A", "A", ArtworkStatus.EXHIBITED, null));
-        room1.add(new ArtworkLeaf(2L, "B", "B", ArtworkStatus.IN_AUCTION, null));
-        RoomComposite room2 = new RoomComposite(2L, "Sala 2", "Room 2", 2L, "Master 2");
-        room2.add(new ArtworkLeaf(3L, "C", "C", ArtworkStatus.SOLD, null));
-        RoomComposite emptyRoom = new RoomComposite(3L, "Sala 3", "Room 3", 3L, "Master 3");
+        StoreComposite store1 = new StoreComposite(1L, "Tienda 1", "Store 1", 1L, "Master 1");
+        store1.add(new ArtworkLeaf(1L, "A", "A", ArtworkStatus.EXHIBITED, null));
+        store1.add(new ArtworkLeaf(2L, "B", "B", ArtworkStatus.IN_AUCTION, null));
+        StoreComposite store2 = new StoreComposite(2L, "Tienda 2", "Store 2", 2L, "Master 2");
+        store2.add(new ArtworkLeaf(3L, "C", "C", ArtworkStatus.SOLD, null));
+        StoreComposite emptyStore = new StoreComposite(3L, "Tienda 3", "Store 3", 3L, "Master 3");
         GalleryComposite gallery = new GalleryComposite();
-        gallery.add(room1);
-        gallery.add(room2);
-        gallery.add(emptyRoom);
+        gallery.add(store1);
+        gallery.add(store2);
+        gallery.add(emptyStore);
 
-        assertThat(room1.countArtworks()).isEqualTo(2);
-        assertThat(emptyRoom.countArtworks()).isZero();
+        assertThat(store1.countArtworks()).isEqualTo(2);
+        assertThat(emptyStore.countArtworks()).isZero();
         assertThat(gallery.countArtworks()).isEqualTo(3);
         assertThat(gallery.countAvailableForAuction()).isEqualTo(1);
     }
 
     @Test
     void toNodeBuildsTheTreeRecursively() {
-        RoomComposite room = new RoomComposite(1L, "Sala", "Room", 7L, "Master");
-        room.add(new ArtworkLeaf(5L, "Obra", "Artwork", ArtworkStatus.EXHIBITED, "thumb.jpg"));
+        StoreComposite store = new StoreComposite(1L, "Tienda", "Store", 7L, "Master");
+        store.add(new ArtworkLeaf(5L, "Obra", "Artwork", ArtworkStatus.EXHIBITED, "thumb.jpg"));
         GalleryComposite gallery = new GalleryComposite();
-        gallery.add(room);
+        gallery.add(store);
 
         GalleryNodeResponse root = gallery.toNode();
 
         assertThat(root.type()).isEqualTo("GALLERY");
         assertThat(root.artworkCount()).isEqualTo(1);
-        GalleryNodeResponse roomNode = root.children().get(0);
-        assertThat(roomNode.type()).isEqualTo("ROOM");
-        assertThat(roomNode.masterId()).isEqualTo(7);
-        GalleryNodeResponse artworkNode = roomNode.children().get(0);
+        GalleryNodeResponse storeNode = root.children().get(0);
+        assertThat(storeNode.type()).isEqualTo("STORE");
+        assertThat(storeNode.masterId()).isEqualTo(7);
+        GalleryNodeResponse artworkNode = storeNode.children().get(0);
         assertThat(artworkNode.type()).isEqualTo("ARTWORK");
         assertThat(artworkNode.status()).isEqualTo("EXHIBITED");
         assertThat(artworkNode.thumbnailUrl()).isEqualTo("thumb.jpg");

@@ -11,16 +11,16 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 /**
- * Virtual room dedicated to one master (1:1). Maps the existing table {@code rooms}.
+ * Virtual store dedicated to one master (1:1). Maps the existing table {@code stores}.
  */
 @Entity
-@Table(name = "rooms")
-public class Room {
+@Table(name = "stores")
+public class Store {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "room_id")
-    private Long roomId;
+    @Column(name = "store_id")
+    private Long storeId;
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "master_id", nullable = false, unique = true)
@@ -41,12 +41,12 @@ public class Room {
     @Column(name = "scene_3d_url", length = 255)
     private String scene3dUrl;
 
-    public Long getRoomId() {
-        return roomId;
+    public Long getStoreId() {
+        return storeId;
     }
 
-    public void setRoomId(Long roomId) {
-        this.roomId = roomId;
+    public void setStoreId(Long storeId) {
+        this.storeId = storeId;
     }
 
     public Master getMaster() {

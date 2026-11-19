@@ -12,7 +12,7 @@ import com.barnizgallery.backend.dto.ArtworkSummaryResponse;
 import com.barnizgallery.backend.dto.AuctionResponse;
 import com.barnizgallery.backend.dto.PhotoResponse;
 import com.barnizgallery.backend.entity.Artwork;
-import com.barnizgallery.backend.entity.Room;
+import com.barnizgallery.backend.entity.Store;
 import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.enums.AuctionStatus;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
@@ -32,26 +32,26 @@ public class ArtworkService {
     private final PhotoRepository photoRepository;
     private final AuctionRepository auctionRepository;
     private final AuctionResponseAssembler auctionAssembler;
-    private final RoomService roomService;
+    private final StoreService storeService;
 
     public ArtworkService(ArtworkRepository artworkRepository, PhotoRepository photoRepository,
             AuctionRepository auctionRepository, AuctionResponseAssembler auctionAssembler,
-            RoomService roomService) {
+            StoreService storeService) {
         this.artworkRepository = artworkRepository;
         this.photoRepository = photoRepository;
         this.auctionRepository = auctionRepository;
         this.auctionAssembler = auctionAssembler;
-        this.roomService = roomService;
+        this.storeService = storeService;
     }
 
-    /** Lists artworks, optionally filtered by room and/or status. */
+    /** Lists artworks, optionally filtered by store and/or status. */
     @Transactional(readOnly = true)
-    public List<ArtworkSummaryResponse> findAll(Long roomId, ArtworkStatus status) {
+    public List<ArtworkSummaryResponse> findAll(Long storeId, ArtworkStatus status) {
         List<Artwork> artworks;
-        if (roomId != null && status != null) {
-            artworks = artworkRepository.findByRoomRoomIdAndStatusOrderByArtworkIdAsc(roomId, status);
-        } else if (roomId != null) {
-            artworks = artworkRepository.findByRoomRoomIdOrderByArtworkIdAsc(roomId);
+        if (storeId != null && status != null) {
+            artworks = artworkRepository.findByStoreStoreIdAndStatusOrderByArtworkIdAsc(storeId, status);
+        } else if (storeId != null) {
+            artworks = artworkRepository.findByStoreStoreIdOrderByArtworkIdAsc(storeId);
         } else if (status != null) {
             artworks = artworkRepository.findByStatusOrderByArtworkIdAsc(status);
         } else {
@@ -77,9 +77,9 @@ public class ArtworkService {
 
     @Transactional
     public ArtworkSummaryResponse create(ArtworkRequest request) {
-        Room room = roomService.getRoom(request.roomId());
+        Store store = storeService.getStore(request.storeId());
         Artwork artwork = new Artwork();
-        artwork.setRoom(room);
+        artwork.setStore(store);
         artwork.setStatus(ArtworkStatus.EXHIBITED);
         ArtworkMapper.apply(request, artwork);
         return ArtworkMapper.toSummary(artworkRepository.save(artwork));
@@ -88,8 +88,8 @@ public class ArtworkService {
     @Transactional
     public ArtworkSummaryResponse update(Long artworkId, ArtworkRequest request) {
         Artwork artwork = getArtwork(artworkId);
-        if (!artwork.getRoom().getRoomId().equals(request.roomId())) {
-            artwork.setRoom(roomService.getRoom(request.roomId()));
+        if (!artwork.getStore().getStoreId().equals(request.storeId())) {
+            artwork.setStore(storeService.getStore(request.storeId()));
         }
         ArtworkMapper.apply(request, artwork);
         return ArtworkMapper.toSummary(artwork);

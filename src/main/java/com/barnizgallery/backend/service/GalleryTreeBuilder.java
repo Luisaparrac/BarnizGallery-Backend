@@ -8,31 +8,31 @@ import org.springframework.stereotype.Component;
 
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Photo;
-import com.barnizgallery.backend.entity.Room;
+import com.barnizgallery.backend.entity.Store;
 import com.barnizgallery.backend.patterns.composite.ArtworkLeaf;
 import com.barnizgallery.backend.patterns.composite.GalleryComposite;
-import com.barnizgallery.backend.patterns.composite.RoomComposite;
+import com.barnizgallery.backend.patterns.composite.StoreComposite;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.PhotoRepository;
-import com.barnizgallery.backend.repository.RoomRepository;
+import com.barnizgallery.backend.repository.StoreRepository;
 
 /**
- * Builds the Composite tree Gallery → Rooms → Artworks from the database.
+ * Builds the Composite tree Gallery → Stores → Artworks from the database.
  * <p>
- * It always runs 3 queries (rooms with masters, artworks and first photos),
- * whatever the number of rooms or artworks, so there is no N+1 problem.
+ * It always runs 3 queries (stores with masters, artworks and first photos),
+ * whatever the number of stores or artworks, so there is no N+1 problem.
  * Must be called inside a transaction.
  */
 @Component
 public class GalleryTreeBuilder {
 
-    private final RoomRepository roomRepository;
+    private final StoreRepository storeRepository;
     private final ArtworkRepository artworkRepository;
     private final PhotoRepository photoRepository;
 
-    public GalleryTreeBuilder(RoomRepository roomRepository, ArtworkRepository artworkRepository,
+    public GalleryTreeBuilder(StoreRepository storeRepository, ArtworkRepository artworkRepository,
             PhotoRepository photoRepository) {
-        this.roomRepository = roomRepository;
+        this.storeRepository = storeRepository;
         this.artworkRepository = artworkRepository;
         this.photoRepository = photoRepository;
     }
@@ -42,17 +42,17 @@ public class GalleryTreeBuilder {
                 .collect(Collectors.toMap(p -> p.getArtwork().getArtworkId(), Photo::getFileUrl));
 
         GalleryComposite gallery = new GalleryComposite();
-        Map<Long, RoomComposite> rooms = new LinkedHashMap<>();
-        for (Room room : roomRepository.findAllWithMaster()) {
-            RoomComposite node = new RoomComposite(room.getRoomId(), room.getNameEs(), room.getNameEn(),
-                    room.getMaster().getMasterId(), room.getMaster().getName());
-            rooms.put(room.getRoomId(), node);
+        Map<Long, StoreComposite> stores = new LinkedHashMap<>();
+        for (Store store : storeRepository.findAllWithMaster()) {
+            StoreComposite node = new StoreComposite(store.getStoreId(), store.getNameEs(), store.getNameEn(),
+                    store.getMaster().getMasterId(), store.getMaster().getName());
+            stores.put(store.getStoreId(), node);
             gallery.add(node);
         }
         for (Artwork artwork : artworkRepository.findAllByOrderByArtworkIdAsc()) {
-            RoomComposite room = rooms.get(artwork.getRoom().getRoomId());
-            if (room != null) {
-                room.add(new ArtworkLeaf(artwork.getArtworkId(), artwork.getTitleEs(), artwork.getTitleEn(),
+            StoreComposite store = stores.get(artwork.getStore().getStoreId());
+            if (store != null) {
+                store.add(new ArtworkLeaf(artwork.getArtworkId(), artwork.getTitleEs(), artwork.getTitleEn(),
                         artwork.getStatus(), thumbnails.get(artwork.getArtworkId())));
             }
         }

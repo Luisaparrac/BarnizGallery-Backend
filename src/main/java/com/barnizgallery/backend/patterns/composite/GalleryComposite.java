@@ -5,7 +5,7 @@ import com.barnizgallery.backend.dto.GalleryNodeResponse;
 /**
  * <b>Composite pattern – Composite (root).</b>
  * <p>
- * The whole gallery. Its children are the rooms ({@link RoomComposite}).
+ * The whole gallery. Its children are the stores ({@link StoreComposite}).
  * Asking the root for {@link #countArtworks()} walks the whole tree.
  */
 public class GalleryComposite extends CompositeGalleryComponent {

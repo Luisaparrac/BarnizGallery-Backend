@@ -1,10 +1,10 @@
 package com.barnizgallery.backend.dto;
 
 /**
- * A room with its master name and number of artworks.
+ * A store with its master name and number of artworks.
  */
-public record RoomSummaryResponse(
-        Long roomId,
+public record StoreSummaryResponse(
+        Long storeId,
         Long masterId,
         String masterName,
         String nameEs,

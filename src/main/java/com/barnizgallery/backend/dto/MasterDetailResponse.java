@@ -3,7 +3,7 @@ package com.barnizgallery.backend.dto;
 import com.barnizgallery.backend.enums.MasterVerificationStatus;
 
 /**
- * A master with its room (room is null if it has none yet).
+ * A master with its store (store is null if it has none yet).
  */
 public record MasterDetailResponse(
         Long masterId,
@@ -13,5 +13,5 @@ public record MasterDetailResponse(
         String workshop,
         String contactInfo,
         MasterVerificationStatus verificationStatus,
-        RoomSummaryResponse room) {
+        StoreSummaryResponse store) {
 }
