@@ -16,6 +16,7 @@ import com.barnizgallery.backend.enums.CameraMode;
 import com.barnizgallery.backend.enums.InteractionAction;
 import com.barnizgallery.backend.enums.Language;
 import com.barnizgallery.backend.enums.UserRole;
+import com.barnizgallery.backend.enums.UserStatus;
 
 class EnumConvertersTest {
 
@@ -37,6 +38,10 @@ class EnumConvertersTest {
                 Arguments.of(new UserRoleConverter(), UserRole.ADMIN, "administrador"),
                 Arguments.of(new UserRoleConverter(), UserRole.ARTISAN, "artesano"),
                 Arguments.of(new UserRoleConverter(), UserRole.CUSTOMER, "cliente"),
+                Arguments.of(new UserStatusConverter(), UserStatus.PENDING, "pendiente"),
+                Arguments.of(new UserStatusConverter(), UserStatus.ACTIVE, "activo"),
+                Arguments.of(new UserStatusConverter(), UserStatus.SUSPENDED, "suspendido"),
+                Arguments.of(new UserStatusConverter(), UserStatus.DELETED, "eliminado"),
                 Arguments.of(new LanguageConverter(), Language.ES, "es"),
                 Arguments.of(new LanguageConverter(), Language.EN, "en"));
     }
