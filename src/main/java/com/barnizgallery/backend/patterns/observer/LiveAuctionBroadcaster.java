@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
  * <b>Observer pattern – ConcreteObserver.</b>
  * <p>
  * Sends every auction event live to {@code /topic/auctions/{auctionId}} through STOMP,
- * so everyone watching the auction in the 3D gallery sees new bids instantly.
+ * so everyone watching the auction in the gallery sees new bids instantly.
  */
 @Component
 public class LiveAuctionBroadcaster implements AuctionObserver {

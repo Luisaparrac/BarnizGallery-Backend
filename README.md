@@ -1,12 +1,11 @@
 # Barniz Gallery – Backend (MUSEO)
 
-Backend of **MUSEO**, an immersive 3D virtual gallery of **Barniz de Pasto Mopa-Mopa**
-(UNESCO Intangible Cultural Heritage, 2020). Visitors walk through rooms dedicated to six master
-artisans, interact with the pieces in 3D, receive room recommendations, take part in live online
-auctions and contact the masters.
+Backend of **MUSEO**, a photo gallery with an online shop for **Barniz de Pasto Mopa-Mopa**
+(UNESCO Intangible Cultural Heritage, 2020). Master artisans run their own stores, buyers browse the
+pieces, receive recommendations, take part in live online auctions and contact the masters.
 
-This repository contains only the backend. The frontend (TypeScript + Three.js/Babylon.js) lives in a
-separate repository and consumes the REST API and WebSocket contract described below.
+This repository contains only the backend. The frontend lives in a separate repository and consumes the
+REST API and WebSocket contract described below.
 
 Final project of the Software Design Patterns course. It implements 8 design patterns.
 
@@ -16,7 +15,7 @@ Final project of the Software Design Patterns course. It implements 8 design pat
 |---|---|
 | Language / build | Java 21, Maven Wrapper |
 | Framework | Spring Boot 4.1 (Web MVC, Data JPA, Validation, WebSocket) |
-| Database | PostgreSQL 18 on Render (existing schema, `ddl-auto=validate`) |
+| Database | PostgreSQL 18, schema `museo` created by Flyway migrations (`ddl-auto=validate`) |
 | API docs | springdoc-openapi – Swagger UI at `/swagger-ui.html` |
 | Real time | STOMP over WebSocket (SockJS fallback) at `/ws` |
 | Deployment | Docker image on Render |
@@ -36,7 +35,7 @@ HTTP / WebSocket
       │
  repository/      Spring Data JPA interfaces
       │
- PostgreSQL (Render)
+ PostgreSQL (schema museo)
 ```
 
 Other packages: `entity/` (JPA entities), `enums/` (English enums), `converter/`
@@ -45,28 +44,34 @@ Other packages: `entity/` (JPA entities), `enums/` (English enums), `converter/`
 
 Important rules:
 
-- The backend **never creates or changes tables** (`spring.jpa.hibernate.ddl-auto=validate`).
+- The backend **never creates or changes tables** (`spring.jpa.hibernate.ddl-auto=validate`); the schema
+  comes from the Flyway migrations in `src/main/resources/db/migration`, written by the database team.
+- Business rules that live in the database (stock reservations, payment triggers, audit, currency
+  checks) are called from the backend, not re-implemented in Java.
 - There is **no seed data**: an empty table returns an empty list.
 - Masters and rooms **cannot be deleted** through the API (the database cascades deletes).
 - All times are **UTC**.
 
 ## Running locally
 
-Requirements: Java 21 and access to the database.
+Requirements: Java 21 and a local PostgreSQL 18.
 
-1. Copy `src/main/resources/application-local.properties.example` to
-   `src/main/resources/application-local.properties` (ignored by git) and fill in the external host,
-   user and password of the Render database. Keep `app.auction.scheduler-enabled=false` there while
-   developing against the shared database.
-2. Run the tests (they never connect to the database):
+1. Create a local database and restore the v1 backup into it with the PostgreSQL 18 `psql`
+   (`psql -v ON_ERROR_STOP=1 -d museo_local -f museo_backup.sql`). The backup is not in this repository.
+2. Copy `src/main/resources/application-local.properties.example` to
+   `src/main/resources/application-local.properties` (ignored by git) and fill in the user and password.
+   On the first start Flyway records the existing v1 tables as **baseline version 1** and applies
+   `V2__museo_v2.sql`, which archives them as `public.museo_v1_*` and creates the `museo` schema with the
+   migrated data. Later starts find the schema up to date.
+3. Run the tests (they never connect to the database):
    ```
    .\mvnw.cmd verify
    ```
-3. Start the app:
+4. Start the app:
    ```
    .\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=local"
    ```
-4. Open http://localhost:8080/swagger-ui.html
+5. Open http://localhost:8080/swagger-ui.html
 
 ## Environment variables
 
@@ -74,6 +79,7 @@ Requirements: Java 21 and access to the database.
 |---|---|---|
 | `DB_URL` | JDBC URL. On Render use the **internal** URL: `jdbc:postgresql://<INTERNAL_HOST>:5432/museo_hm45` | – |
 | `DB_USERNAME` / `DB_PASSWORD` | Database credentials | – |
+| `FLYWAY_ENABLED` | Run the Flyway migrations on start (baseline 1 on an existing v1 database, then V2) | `true` |
 | `PORT` | HTTP port (set by Render) | `8080` |
 | `CORS_ALLOWED_ORIGINS` | Comma-separated frontend origins (REST and WebSocket) | `http://localhost:5173,http://localhost:3000` |
 | `AUCTION_CURRENCY` | Currency of new auctions | `USD` |

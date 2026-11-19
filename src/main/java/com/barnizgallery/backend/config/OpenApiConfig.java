@@ -17,6 +17,6 @@ public class OpenApiConfig {
         return new OpenAPI().info(new Info()
                 .title("Barniz Gallery API")
                 .version("v1")
-                .description("REST API of MUSEO, the immersive 3D gallery of Barniz de Pasto Mopa-Mopa."));
+                .description("REST API of MUSEO, the gallery and shop of Barniz de Pasto Mopa-Mopa."));
     }
 }

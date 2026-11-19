@@ -1,7 +1,7 @@
 package com.barnizgallery.backend.exception;
 
 /**
- * Thrown when an optional integration (AI, Hyper3D, storage) is not configured.
+ * Thrown when an optional integration (AI, storage) is not configured.
  * Mapped to HTTP 503.
  */
 public class FeatureDisabledException extends RuntimeException {
