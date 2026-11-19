@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Component;
 
-import com.barnizgallery.backend.dto.VisitorNotification;
+import com.barnizgallery.backend.dto.UserNotification;
 import com.barnizgallery.backend.entity.TasteProfile;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.TasteProfileRepository;
@@ -17,7 +17,7 @@ import com.barnizgallery.backend.repository.TasteProfileRepository;
 /**
  * <b>Observer pattern – ConcreteObserver.</b>
  * <p>
- * When an auction starts, notifies the visitors whose preferred colors match the
+ * When an auction starts, notifies the users whose preferred colors match the
  * {@code color_tags} of the auctioned artwork.
  */
 @Component
@@ -47,10 +47,10 @@ public class MatchingAuctionNotifier implements AuctionObserver {
             for (TasteProfile profile : tasteProfileRepository.findAll()) {
                 boolean matches = normalize(profile.getPreferredColors()).stream().anyMatch(artworkColors::contains);
                 if (matches) {
-                    VisitorNotification notification = new VisitorNotification(
-                            VisitorNotification.MATCHING_AUCTION, event.auctionId(), event.artworkId(),
+                    UserNotification notification = new UserNotification(
+                            UserNotification.MATCHING_AUCTION, event.auctionId(), event.artworkId(),
                             "An auction matching your tastes has started: " + artwork.getTitleEn());
-                    messaging.convertAndSend("/topic/visitors/" + profile.getVisitor().getVisitorId()
+                    messaging.convertAndSend("/topic/users/" + profile.getUser().getUserId()
                             + "/notifications", notification);
                 }
             }

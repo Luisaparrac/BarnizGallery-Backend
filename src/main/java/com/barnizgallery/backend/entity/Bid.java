@@ -15,7 +15,7 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 /**
- * A bid placed by a visitor in an auction. Maps the existing table {@code bids}.
+ * A bid placed by a user in an auction. Maps the existing table {@code bids}.
  */
 @Entity
 @Table(name = "bids")
@@ -31,8 +31,8 @@ public class Bid {
     private Auction auction;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "visitor_id", nullable = false)
-    private Visitor visitor;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(name = "amount", nullable = false, precision = 14, scale = 2)
     private BigDecimal amount;
@@ -67,12 +67,12 @@ public class Bid {
         this.auction = auction;
     }
 
-    public Visitor getVisitor() {
-        return visitor;
+    public User getUser() {
+        return user;
     }
 
-    public void setVisitor(Visitor visitor) {
-        this.visitor = visitor;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public BigDecimal getAmount() {

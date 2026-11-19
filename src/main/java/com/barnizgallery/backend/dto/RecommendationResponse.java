@@ -4,11 +4,11 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * A room recommended to a visitor (score from 0 to 100).
+ * A room recommended to a user (score from 0 to 100).
  */
 public record RecommendationResponse(
         Long recommendationId,
-        Long visitorId,
+        Long userId,
         Long roomId,
         String roomNameEs,
         String roomNameEn,

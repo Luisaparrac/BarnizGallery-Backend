@@ -11,5 +11,5 @@ import com.barnizgallery.backend.entity.TasteProfile;
  */
 public interface TasteProfileRepository extends JpaRepository<TasteProfile, Long> {
 
-    Optional<TasteProfile> findByVisitorVisitorId(Long visitorId);
+    Optional<TasteProfile> findByUserUserId(Long userId);
 }

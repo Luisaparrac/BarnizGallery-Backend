@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Interaction;
-import com.barnizgallery.backend.entity.Visitor;
+import com.barnizgallery.backend.entity.User;
 import com.barnizgallery.backend.enums.InteractionAction;
 import com.barnizgallery.backend.exception.BusinessRuleException;
 
@@ -12,7 +12,7 @@ import com.barnizgallery.backend.exception.BusinessRuleException;
  * <b>Factory Method pattern – Creator (abstract).</b>
  * <p>
  * Creates {@link Interaction} objects (the Product). The common steps live in
- * {@link #create(Visitor, Artwork, Long)}; each subclass (ConcreteCreator) decides
+ * {@link #create(User, Artwork, Long)}; each subclass (ConcreteCreator) decides
  * the parts that change: which action it creates ({@link #action()}, the factory method),
  * how much the interaction is worth for recommendations ({@link #weight()}) and
  * its own validation ({@link #validateDuration(Integer)}).
@@ -26,9 +26,9 @@ public abstract class InteractionFactory {
      * Builds a new interaction ready to be saved. It is final so all interactions
      * follow the same steps.
      */
-    public final Interaction create(Visitor visitor, Artwork artwork, Integer durationSeconds) {
-        if (visitor == null || artwork == null) {
-            throw new IllegalArgumentException("Visitor and artwork are required");
+    public final Interaction create(User user, Artwork artwork, Integer durationSeconds) {
+        if (user == null || artwork == null) {
+            throw new IllegalArgumentException("User and artwork are required");
         }
         if (durationSeconds != null && durationSeconds < 0) {
             throw BusinessRuleException.unprocessable("durationSeconds must be >= 0");
@@ -36,7 +36,7 @@ public abstract class InteractionFactory {
         validateDuration(durationSeconds);
 
         Interaction interaction = new Interaction();
-        interaction.setVisitor(visitor);
+        interaction.setUser(user);
         interaction.setArtwork(artwork);
         interaction.setAction(action());
         interaction.setDurationSeconds(durationSeconds);

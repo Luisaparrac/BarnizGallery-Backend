@@ -18,7 +18,7 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 /**
- * An interaction of a visitor with an artwork. Maps the existing table {@code interactions}.
+ * An interaction of a user with an artwork. Maps the existing table {@code interactions}.
  */
 @Entity
 @Table(name = "interactions")
@@ -30,8 +30,8 @@ public class Interaction {
     private Long interactionId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "visitor_id", nullable = false)
-    private Visitor visitor;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "artwork_id", nullable = false)
@@ -63,12 +63,12 @@ public class Interaction {
         this.interactionId = interactionId;
     }
 
-    public Visitor getVisitor() {
-        return visitor;
+    public User getUser() {
+        return user;
     }
 
-    public void setVisitor(Visitor visitor) {
-        this.visitor = visitor;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Artwork getArtwork() {

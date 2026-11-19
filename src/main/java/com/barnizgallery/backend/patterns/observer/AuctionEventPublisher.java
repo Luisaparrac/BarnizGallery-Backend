@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
  * <b>Observer pattern – Subject.</b>
  * <p>
  * When something happens in an auction (a bid, start, finish, cancel), several parts of the
- * system must react: broadcast it live, warn the outbid visitor, record the interaction and
- * notify visitors with matching tastes. The services only call {@link #publish(AuctionEvent)};
+ * system must react: broadcast it live, warn the outbid user, record the interaction and
+ * notify users with matching tastes. The services only call {@link #publish(AuctionEvent)};
  * they do not know who is listening. New reactions are added as new observers, without
  * changing the services.
  * <p>

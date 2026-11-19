@@ -19,7 +19,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 /**
- * Interactions of visitors with artworks (Factory Method pattern).
+ * Interactions of users with artworks (Factory Method pattern).
  */
 @RestController
 @Tag(name = "Interactions")
@@ -38,7 +38,7 @@ public class InteractionController {
         return interactionService.record(request);
     }
 
-    @GetMapping("/api/visitors/{id}/interactions")
+    @GetMapping("/api/users/{id}/interactions")
     public List<InteractionResponse> history(@PathVariable Long id) {
         return interactionService.history(id);
     }

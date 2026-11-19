@@ -9,9 +9,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 /**
- * Body to identify a visitor by email (created if it does not exist).
+ * Body to identify a user by email (created if it does not exist).
  */
-public record IdentifyVisitorRequest(
+public record IdentifyUserRequest(
         @NotBlank @Email @Size(max = 150) String email,
         @NotBlank @Size(max = 100) String name,
         @Size(max = 100) String country,

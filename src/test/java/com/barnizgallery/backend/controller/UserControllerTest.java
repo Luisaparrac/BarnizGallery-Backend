@@ -13,20 +13,20 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import com.barnizgallery.backend.dto.IdentifyVisitorRequest;
-import com.barnizgallery.backend.dto.IdentifyVisitorResponse;
-import com.barnizgallery.backend.dto.VisitorResponse;
+import com.barnizgallery.backend.dto.IdentifyUserRequest;
+import com.barnizgallery.backend.dto.IdentifyUserResponse;
+import com.barnizgallery.backend.dto.UserResponse;
 import com.barnizgallery.backend.enums.CameraMode;
 import com.barnizgallery.backend.enums.Language;
 import com.barnizgallery.backend.exception.GlobalExceptionHandler;
-import com.barnizgallery.backend.service.VisitorService;
+import com.barnizgallery.backend.service.UserService;
 
 /**
  * Web test with a mocked service (no Spring context, no database).
  */
-class VisitorControllerTest {
+class UserControllerTest {
 
-    private final VisitorService visitorService = mock(VisitorService.class);
+    private final UserService userService = mock(UserService.class);
     private MockMvc mockMvc;
 
     private static final String BODY = """
@@ -36,41 +36,41 @@ class VisitorControllerTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new VisitorController(visitorService))
+        mockMvc = MockMvcBuilders.standaloneSetup(new UserController(userService))
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
     }
 
     @Test
-    void identifyNewVisitorReturns201AndIsNewTrue() throws Exception {
-        when(visitorService.identify(any(IdentifyVisitorRequest.class))).thenReturn(response(true));
+    void identifyNewUserReturns201AndIsNewTrue() throws Exception {
+        when(userService.identify(any(IdentifyUserRequest.class))).thenReturn(response(true));
 
-        mockMvc.perform(post("/api/visitors/identify").contentType(MediaType.APPLICATION_JSON).content(BODY))
+        mockMvc.perform(post("/api/users/identify").contentType(MediaType.APPLICATION_JSON).content(BODY))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.isNew").value(true))
-                .andExpect(jsonPath("$.visitor.email").value("ana@mail.com"));
+                .andExpect(jsonPath("$.user.email").value("ana@mail.com"));
     }
 
     @Test
-    void identifyExistingVisitorReturns200() throws Exception {
-        when(visitorService.identify(any(IdentifyVisitorRequest.class))).thenReturn(response(false));
+    void identifyExistingUserReturns200() throws Exception {
+        when(userService.identify(any(IdentifyUserRequest.class))).thenReturn(response(false));
 
-        mockMvc.perform(post("/api/visitors/identify").contentType(MediaType.APPLICATION_JSON).content(BODY))
+        mockMvc.perform(post("/api/users/identify").contentType(MediaType.APPLICATION_JSON).content(BODY))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.isNew").value(false));
     }
 
     @Test
     void invalidEmailIs400() throws Exception {
-        mockMvc.perform(post("/api/visitors/identify").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/api/users/identify").contentType(MediaType.APPLICATION_JSON)
                 .content(BODY.replace("ana@mail.com", "not-an-email")))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.fieldErrors[0].field").value("email"));
     }
 
-    private static IdentifyVisitorResponse response(boolean isNew) {
-        return new IdentifyVisitorResponse(
-                new VisitorResponse(1L, "Ana", "ana@mail.com", "Colombia", Language.ES, CameraMode.FIRST_PERSON),
+    private static IdentifyUserResponse response(boolean isNew) {
+        return new IdentifyUserResponse(
+                new UserResponse(1L, "Ana", "ana@mail.com", "Colombia", Language.ES, CameraMode.FIRST_PERSON),
                 isNew);
     }
 }

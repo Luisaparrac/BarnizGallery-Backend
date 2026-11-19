@@ -9,7 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  *
  * @param currency             single currency of every auction
  * @param minIncrement         minimum amount a bid must add over the current reference
- * @param maxBidsPerMinute     bids allowed per visitor in 60 seconds
+ * @param maxBidsPerMinute     bids allowed per user in 60 seconds
  * @param suspiciousMultiplier a bid above this many times the reference is reported as suspicious
  * @param schedulerEnabled     when false the 60-second auction scheduler does not run
  *                             (useful to avoid writes while developing against the real database)

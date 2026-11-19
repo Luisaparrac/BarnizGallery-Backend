@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Room;
 import com.barnizgallery.backend.entity.TasteProfile;
-import com.barnizgallery.backend.entity.Visitor;
+import com.barnizgallery.backend.entity.User;
 import com.barnizgallery.backend.enums.Language;
 import com.barnizgallery.backend.exception.FeatureDisabledException;
 import com.barnizgallery.backend.patterns.adapter.AiTextClient;
@@ -60,11 +60,11 @@ public class AiStrategy implements RecommendationStrategy {
     }
 
     @Override
-    public List<RecommendationResult> recommend(Visitor visitor) {
+    public List<RecommendationResult> recommend(User user) {
         if (!aiClient.isEnabled()) {
             throw new FeatureDisabledException("The 'ai' recommendation strategy needs an AI provider");
         }
-        String answer = aiClient.complete(SYSTEM_PROMPT, buildUserPrompt(visitor));
+        String answer = aiClient.complete(SYSTEM_PROMPT, buildUserPrompt(user));
         Set<Long> validRooms = new LinkedHashSet<>();
         roomRepository.findAll().forEach(room -> validRooms.add(room.getRoomId()));
         List<RecommendationResult> results = parse(answer, validRooms);
@@ -72,7 +72,7 @@ public class AiStrategy implements RecommendationStrategy {
         return results;
     }
 
-    private String buildUserPrompt(Visitor visitor) {
+    private String buildUserPrompt(User user) {
         Map<Long, Set<String>> tagsByRoom = new LinkedHashMap<>();
         for (Artwork artwork : artworkRepository.findAllByOrderByArtworkIdAsc()) {
             Set<String> tags = tagsByRoom.computeIfAbsent(artwork.getRoom().getRoomId(), id -> new LinkedHashSet<>());
@@ -84,10 +84,10 @@ public class AiStrategy implements RecommendationStrategy {
             }
         }
         StringBuilder prompt = new StringBuilder();
-        prompt.append("Language: ").append(visitor.getPreferredLanguage() == Language.EN ? "English" : "Spanish")
+        prompt.append("Language: ").append(user.getPreferredLanguage() == Language.EN ? "English" : "Spanish")
                 .append('\n');
-        tasteProfileRepository.findByVisitorVisitorId(visitor.getVisitorId()).ifPresent((TasteProfile p) -> prompt
-                .append("Visitor preferences: colors=").append(p.getPreferredColors())
+        tasteProfileRepository.findByUserUserId(user.getUserId()).ifPresent((TasteProfile p) -> prompt
+                .append("User preferences: colors=").append(p.getPreferredColors())
                 .append(", types=").append(p.getPreferredTypes())
                 .append(", styles=").append(p.getPreferredStyles())
                 .append(", budget=").append(p.getBudgetRange()).append('\n'));

@@ -6,7 +6,7 @@ import com.barnizgallery.backend.enums.Language;
 /**
  * Body to change the language and/or camera mode. Null fields are not changed.
  */
-public record VisitorPreferencesRequest(
+public record UserPreferencesRequest(
         Language preferredLanguage,
         CameraMode cameraMode) {
 }

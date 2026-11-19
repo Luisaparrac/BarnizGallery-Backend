@@ -10,13 +10,13 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import com.barnizgallery.backend.entity.Visitor;
+import com.barnizgallery.backend.entity.User;
 import com.barnizgallery.backend.repository.InteractionRepository;
 
 /**
  * <b>Strategy pattern – ConcreteStrategy "hybrid" (default).</b>
  * <p>
- * Combines the other two strategies: when the visitor has enough interactions
+ * Combines the other two strategies: when the user has enough interactions
  * ({@value #MIN_INTERACTIONS} or more) the score is 60 % interactions + 40 % profile;
  * otherwise it uses 100 % the profile.
  */
@@ -44,12 +44,12 @@ public class HybridStrategy implements RecommendationStrategy {
     }
 
     @Override
-    public List<RecommendationResult> recommend(Visitor visitor) {
-        List<RecommendationResult> byProfile = profileStrategy.recommend(visitor);
-        if (interactionRepository.countByVisitorVisitorId(visitor.getVisitorId()) < MIN_INTERACTIONS) {
+    public List<RecommendationResult> recommend(User user) {
+        List<RecommendationResult> byProfile = profileStrategy.recommend(user);
+        if (interactionRepository.countByUserUserId(user.getUserId()) < MIN_INTERACTIONS) {
             return byProfile;
         }
-        List<RecommendationResult> byInteractions = interactionStrategy.recommend(visitor);
+        List<RecommendationResult> byInteractions = interactionStrategy.recommend(user);
 
         Map<Long, RecommendationResult> profileMap = toMap(byProfile);
         Map<Long, RecommendationResult> interactionMap = toMap(byInteractions);

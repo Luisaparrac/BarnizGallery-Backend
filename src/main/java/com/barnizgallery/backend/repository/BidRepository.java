@@ -22,16 +22,16 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
 
     long countByAuctionAuctionId(Long auctionId);
 
-    /** Bids of a visitor after a moment (used to detect bid flooding). */
-    long countByVisitorVisitorIdAndBidDateAfter(Long visitorId, LocalDateTime since);
+    /** Bids of a user after a moment (used to detect bid flooding). */
+    long countByUserUserIdAndBidDateAfter(Long userId, LocalDateTime since);
 
     /** Current highest bid of an auction (the earliest one wins a tie). */
     Optional<Bid> findFirstByAuctionAuctionIdOrderByAmountDescBidDateAsc(Long auctionId);
 
-    /** Bids of an auction with their visitor, highest first. */
-    @Query("select b from Bid b join fetch b.visitor where b.auction.auctionId = :auctionId "
+    /** Bids of an auction with their user, highest first. */
+    @Query("select b from Bid b join fetch b.user where b.auction.auctionId = :auctionId "
             + "order by b.amount desc, b.bidDate asc")
-    List<Bid> findByAuctionWithVisitor(Long auctionId);
+    List<Bid> findByAuctionWithUser(Long auctionId);
 
     /** Highest bid and bid count of many auctions in a single query. */
     @Query("select b.auction.auctionId as auctionId, max(b.amount) as highest, count(b) as bidCount "

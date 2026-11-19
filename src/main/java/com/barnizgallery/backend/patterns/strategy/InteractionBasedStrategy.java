@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
-import com.barnizgallery.backend.entity.Visitor;
+import com.barnizgallery.backend.entity.User;
 import com.barnizgallery.backend.patterns.factorymethod.InteractionFactoryProvider;
 import com.barnizgallery.backend.repository.InteractionRepository;
 import com.barnizgallery.backend.repository.RoomInteraction;
@@ -16,7 +16,7 @@ import com.barnizgallery.backend.repository.RoomInteraction;
 /**
  * <b>Strategy pattern – ConcreteStrategy "interactions".</b>
  * <p>
- * Adds, per room, the points of the visitor's interactions:
+ * Adds, per room, the points of the user's interactions:
  * weight of the action (from the Factory Method creators) × duration factor.
  * The duration factor goes from 1 (no duration) to 2 (5 minutes or more).
  * The room with most points gets 100 and the others are proportional.
@@ -42,10 +42,10 @@ public class InteractionBasedStrategy implements RecommendationStrategy {
     }
 
     @Override
-    public List<RecommendationResult> recommend(Visitor visitor) {
+    public List<RecommendationResult> recommend(User user) {
         Map<Long, Double> pointsByRoom = new LinkedHashMap<>();
         Map<Long, Integer> countByRoom = new LinkedHashMap<>();
-        for (RoomInteraction interaction : interactionRepository.findRoomInteractions(visitor.getVisitorId())) {
+        for (RoomInteraction interaction : interactionRepository.findRoomInteractions(user.getUserId())) {
             double points = factoryProvider.weightOf(interaction.getAction())
                     * durationFactor(interaction.getDurationSeconds());
             pointsByRoom.merge(interaction.getRoomId(), points, Double::sum);
@@ -59,7 +59,7 @@ public class InteractionBasedStrategy implements RecommendationStrategy {
         List<RecommendationResult> results = new ArrayList<>();
         pointsByRoom.forEach((roomId, points) -> {
             int count = countByRoom.get(roomId);
-            String reason = LocalizedText.pick(visitor,
+            String reason = LocalizedText.pick(user,
                     "Interactuaste " + count + " veces con obras de esta sala",
                     "You interacted " + count + " times with artworks in this room");
             results.add(RecommendationResult.of(roomId, 100.0 * points / max, reason));

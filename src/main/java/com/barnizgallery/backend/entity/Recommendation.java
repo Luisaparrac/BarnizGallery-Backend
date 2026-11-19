@@ -15,7 +15,7 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 /**
- * A room recommended to a visitor with a score from 0 to 100. Maps the existing table {@code recommendations}.
+ * A room recommended to a user with a score from 0 to 100. Maps the existing table {@code recommendations}.
  */
 @Entity
 @Table(name = "recommendations")
@@ -27,8 +27,8 @@ public class Recommendation {
     private Long recommendationId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "visitor_id", nullable = false)
-    private Visitor visitor;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "room_id", nullable = false)
@@ -59,12 +59,12 @@ public class Recommendation {
         this.recommendationId = recommendationId;
     }
 
-    public Visitor getVisitor() {
-        return visitor;
+    public User getUser() {
+        return user;
     }
 
-    public void setVisitor(Visitor visitor) {
-        this.visitor = visitor;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Room getRoom() {

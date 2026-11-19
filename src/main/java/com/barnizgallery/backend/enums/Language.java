@@ -1,7 +1,7 @@
 package com.barnizgallery.backend.enums;
 
 /**
- * Preferred language of a visitor. Stored in {@code visitors.preferred_language}.
+ * Preferred language of a user. Stored in {@code users.preferred_language}.
  */
 public enum Language implements DbValueEnum {
 

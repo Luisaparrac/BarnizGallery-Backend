@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import com.barnizgallery.backend.TestEntities;
 import com.barnizgallery.backend.entity.Room;
 import com.barnizgallery.backend.entity.TasteProfile;
-import com.barnizgallery.backend.entity.Visitor;
+import com.barnizgallery.backend.entity.User;
 import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.enums.InteractionAction;
 import com.barnizgallery.backend.enums.Language;
@@ -50,8 +50,8 @@ class RecommendationStrategiesTest {
     private InteractionBasedStrategy interactionStrategy;
     private HybridStrategy hybridStrategy;
 
-    private final Visitor visitorEs = TestEntities.visitor(1, Language.ES);
-    private final Visitor visitorEn = TestEntities.visitor(1, Language.EN);
+    private final User userEs = TestEntities.user(1, Language.ES);
+    private final User userEn = TestEntities.user(1, Language.EN);
     private final Room room1 = TestEntities.room(1, TestEntities.master(1));
     private final Room room2 = TestEntities.room(2, TestEntities.master(2));
 
@@ -69,19 +69,19 @@ class RecommendationStrategiesTest {
     private void givenPreferredColors(String... colors) {
         TasteProfile profile = new TasteProfile();
         profile.setPreferredColors(List.of(colors));
-        when(tasteProfileRepository.findByVisitorVisitorId(1L)).thenReturn(Optional.of(profile));
+        when(tasteProfileRepository.findByUserUserId(1L)).thenReturn(Optional.of(profile));
     }
 
     private void givenInteractions(RoomInteraction... interactions) {
         when(interactionRepository.findRoomInteractions(1L)).thenReturn(List.of(interactions));
-        when(interactionRepository.countByVisitorVisitorId(1L)).thenReturn((long) interactions.length);
+        when(interactionRepository.countByUserUserId(1L)).thenReturn((long) interactions.length);
     }
 
     @Test
     void profileScoresByProportionOfMatchingColors() {
         givenPreferredColors("rojo", "verde", "dorado", "negro");
 
-        List<RecommendationResult> results = profileStrategy.recommend(visitorEs);
+        List<RecommendationResult> results = profileStrategy.recommend(userEs);
 
         assertThat(results).extracting(RecommendationResult::roomId).containsExactly(1L, 2L);
         assertThat(results.get(0).score()).isEqualByComparingTo("75.00");
@@ -90,10 +90,10 @@ class RecommendationStrategiesTest {
     }
 
     @Test
-    void profileReasonFollowsVisitorLanguage() {
+    void profileReasonFollowsUserLanguage() {
         givenPreferredColors("azul");
 
-        List<RecommendationResult> results = profileStrategy.recommend(visitorEn);
+        List<RecommendationResult> results = profileStrategy.recommend(userEn);
 
         assertThat(results).singleElement().satisfies(r -> {
             assertThat(r.roomId()).isEqualTo(2);
@@ -104,9 +104,9 @@ class RecommendationStrategiesTest {
 
     @Test
     void profileWithoutTasteProfileGivesNothing() {
-        when(tasteProfileRepository.findByVisitorVisitorId(1L)).thenReturn(Optional.empty());
+        when(tasteProfileRepository.findByUserUserId(1L)).thenReturn(Optional.empty());
 
-        assertThat(profileStrategy.recommend(visitorEs)).isEmpty();
+        assertThat(profileStrategy.recommend(userEs)).isEmpty();
     }
 
     @Test
@@ -114,7 +114,7 @@ class RecommendationStrategiesTest {
         // room 1: ZOOM (3) with 300 s -> 3 x 2 = 6 points; room 2: VIEW (1) without duration bonus -> 1 point
         givenInteractions(interaction(1, InteractionAction.ZOOM, 300), interaction(2, InteractionAction.VIEW, 0));
 
-        List<RecommendationResult> results = interactionStrategy.recommend(visitorEs);
+        List<RecommendationResult> results = interactionStrategy.recommend(userEs);
 
         assertThat(results).extracting(RecommendationResult::roomId).containsExactly(1L, 2L);
         assertThat(results.get(0).score()).isEqualByComparingTo("100");
@@ -133,7 +133,7 @@ class RecommendationStrategiesTest {
         givenPreferredColors("azul");
         givenInteractions(interaction(1, InteractionAction.ZOOM, null));
 
-        List<RecommendationResult> results = hybridStrategy.recommend(visitorEs);
+        List<RecommendationResult> results = hybridStrategy.recommend(userEs);
 
         assertThat(results).singleElement().satisfies(r -> {
             assertThat(r.roomId()).isEqualTo(2);
@@ -147,7 +147,7 @@ class RecommendationStrategiesTest {
         givenInteractions(interaction(1, InteractionAction.ZOOM, null), interaction(1, InteractionAction.ZOOM, null),
                 interaction(1, InteractionAction.ZOOM, null));
 
-        List<RecommendationResult> results = hybridStrategy.recommend(visitorEs);
+        List<RecommendationResult> results = hybridStrategy.recommend(userEs);
 
         // room 1: 0.6 x 100 + 0.4 x 0 = 60; room 2: 0.6 x 0 + 0.4 x 100 = 40
         assertThat(results).extracting(RecommendationResult::roomId).containsExactly(1L, 2L);
@@ -176,7 +176,7 @@ class RecommendationStrategiesTest {
         AiStrategy aiStrategy = new AiStrategy(new DisabledAiClient(), mock(RoomRepository.class), artworkRepository,
                 tasteProfileRepository);
 
-        assertThatThrownBy(() -> aiStrategy.recommend(visitorEs)).isInstanceOf(FeatureDisabledException.class);
+        assertThatThrownBy(() -> aiStrategy.recommend(userEs)).isInstanceOf(FeatureDisabledException.class);
     }
 
     @Test

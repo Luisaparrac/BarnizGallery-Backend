@@ -13,13 +13,13 @@ import com.barnizgallery.backend.entity.Recommendation;
  */
 public interface RecommendationRepository extends JpaRepository<Recommendation, Long> {
 
-    /** Saved recommendations of a visitor with their room, best score first. */
-    @Query("select r from Recommendation r join fetch r.room where r.visitor.visitorId = :visitorId "
+    /** Saved recommendations of a user with their room, best score first. */
+    @Query("select r from Recommendation r join fetch r.room where r.user.userId = :userId "
             + "order by r.score desc nulls last, r.recommendationId")
-    List<Recommendation> findByVisitorWithRoom(Long visitorId);
+    List<Recommendation> findByUserWithRoom(Long userId);
 
-    /** Removes the previous recommendations of a visitor before saving new ones. */
+    /** Removes the previous recommendations of a user before saving new ones. */
     @Modifying
-    @Query("delete from Recommendation r where r.visitor.visitorId = :visitorId")
-    int deleteByVisitorId(Long visitorId);
+    @Query("delete from Recommendation r where r.user.userId = :userId")
+    int deleteByUserId(Long userId);
 }

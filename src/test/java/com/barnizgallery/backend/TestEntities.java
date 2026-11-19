@@ -9,7 +9,7 @@ import com.barnizgallery.backend.entity.Auction;
 import com.barnizgallery.backend.entity.Master;
 import com.barnizgallery.backend.entity.Photo;
 import com.barnizgallery.backend.entity.Room;
-import com.barnizgallery.backend.entity.Visitor;
+import com.barnizgallery.backend.entity.User;
 import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.enums.AuctionStatus;
 import com.barnizgallery.backend.enums.CameraMode;
@@ -58,14 +58,14 @@ public final class TestEntities {
         return photo;
     }
 
-    public static Visitor visitor(long id, Language language) {
-        Visitor visitor = new Visitor();
-        visitor.setVisitorId(id);
-        visitor.setName("Visitor " + id);
-        visitor.setEmail("visitor" + id + "@test.local");
-        visitor.setPreferredLanguage(language);
-        visitor.setCameraMode(CameraMode.FIRST_PERSON);
-        return visitor;
+    public static User user(long id, Language language) {
+        User user = new User();
+        user.setUserId(id);
+        user.setName("User " + id);
+        user.setEmail("user" + id + "@test.local");
+        user.setPreferredLanguage(language);
+        user.setCameraMode(CameraMode.FIRST_PERSON);
+        return user;
     }
 
     public static Auction auction(long id, Artwork artwork, AuctionStatus status, LocalDateTime start,

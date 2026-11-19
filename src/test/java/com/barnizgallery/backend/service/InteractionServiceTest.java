@@ -35,7 +35,7 @@ class InteractionServiceTest {
     @Mock
     private InteractionRepository interactionRepository;
     @Mock
-    private VisitorService visitorService;
+    private UserService userService;
     @Mock
     private ArtworkService artworkService;
     private InteractionService interactionService;
@@ -44,12 +44,12 @@ class InteractionServiceTest {
     void setUp() {
         InteractionFactoryProvider provider = new InteractionFactoryProvider(List.of(new ViewInteractionFactory(),
                 new ZoomInteractionFactory(), new BidInteractionFactory()));
-        interactionService = new InteractionService(interactionRepository, provider, visitorService, artworkService);
+        interactionService = new InteractionService(interactionRepository, provider, userService, artworkService);
     }
 
     @Test
     void recordUsesTheFactoryOfTheAction() {
-        when(visitorService.getVisitor(1L)).thenReturn(TestEntities.visitor(1, Language.ES));
+        when(userService.getUser(1L)).thenReturn(TestEntities.user(1, Language.ES));
         when(artworkService.getArtwork(2L)).thenReturn(
                 TestEntities.artwork(2, TestEntities.room(1, TestEntities.master(1)), ArtworkStatus.EXHIBITED));
         when(interactionRepository.save(any(Interaction.class))).thenAnswer(inv -> inv.getArgument(0));

@@ -15,20 +15,20 @@ import com.barnizgallery.backend.mapper.ContactMessageMapper;
 import com.barnizgallery.backend.repository.ContactMessageRepository;
 
 /**
- * Messages from visitors to masters.
+ * Messages from users to masters.
  */
 @Service
 public class ContactMessageService {
 
     private final ContactMessageRepository contactMessageRepository;
-    private final VisitorService visitorService;
+    private final UserService userService;
     private final MasterService masterService;
     private final ArtworkService artworkService;
 
-    public ContactMessageService(ContactMessageRepository contactMessageRepository, VisitorService visitorService,
+    public ContactMessageService(ContactMessageRepository contactMessageRepository, UserService userService,
             MasterService masterService, ArtworkService artworkService) {
         this.contactMessageRepository = contactMessageRepository;
-        this.visitorService = visitorService;
+        this.userService = userService;
         this.masterService = masterService;
         this.artworkService = artworkService;
     }
@@ -37,7 +37,7 @@ public class ContactMessageService {
     @Transactional
     public ContactMessageResponse send(ContactMessageRequest request) {
         ContactMessage message = new ContactMessage();
-        message.setVisitor(visitorService.getVisitor(request.visitorId()));
+        message.setUser(userService.getUser(request.userId()));
         Master master = masterService.getMaster(request.masterId());
         message.setMaster(master);
         if (request.artworkId() != null) {
@@ -55,7 +55,7 @@ public class ContactMessageService {
     @Transactional(readOnly = true)
     public List<ContactMessageResponse> findByMaster(Long masterId) {
         masterService.getMaster(masterId);
-        return contactMessageRepository.findByMasterWithVisitor(masterId).stream()
+        return contactMessageRepository.findByMasterWithUser(masterId).stream()
                 .map(ContactMessageMapper::toResponse)
                 .toList();
     }

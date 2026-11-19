@@ -14,7 +14,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import com.barnizgallery.backend.TestEntities;
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Interaction;
-import com.barnizgallery.backend.entity.Visitor;
+import com.barnizgallery.backend.entity.User;
 import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.enums.InteractionAction;
 import com.barnizgallery.backend.enums.Language;
@@ -22,7 +22,7 @@ import com.barnizgallery.backend.exception.BusinessRuleException;
 
 class InteractionFactoryTest {
 
-    private final Visitor visitor = TestEntities.visitor(1, Language.ES);
+    private final User user = TestEntities.user(1, Language.ES);
     private final Artwork artwork = TestEntities.artwork(2, TestEntities.room(1, TestEntities.master(1)),
             ArtworkStatus.EXHIBITED);
 
@@ -36,11 +36,11 @@ class InteractionFactoryTest {
     @ParameterizedTest
     @MethodSource("creators")
     void eachCreatorProducesItsActionAndWeight(InteractionFactory factory, InteractionAction action, int weight) {
-        Interaction interaction = factory.create(visitor, artwork, 10);
+        Interaction interaction = factory.create(user, artwork, 10);
 
         assertThat(interaction.getAction()).isEqualTo(action);
         assertThat(factory.weight()).isEqualTo(weight);
-        assertThat(interaction.getVisitor()).isSameAs(visitor);
+        assertThat(interaction.getUser()).isSameAs(user);
         assertThat(interaction.getArtwork()).isSameAs(artwork);
         assertThat(interaction.getDurationSeconds()).isEqualTo(10);
         assertThat(interaction.getInteractionDate()).isNotNull();
@@ -49,20 +49,20 @@ class InteractionFactoryTest {
     @ParameterizedTest
     @MethodSource("creators")
     void negativeDurationIsRejectedByEveryCreator(InteractionFactory factory) {
-        assertThatThrownBy(() -> factory.create(visitor, artwork, -1)).isInstanceOf(BusinessRuleException.class);
+        assertThatThrownBy(() -> factory.create(user, artwork, -1)).isInstanceOf(BusinessRuleException.class);
     }
 
     @Test
     void viewRequiresDuration() {
-        assertThatThrownBy(() -> new ViewInteractionFactory().create(visitor, artwork, null))
+        assertThatThrownBy(() -> new ViewInteractionFactory().create(user, artwork, null))
                 .isInstanceOf(BusinessRuleException.class)
                 .hasMessageContaining("durationSeconds is required");
     }
 
     @Test
     void otherActionsAcceptMissingDuration() {
-        assertThat(new ZoomInteractionFactory().create(visitor, artwork, null).getDurationSeconds()).isNull();
-        assertThat(new BidInteractionFactory().create(visitor, artwork, null).getDurationSeconds()).isNull();
+        assertThat(new ZoomInteractionFactory().create(user, artwork, null).getDurationSeconds()).isNull();
+        assertThat(new BidInteractionFactory().create(user, artwork, null).getDurationSeconds()).isNull();
     }
 
     @Test

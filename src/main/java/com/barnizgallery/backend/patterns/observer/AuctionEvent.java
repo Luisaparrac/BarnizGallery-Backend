@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * It is also the JSON sent to {@code /topic/auctions/{auctionId}}.
  *
  * @param bid                 the new bid (only for BID_PLACED)
- * @param previousTopBidderId visitor who had the highest bid before this one (only for BID_PLACED, may be null)
+ * @param previousTopBidderId user who had the highest bid before this one (only for BID_PLACED, may be null)
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record AuctionEvent(

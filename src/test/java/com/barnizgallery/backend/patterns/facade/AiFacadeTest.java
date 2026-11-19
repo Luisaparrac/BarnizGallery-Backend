@@ -64,7 +64,7 @@ class AiFacadeTest {
 
     @Test
     void bidFloodingIsRejected() {
-        when(bidRepository.countByVisitorVisitorIdAndBidDateAfter(eq(9L), any())).thenReturn(5L);
+        when(bidRepository.countByUserUserIdAndBidDateAfter(eq(9L), any())).thenReturn(5L);
 
         BidAssessment assessment = facade(new DisabledAiClient()).assessBid(auction, new BigDecimal("150"), 9L);
 
@@ -73,7 +73,7 @@ class AiFacadeTest {
 
     @Test
     void hugeBidOverHighestIsSuspiciousButAccepted() {
-        when(bidRepository.countByVisitorVisitorIdAndBidDateAfter(eq(9L), any())).thenReturn(0L);
+        when(bidRepository.countByUserUserIdAndBidDateAfter(eq(9L), any())).thenReturn(0L);
         when(bidRepository.findHighestAmount(7L)).thenReturn(new BigDecimal("200"));
 
         BidAssessment assessment = facade(new DisabledAiClient()).assessBid(auction, new BigDecimal("2001"), 9L);
@@ -83,7 +83,7 @@ class AiFacadeTest {
 
     @Test
     void hugeBidOverBasePriceWhenNoBidsIsSuspicious() {
-        when(bidRepository.countByVisitorVisitorIdAndBidDateAfter(eq(9L), any())).thenReturn(0L);
+        when(bidRepository.countByUserUserIdAndBidDateAfter(eq(9L), any())).thenReturn(0L);
         when(bidRepository.findHighestAmount(7L)).thenReturn(null);
 
         assertThat(facade(new DisabledAiClient()).assessBid(auction, new BigDecimal("1001"), 9L).verdict())
@@ -96,7 +96,7 @@ class AiFacadeTest {
     void aiIsNotCalledWhenDisabled() {
         AiTextClient client = mock(AiTextClient.class);
         when(client.isEnabled()).thenReturn(false);
-        when(bidRepository.countByVisitorVisitorIdAndBidDateAfter(eq(9L), any())).thenReturn(0L);
+        when(bidRepository.countByUserUserIdAndBidDateAfter(eq(9L), any())).thenReturn(0L);
 
         facade(client).assessBid(auction, new BigDecimal("150"), 9L);
 
@@ -108,7 +108,7 @@ class AiFacadeTest {
         AiTextClient client = mock(AiTextClient.class);
         when(client.isEnabled()).thenReturn(true);
         when(client.complete(anyString(), anyString())).thenReturn("SUSPICIOUS: unusual pattern");
-        when(bidRepository.countByVisitorVisitorIdAndBidDateAfter(eq(9L), any())).thenReturn(0L);
+        when(bidRepository.countByUserUserIdAndBidDateAfter(eq(9L), any())).thenReturn(0L);
 
         assertThat(facade(client).assessBid(auction, new BigDecimal("150"), 9L).verdict())
                 .isEqualTo(BidVerdict.SUSPICIOUS);

@@ -14,14 +14,14 @@ public final class InteractionMapper {
     }
 
     public static InteractionResponse toResponse(Interaction interaction) {
-        return new InteractionResponse(interaction.getInteractionId(), interaction.getVisitor().getVisitorId(),
+        return new InteractionResponse(interaction.getInteractionId(), interaction.getUser().getUserId(),
                 interaction.getArtwork().getArtworkId(), interaction.getAction(), interaction.getDurationSeconds(),
                 interaction.getInteractionDate());
     }
 
     public static RecommendationResponse toResponse(Recommendation recommendation) {
         return new RecommendationResponse(recommendation.getRecommendationId(),
-                recommendation.getVisitor().getVisitorId(), recommendation.getRoom().getRoomId(),
+                recommendation.getUser().getUserId(), recommendation.getRoom().getRoomId(),
                 recommendation.getRoom().getNameEs(), recommendation.getRoom().getNameEn(),
                 recommendation.getScore(), recommendation.getReason(), recommendation.getRecommendationDate());
     }

@@ -7,9 +7,9 @@ import java.time.LocalDateTime;
  */
 public record ContactMessageResponse(
         Long messageId,
-        Long visitorId,
-        String visitorName,
-        String visitorEmail,
+        Long userId,
+        String userName,
+        String userEmail,
         Long masterId,
         Long artworkId,
         String content,

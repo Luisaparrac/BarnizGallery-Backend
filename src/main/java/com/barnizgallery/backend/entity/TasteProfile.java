@@ -18,7 +18,7 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 /**
- * Taste profile of a visitor (1:1), filled from the initial questionnaire. Maps the existing table {@code taste_profiles}.
+ * Taste profile of a user (1:1), filled from the initial questionnaire. Maps the existing table {@code taste_profiles}.
  */
 @Entity
 @Table(name = "taste_profiles")
@@ -30,8 +30,8 @@ public class TasteProfile {
     private Long profileId;
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "visitor_id", nullable = false, unique = true)
-    private Visitor visitor;
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    private User user;
 
     @JdbcTypeCode(SqlTypes.ARRAY)
     @Column(name = "preferred_colors", columnDefinition = "text[]")
@@ -67,12 +67,12 @@ public class TasteProfile {
         this.profileId = profileId;
     }
 
-    public Visitor getVisitor() {
-        return visitor;
+    public User getUser() {
+        return user;
     }
 
-    public void setVisitor(Visitor visitor) {
-        this.visitor = visitor;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public List<String> getPreferredColors() {

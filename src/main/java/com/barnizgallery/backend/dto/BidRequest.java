@@ -11,7 +11,7 @@ import jakarta.validation.constraints.Size;
  * Body to place a bid in an auction.
  */
 public record BidRequest(
-        @NotNull Long visitorId,
+        @NotNull Long userId,
         @NotNull @Positive BigDecimal amount,
         @NotBlank @Size(max = 10) String currency) {
 }

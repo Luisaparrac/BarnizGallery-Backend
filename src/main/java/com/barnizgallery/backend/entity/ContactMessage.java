@@ -14,7 +14,7 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 /**
- * Message sent by a visitor to a master, optionally about one artwork. Maps the existing table {@code contact_messages}.
+ * Message sent by a user to a master, optionally about one artwork. Maps the existing table {@code contact_messages}.
  */
 @Entity
 @Table(name = "contact_messages")
@@ -26,8 +26,8 @@ public class ContactMessage {
     private Long messageId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "visitor_id", nullable = false)
-    private Visitor visitor;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "master_id", nullable = false)
@@ -59,12 +59,12 @@ public class ContactMessage {
         this.messageId = messageId;
     }
 
-    public Visitor getVisitor() {
-        return visitor;
+    public User getUser() {
+        return user;
     }
 
-    public void setVisitor(Visitor visitor) {
-        this.visitor = visitor;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Master getMaster() {

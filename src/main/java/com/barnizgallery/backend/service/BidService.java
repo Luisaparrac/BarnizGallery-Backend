@@ -18,7 +18,7 @@ import com.barnizgallery.backend.dto.BidRequest;
 import com.barnizgallery.backend.dto.BidResponse;
 import com.barnizgallery.backend.entity.Auction;
 import com.barnizgallery.backend.entity.Bid;
-import com.barnizgallery.backend.entity.Visitor;
+import com.barnizgallery.backend.entity.User;
 import com.barnizgallery.backend.exception.BusinessRuleException;
 import com.barnizgallery.backend.mapper.AuctionMapper;
 import com.barnizgallery.backend.patterns.facade.AiFacade;
@@ -40,19 +40,19 @@ public class BidService {
 
     private final BidRepository bidRepository;
     private final AuctionService auctionService;
-    private final VisitorService visitorService;
+    private final UserService userService;
     private final AiFacade aiFacade;
     private final AuctionEventPublisher eventPublisher;
     private final SimpMessageSendingOperations messaging;
     private final AuctionProperties auctionProperties;
     private final Clock clock;
 
-    public BidService(BidRepository bidRepository, AuctionService auctionService, VisitorService visitorService,
+    public BidService(BidRepository bidRepository, AuctionService auctionService, UserService userService,
             AiFacade aiFacade, AuctionEventPublisher eventPublisher, SimpMessageSendingOperations messaging,
             AuctionProperties auctionProperties, Clock clock) {
         this.bidRepository = bidRepository;
         this.auctionService = auctionService;
-        this.visitorService = visitorService;
+        this.userService = userService;
         this.aiFacade = aiFacade;
         this.eventPublisher = eventPublisher;
         this.messaging = messaging;
@@ -76,7 +76,7 @@ public class BidService {
     public BidResponse placeBid(Long auctionId, BidRequest request) {
         Auction auction = auctionService.getSyncedAuctionForUpdate(auctionId);
         auctionService.contextFor(auction).placeBid(request);
-        Visitor visitor = visitorService.getVisitor(request.visitorId());
+        User user = userService.getUser(request.userId());
 
         String currency = auctionProperties.currency().toUpperCase(Locale.ROOT);
         if (!currency.equals(request.currency().trim().toUpperCase(Locale.ROOT))) {
@@ -92,27 +92,27 @@ public class BidService {
             throw BusinessRuleException.unprocessable("The bid must be at least " + minimum + " " + currency);
         }
 
-        BidAssessment assessment = aiFacade.assessBid(auction, request.amount(), visitor.getVisitorId());
+        BidAssessment assessment = aiFacade.assessBid(auction, request.amount(), user.getUserId());
         if (assessment.verdict() == BidVerdict.REJECTED) {
             throw BusinessRuleException.tooManyRequests(assessment.reason());
         }
 
         Bid bid = new Bid();
         bid.setAuction(auction);
-        bid.setVisitor(visitor);
+        bid.setUser(user);
         bid.setAmount(request.amount());
         bid.setCurrency(currency);
         bid.setBidDate(LocalDateTime.now(clock));
         BidResponse saved = AuctionMapper.toResponse(bidRepository.save(bid));
 
         if (assessment.verdict() == BidVerdict.SUSPICIOUS) {
-            log.warn("Suspicious bid {} on auction {} by visitor {}: {}", saved.bidId(), auctionId,
-                    visitor.getVisitorId(), assessment.reason());
+            log.warn("Suspicious bid {} on auction {} by user {}: {}", saved.bidId(), auctionId,
+                    user.getUserId(), assessment.reason());
             messaging.convertAndSend(ANOMALIES_TOPIC, new AnomalyAlert(auctionId, saved.bidId(),
-                    visitor.getVisitorId(), saved.amount(), assessment.reason(), saved.bidDate()));
+                    user.getUserId(), saved.amount(), assessment.reason(), saved.bidDate()));
         }
 
-        Long previousTopBidderId = currentTop == null ? null : currentTop.getVisitor().getVisitorId();
+        Long previousTopBidderId = currentTop == null ? null : currentTop.getUser().getUserId();
         eventPublisher.publish(AuctionEvent.bidPlaced(auctionId, auction.getArtwork().getArtworkId(), saved,
                 previousTopBidderId));
         return saved;
@@ -122,7 +122,7 @@ public class BidService {
     @Transactional
     public List<BidResponse> findByAuction(Long auctionId) {
         auctionService.getSyncedAuction(auctionId);
-        return bidRepository.findByAuctionWithVisitor(auctionId).stream()
+        return bidRepository.findByAuctionWithUser(auctionId).stream()
                 .map(AuctionMapper::toResponse)
                 .toList();
     }

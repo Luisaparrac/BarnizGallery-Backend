@@ -4,11 +4,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Taste profile of a visitor.
+ * Taste profile of a user.
  */
 public record TasteProfileResponse(
         Long profileId,
-        Long visitorId,
+        Long userId,
         List<String> preferredColors,
         List<String> preferredTypes,
         List<String> preferredStyles,

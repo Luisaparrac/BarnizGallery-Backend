@@ -5,7 +5,7 @@ import java.math.RoundingMode;
 
 /**
  * Result produced by every {@link RecommendationStrategy}: a room, a score from 0 to 100
- * and a reason written in the visitor's preferred language.
+ * and a reason written in the user's preferred language.
  */
 public record RecommendationResult(Long roomId, BigDecimal score, String reason) {
 

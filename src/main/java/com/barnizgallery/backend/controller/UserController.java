@@ -11,58 +11,58 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.barnizgallery.backend.dto.IdentifyVisitorRequest;
-import com.barnizgallery.backend.dto.IdentifyVisitorResponse;
+import com.barnizgallery.backend.dto.IdentifyUserRequest;
+import com.barnizgallery.backend.dto.IdentifyUserResponse;
 import com.barnizgallery.backend.dto.TasteProfileRequest;
 import com.barnizgallery.backend.dto.TasteProfileResponse;
-import com.barnizgallery.backend.dto.VisitorPreferencesRequest;
-import com.barnizgallery.backend.dto.VisitorResponse;
-import com.barnizgallery.backend.service.VisitorService;
+import com.barnizgallery.backend.dto.UserPreferencesRequest;
+import com.barnizgallery.backend.dto.UserResponse;
+import com.barnizgallery.backend.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 /**
- * Visitor identification (email only), preferences and taste profile.
+ * User identification (email only), preferences and taste profile.
  */
 @RestController
-@RequestMapping("/api/visitors")
-@Tag(name = "Visitors")
-public class VisitorController {
+@RequestMapping("/api/users")
+@Tag(name = "Users")
+public class UserController {
 
-    private final VisitorService visitorService;
+    private final UserService userService;
 
-    public VisitorController(VisitorService visitorService) {
-        this.visitorService = visitorService;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @PostMapping("/identify")
-    @Operation(summary = "Find a visitor by email, or create it (201) if it does not exist")
-    public ResponseEntity<IdentifyVisitorResponse> identify(@Valid @RequestBody IdentifyVisitorRequest request) {
-        IdentifyVisitorResponse response = visitorService.identify(request);
+    @Operation(summary = "Find a user by email, or create it (201) if it does not exist")
+    public ResponseEntity<IdentifyUserResponse> identify(@Valid @RequestBody IdentifyUserRequest request) {
+        IdentifyUserResponse response = userService.identify(request);
         return ResponseEntity.status(response.isNew() ? HttpStatus.CREATED : HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{id}")
-    public VisitorResponse findById(@PathVariable Long id) {
-        return visitorService.findById(id);
+    public UserResponse findById(@PathVariable Long id) {
+        return userService.findById(id);
     }
 
     @PatchMapping("/{id}/preferences")
-    public VisitorResponse updatePreferences(@PathVariable Long id,
-            @Valid @RequestBody VisitorPreferencesRequest request) {
-        return visitorService.updatePreferences(id, request);
+    public UserResponse updatePreferences(@PathVariable Long id,
+            @Valid @RequestBody UserPreferencesRequest request) {
+        return userService.updatePreferences(id, request);
     }
 
     @GetMapping("/{id}/taste-profile")
     public TasteProfileResponse getTasteProfile(@PathVariable Long id) {
-        return visitorService.getTasteProfile(id);
+        return userService.getTasteProfile(id);
     }
 
     @PutMapping("/{id}/taste-profile")
     public TasteProfileResponse saveTasteProfile(@PathVariable Long id,
             @Valid @RequestBody TasteProfileRequest request) {
-        return visitorService.saveTasteProfile(id, request);
+        return userService.saveTasteProfile(id, request);
     }
 }

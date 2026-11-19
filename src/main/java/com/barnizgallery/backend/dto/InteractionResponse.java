@@ -9,7 +9,7 @@ import com.barnizgallery.backend.enums.InteractionAction;
  */
 public record InteractionResponse(
         Long interactionId,
-        Long visitorId,
+        Long userId,
         Long artworkId,
         InteractionAction action,
         Integer durationSeconds,

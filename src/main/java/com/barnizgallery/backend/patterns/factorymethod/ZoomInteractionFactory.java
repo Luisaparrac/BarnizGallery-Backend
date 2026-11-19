@@ -7,7 +7,7 @@ import com.barnizgallery.backend.enums.InteractionAction;
 /**
  * <b>Factory Method pattern – ConcreteCreator.</b>
  * <p>
- * Creates ZOOM interactions (weight 3): the visitor enlarged the photos of the piece to inspect it.
+ * Creates ZOOM interactions (weight 3): the user enlarged the photos of the piece to inspect it.
  * Historical TOUCH and ROTATE interactions were migrated to this action.
  */
 @Component

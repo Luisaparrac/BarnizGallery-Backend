@@ -28,7 +28,7 @@ public final class AuctionMapper {
     }
 
     public static BidResponse toResponse(Bid bid) {
-        return new BidResponse(bid.getBidId(), bid.getAuction().getAuctionId(), bid.getVisitor().getVisitorId(),
-                bid.getVisitor().getName(), bid.getAmount(), bid.getCurrency(), bid.getBidDate());
+        return new BidResponse(bid.getBidId(), bid.getAuction().getAuctionId(), bid.getUser().getUserId(),
+                bid.getUser().getName(), bid.getAmount(), bid.getCurrency(), bid.getBidDate());
     }
 }

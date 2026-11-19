@@ -30,7 +30,7 @@ class ContactMessageServiceTest {
     @Mock
     private ContactMessageRepository contactMessageRepository;
     @Mock
-    private VisitorService visitorService;
+    private UserService userService;
     @Mock
     private MasterService masterService;
     @Mock
@@ -43,7 +43,7 @@ class ContactMessageServiceTest {
 
     @Test
     void sendWithArtworkOfAnotherMasterIsRejected() {
-        when(visitorService.getVisitor(5L)).thenReturn(TestEntities.visitor(5, Language.ES));
+        when(userService.getUser(5L)).thenReturn(TestEntities.user(5, Language.ES));
         when(masterService.getMaster(1L)).thenReturn(master1);
         when(artworkService.getArtwork(30L)).thenReturn(
                 TestEntities.artwork(30, TestEntities.room(2, master2), ArtworkStatus.EXHIBITED));
@@ -56,7 +56,7 @@ class ContactMessageServiceTest {
 
     @Test
     void sendWithArtworkOfSameMasterIsSaved() {
-        when(visitorService.getVisitor(5L)).thenReturn(TestEntities.visitor(5, Language.ES));
+        when(userService.getUser(5L)).thenReturn(TestEntities.user(5, Language.ES));
         when(masterService.getMaster(1L)).thenReturn(master1);
         when(artworkService.getArtwork(30L)).thenReturn(
                 TestEntities.artwork(30, TestEntities.room(1, master1), ArtworkStatus.EXHIBITED));
@@ -70,7 +70,7 @@ class ContactMessageServiceTest {
 
     @Test
     void sendWithoutArtworkIsSaved() {
-        when(visitorService.getVisitor(5L)).thenReturn(TestEntities.visitor(5, Language.ES));
+        when(userService.getUser(5L)).thenReturn(TestEntities.user(5, Language.ES));
         when(masterService.getMaster(1L)).thenReturn(master1);
         when(contactMessageRepository.save(any(ContactMessage.class))).thenAnswer(inv -> inv.getArgument(0));
 

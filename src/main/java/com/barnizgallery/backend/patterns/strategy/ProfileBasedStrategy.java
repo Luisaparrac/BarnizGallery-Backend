@@ -14,14 +14,14 @@ import org.springframework.stereotype.Component;
 
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.TasteProfile;
-import com.barnizgallery.backend.entity.Visitor;
+import com.barnizgallery.backend.entity.User;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.TasteProfileRepository;
 
 /**
  * <b>Strategy pattern – ConcreteStrategy "profile".</b>
  * <p>
- * Compares the colors of the visitor's taste profile with the {@code color_tags} of the
+ * Compares the colors of the user's taste profile with the {@code color_tags} of the
  * artworks of each room. Score = 100 × (preferred colors found in the room) / (preferred colors).
  */
 @Component
@@ -42,9 +42,9 @@ public class ProfileBasedStrategy implements RecommendationStrategy {
     }
 
     @Override
-    public List<RecommendationResult> recommend(Visitor visitor) {
+    public List<RecommendationResult> recommend(User user) {
         // TODO: use piece_type/style when the columns exist (preferred_types / preferred_styles)
-        Optional<TasteProfile> profile = tasteProfileRepository.findByVisitorVisitorId(visitor.getVisitorId());
+        Optional<TasteProfile> profile = tasteProfileRepository.findByUserUserId(user.getUserId());
         Set<String> preferred = normalize(profile.map(TasteProfile::getPreferredColors).orElse(null));
         if (preferred.isEmpty()) {
             return List.of();
@@ -62,7 +62,7 @@ public class ProfileBasedStrategy implements RecommendationStrategy {
             if (!matched.isEmpty()) {
                 double score = 100.0 * matched.size() / preferred.size();
                 String colors = String.join(", ", matched);
-                String reason = LocalizedText.pick(visitor,
+                String reason = LocalizedText.pick(user,
                         "Coincide con tus colores preferidos: " + colors,
                         "Matches your preferred colors: " + colors);
                 results.add(RecommendationResult.of(roomId, score, reason));

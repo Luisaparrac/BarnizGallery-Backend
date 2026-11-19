@@ -111,21 +111,21 @@ Dates are ISO-8601 (UTC). Enum values are in English (`EXHIBITED`, `ACTIVE`, `FI
 | POST | `/api/artworks/{id}/photos/upload` | Multipart upload (503 while storage is disabled) |
 | DELETE | `/api/photos/{id}` | Delete a photo |
 
-### Visitors
+### Users
 | Method | Path | Description |
 |---|---|---|
-| POST | `/api/visitors/identify` | `{ email, name, country, preferredLanguage, cameraMode }` → existing visitor (200) or new one (201), with `isNew` |
-| GET | `/api/visitors/{id}` | Visitor |
-| PATCH | `/api/visitors/{id}/preferences` | Change language and/or camera mode |
-| GET / PUT | `/api/visitors/{id}/taste-profile` | Read / save the initial questionnaire |
+| POST | `/api/users/identify` | `{ email, name, country, preferredLanguage, cameraMode }` → existing user (200) or new one (201), with `isNew` |
+| GET | `/api/users/{id}` | User |
+| PATCH | `/api/users/{id}/preferences` | Change language and/or camera mode |
+| GET / PUT | `/api/users/{id}/taste-profile` | Read / save the initial questionnaire |
 
 ### Interactions and recommendations
 | Method | Path | Description |
 |---|---|---|
-| POST | `/api/interactions` | `{ visitorId, artworkId, action, durationSeconds }` – `VIEW` (duration required), `ZOOM`. `BID` interactions are recorded automatically |
-| GET | `/api/visitors/{id}/interactions` | History |
-| POST | `/api/visitors/{id}/recommendations?strategy=hybrid` | Compute (`profile`, `interactions`, `hybrid`, `ai`) and replace previous ones |
-| GET | `/api/visitors/{id}/recommendations` | Last saved recommendations |
+| POST | `/api/interactions` | `{ userId, artworkId, action, durationSeconds }` – `VIEW` (duration required), `ZOOM`. `BID` interactions are recorded automatically |
+| GET | `/api/users/{id}/interactions` | History |
+| POST | `/api/users/{id}/recommendations?strategy=hybrid` | Compute (`profile`, `interactions`, `hybrid`, `ai`) and replace previous ones |
+| GET | `/api/users/{id}/recommendations` | Last saved recommendations |
 
 ### Auctions and bids
 | Method | Path | Description |
@@ -136,7 +136,7 @@ Dates are ISO-8601 (UTC). Enum values are in English (`EXHIBITED`, `ACTIVE`, `FI
 | GET | `/api/artworks/{id}/suggested-price` | AI price suggestion (503 while AI is disabled) |
 | POST | `/api/auctions/{id}/start` · `/finish` · `/cancel` | Lifecycle (State) |
 | GET | `/api/auctions/{id}/bids` | Bids, highest first |
-| POST | `/api/auctions/{id}/bids` | `{ visitorId, amount, currency }` |
+| POST | `/api/auctions/{id}/bids` | `{ userId, amount, currency }` |
 
 Bid rules: only in `ACTIVE` auctions; `currency` must equal `AUCTION_CURRENCY`; `amount` must be at least
 max(highest bid, base price) + `app.auction.min-increment` (422 otherwise); more than 5 bids per minute
@@ -146,7 +146,7 @@ from the same visitor → 429; an amount above 10 × the reference is accepted b
 ### Contact
 | Method | Path | Description |
 |---|---|---|
-| POST | `/api/contact-messages` | `{ visitorId, masterId, artworkId?, content }` – the artwork must belong to the master's room |
+| POST | `/api/contact-messages` | `{ userId, masterId, artworkId?, content }` – the artwork must belong to the master's room |
 | GET | `/api/masters/{id}/messages` | Messages received by a master |
 
 ### Errors
@@ -165,8 +165,8 @@ Every error has the same shape:
 | Topic | Payload |
 |---|---|
 | `/topic/auctions/{auctionId}` | `AuctionEvent { type: BID_PLACED \| AUCTION_STARTED \| AUCTION_FINISHED \| AUCTION_CANCELLED, auctionId, artworkId, bid?, previousTopBidderId?, timestamp }` |
-| `/topic/visitors/{visitorId}/notifications` | `{ type: "OUTBID" \| "MATCHING_AUCTION", auctionId, artworkId, message }` |
-| `/topic/admin/anomalies` | `{ auctionId, bidId, visitorId, amount, reason, timestamp }` |
+| `/topic/users/{userId}/notifications` | `{ type: "OUTBID" \| "MATCHING_AUCTION", auctionId, artworkId, message }` |
+| `/topic/admin/anomalies` | `{ auctionId, bidId, userId, amount, reason, timestamp }` |
 
 Bids are placed through REST (`POST /api/auctions/{id}/bids`); WebSocket is used to receive updates.
 

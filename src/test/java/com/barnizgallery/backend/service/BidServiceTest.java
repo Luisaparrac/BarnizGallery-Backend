@@ -30,7 +30,7 @@ import com.barnizgallery.backend.dto.BidResponse;
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Auction;
 import com.barnizgallery.backend.entity.Bid;
-import com.barnizgallery.backend.entity.Visitor;
+import com.barnizgallery.backend.entity.User;
 import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.enums.AuctionStatus;
 import com.barnizgallery.backend.enums.Language;
@@ -50,7 +50,7 @@ class BidServiceTest {
 
     private final BidRepository bidRepository = mock(BidRepository.class);
     private final AuctionService auctionService = mock(AuctionService.class);
-    private final VisitorService visitorService = mock(VisitorService.class);
+    private final UserService userService = mock(UserService.class);
     private final AiFacade aiFacade = mock(AiFacade.class);
     private final AuctionEventPublisher publisher = mock(AuctionEventPublisher.class);
     private final SimpMessageSendingOperations messaging = mock(SimpMessageSendingOperations.class);
@@ -59,14 +59,14 @@ class BidServiceTest {
 
     private BidService bidService;
     private Auction auction;
-    private final Visitor visitor = TestEntities.visitor(3, Language.ES);
+    private final User user = TestEntities.user(3, Language.ES);
 
     @BeforeEach
     void setUp() {
-        bidService = new BidService(bidRepository, auctionService, visitorService, aiFacade, publisher, messaging,
+        bidService = new BidService(bidRepository, auctionService, userService, aiFacade, publisher, messaging,
                 properties, Clock.fixed(NOW.atZone(ZONE).toInstant(), ZONE));
         givenAuction(AuctionStatus.ACTIVE);
-        when(visitorService.getVisitor(3L)).thenReturn(visitor);
+        when(userService.getUser(3L)).thenReturn(user);
         when(aiFacade.assessBid(any(), any(), eq(3L))).thenReturn(BidAssessment.ok());
         when(bidRepository.save(any(Bid.class))).thenAnswer(inv -> {
             Bid bid = inv.getArgument(0);
@@ -83,10 +83,10 @@ class BidServiceTest {
         when(auctionService.contextFor(auction)).thenReturn(new AuctionContext(auction, () -> 0));
     }
 
-    private void givenTopBid(String amount, int visitorId) {
+    private void givenTopBid(String amount, int userId) {
         Bid top = new Bid();
         top.setAmount(new BigDecimal(amount));
-        top.setVisitor(TestEntities.visitor(visitorId, Language.EN));
+        top.setUser(TestEntities.user(userId, Language.EN));
         when(bidRepository.findFirstByAuctionAuctionIdOrderByAmountDescBidDateAsc(1L)).thenReturn(Optional.of(top));
     }
 

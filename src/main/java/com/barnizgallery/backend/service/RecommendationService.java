@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.barnizgallery.backend.dto.RecommendationResponse;
 import com.barnizgallery.backend.entity.Recommendation;
 import com.barnizgallery.backend.entity.Room;
-import com.barnizgallery.backend.entity.Visitor;
+import com.barnizgallery.backend.entity.User;
 import com.barnizgallery.backend.mapper.InteractionMapper;
 import com.barnizgallery.backend.patterns.facade.AiFacade;
 import com.barnizgallery.backend.patterns.strategy.RecommendationResult;
@@ -30,23 +30,23 @@ public class RecommendationService {
     private final AiFacade aiFacade;
     private final RecommendationRepository recommendationRepository;
     private final RoomRepository roomRepository;
-    private final VisitorService visitorService;
+    private final UserService userService;
 
     public RecommendationService(AiFacade aiFacade, RecommendationRepository recommendationRepository,
-            RoomRepository roomRepository, VisitorService visitorService) {
+            RoomRepository roomRepository, UserService userService) {
         this.aiFacade = aiFacade;
         this.recommendationRepository = recommendationRepository;
         this.roomRepository = roomRepository;
-        this.visitorService = visitorService;
+        this.userService = userService;
     }
 
     /** Computes new recommendations, replaces the previous ones and returns them by score. */
     @Transactional
-    public List<RecommendationResponse> compute(Long visitorId, String strategyName) {
-        Visitor visitor = visitorService.getVisitor(visitorId);
-        List<RecommendationResult> results = aiFacade.recommendRooms(visitor, strategyName);
+    public List<RecommendationResponse> compute(Long userId, String strategyName) {
+        User user = userService.getUser(userId);
+        List<RecommendationResult> results = aiFacade.recommendRooms(user, strategyName);
 
-        recommendationRepository.deleteByVisitorId(visitorId);
+        recommendationRepository.deleteByUserId(userId);
         Map<Long, Room> rooms = roomRepository.findAllById(results.stream().map(RecommendationResult::roomId)
                 .toList()).stream().collect(Collectors.toMap(Room::getRoomId, Function.identity()));
 
@@ -58,7 +58,7 @@ public class RecommendationService {
                 continue;
             }
             Recommendation recommendation = new Recommendation();
-            recommendation.setVisitor(visitor);
+            recommendation.setUser(user);
             recommendation.setRoom(room);
             recommendation.setScore(result.score());
             recommendation.setReason(result.reason());
@@ -71,9 +71,9 @@ public class RecommendationService {
     }
 
     @Transactional(readOnly = true)
-    public List<RecommendationResponse> latest(Long visitorId) {
-        visitorService.getVisitor(visitorId);
-        return recommendationRepository.findByVisitorWithRoom(visitorId).stream()
+    public List<RecommendationResponse> latest(Long userId) {
+        userService.getUser(userId);
+        return recommendationRepository.findByUserWithRoom(userId).stream()
                 .map(InteractionMapper::toResponse)
                 .toList();
     }

@@ -22,7 +22,7 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 
 import com.barnizgallery.backend.TestEntities;
 import com.barnizgallery.backend.dto.BidResponse;
-import com.barnizgallery.backend.dto.VisitorNotification;
+import com.barnizgallery.backend.dto.UserNotification;
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.TasteProfile;
 import com.barnizgallery.backend.enums.ArtworkStatus;
@@ -35,7 +35,7 @@ class AuctionObserversTest {
     private final SimpMessageSendingOperations messaging = mock(SimpMessageSendingOperations.class);
 
     private static AuctionEvent bidEvent(long bidderId, Long previousTopBidderId) {
-        BidResponse bid = new BidResponse(10L, 1L, bidderId, "Visitor", new BigDecimal("500"), "USD",
+        BidResponse bid = new BidResponse(10L, 1L, bidderId, "User", new BigDecimal("500"), "USD",
                 LocalDateTime.now());
         return AuctionEvent.bidPlaced(1L, 7L, bid, previousTopBidderId);
     }
@@ -79,8 +79,8 @@ class AuctionObserversTest {
         new OutbidNotifier(messaging).onEvent(bidEvent(3, 8L));
 
         ArgumentCaptor<Object> payload = ArgumentCaptor.forClass(Object.class);
-        verify(messaging).convertAndSend(eq("/topic/visitors/8/notifications"), payload.capture());
-        assertThat(((VisitorNotification) payload.getValue()).type()).isEqualTo(VisitorNotification.OUTBID);
+        verify(messaging).convertAndSend(eq("/topic/users/8/notifications"), payload.capture());
+        assertThat(((UserNotification) payload.getValue()).type()).isEqualTo(UserNotification.OUTBID);
     }
 
     @Test
@@ -95,7 +95,7 @@ class AuctionObserversTest {
     }
 
     @Test
-    void matchingNotifierWarnsVisitorsWithMatchingColors() {
+    void matchingNotifierWarnsUsersWithMatchingColors() {
         ArtworkRepository artworkRepository = mock(ArtworkRepository.class);
         TasteProfileRepository tasteProfileRepository = mock(TasteProfileRepository.class);
         Artwork artwork = TestEntities.artwork(7, TestEntities.room(1, TestEntities.master(1)),
@@ -107,14 +107,14 @@ class AuctionObserversTest {
         new MatchingAuctionNotifier(artworkRepository, tasteProfileRepository, messaging)
                 .onEvent(AuctionEvent.of(AuctionEventType.AUCTION_STARTED, 1L, 7L));
 
-        verify(messaging).convertAndSend(eq("/topic/visitors/1/notifications"), any(Object.class));
-        verify(messaging).convertAndSend(eq("/topic/visitors/3/notifications"), any(Object.class));
+        verify(messaging).convertAndSend(eq("/topic/users/1/notifications"), any(Object.class));
+        verify(messaging).convertAndSend(eq("/topic/users/3/notifications"), any(Object.class));
         verify(messaging, times(2)).convertAndSend(anyString(), any(Object.class));
     }
 
-    private static TasteProfile profile(int visitorId, String... colors) {
+    private static TasteProfile profile(int userId, String... colors) {
         TasteProfile profile = new TasteProfile();
-        profile.setVisitor(TestEntities.visitor(visitorId, Language.ES));
+        profile.setUser(TestEntities.user(userId, Language.ES));
         profile.setPreferredColors(List.of(colors));
         return profile;
     }

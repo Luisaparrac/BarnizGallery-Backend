@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 import com.barnizgallery.backend.config.AuctionProperties;
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Auction;
-import com.barnizgallery.backend.entity.Visitor;
+import com.barnizgallery.backend.entity.User;
 import com.barnizgallery.backend.patterns.adapter.AiTextClient;
 import com.barnizgallery.backend.patterns.strategy.RecommendationResult;
 import com.barnizgallery.backend.patterns.strategy.RecommendationStrategyResolver;
@@ -63,13 +63,13 @@ public class AiFacade {
     }
 
     /** Recommends rooms with the default strategy (hybrid). */
-    public List<RecommendationResult> recommendRooms(Visitor visitor) {
-        return recommendRooms(visitor, null);
+    public List<RecommendationResult> recommendRooms(User user) {
+        return recommendRooms(user, null);
     }
 
     /** Recommends rooms with the strategy chosen by name (Strategy pattern). */
-    public List<RecommendationResult> recommendRooms(Visitor visitor, String strategyName) {
-        return strategyResolver.resolve(strategyName).recommend(visitor);
+    public List<RecommendationResult> recommendRooms(User user, String strategyName) {
+        return strategyResolver.resolve(strategyName).recommend(user);
     }
 
     /**
@@ -97,14 +97,14 @@ public class AiFacade {
     /**
      * Reviews a bid before it is saved. The deterministic rules always run:
      * <ul>
-     * <li>more than {@code app.auction.max-bids-per-minute} bids of the visitor in 60 s → REJECTED</li>
+     * <li>more than {@code app.auction.max-bids-per-minute} bids of the user in 60 s → REJECTED</li>
      * <li>amount above {@code app.auction.suspicious-multiplier} × (highest bid or base price) → SUSPICIOUS</li>
      * </ul>
      * When AI is enabled it can also mark the bid as SUSPICIOUS (never reject it).
      */
-    public BidAssessment assessBid(Auction auction, BigDecimal amount, Long visitorId) {
+    public BidAssessment assessBid(Auction auction, BigDecimal amount, Long userId) {
 
-        long recentBids = bidRepository.countByVisitorVisitorIdAndBidDateAfter(visitorId,
+        long recentBids = bidRepository.countByUserUserIdAndBidDateAfter(userId,
                 LocalDateTime.now().minusSeconds(60));
         if (recentBids >= auctionProperties.maxBidsPerMinute()) {
             return BidAssessment.rejected("Too many bids: the limit is " + auctionProperties.maxBidsPerMinute()

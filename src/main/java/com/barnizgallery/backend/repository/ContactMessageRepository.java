@@ -13,7 +13,7 @@ import com.barnizgallery.backend.entity.ContactMessage;
 public interface ContactMessageRepository extends JpaRepository<ContactMessage, Long> {
 
     /** Messages of a master, newest first, with the sender loaded in the same query. */
-    @Query("select m from ContactMessage m join fetch m.visitor "
+    @Query("select m from ContactMessage m join fetch m.user "
             + "where m.master.masterId = :masterId order by m.messageDate desc, m.messageId desc")
-    List<ContactMessage> findByMasterWithVisitor(Long masterId);
+    List<ContactMessage> findByMasterWithUser(Long masterId);
 }

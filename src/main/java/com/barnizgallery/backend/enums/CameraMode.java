@@ -1,7 +1,7 @@
 package com.barnizgallery.backend.enums;
 
 /**
- * Camera mode chosen by a visitor. Stored in {@code visitors.camera_mode}.
+ * Camera mode chosen by a user. Stored in {@code users.camera_mode}.
  */
 public enum CameraMode implements DbValueEnum {
 

@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import com.barnizgallery.backend.enums.InteractionAction;
 import com.barnizgallery.backend.service.ArtworkService;
 import com.barnizgallery.backend.service.InteractionService;
-import com.barnizgallery.backend.service.VisitorService;
+import com.barnizgallery.backend.service.UserService;
 
 /**
  * <b>Observer pattern – ConcreteObserver.</b>
@@ -17,13 +17,13 @@ import com.barnizgallery.backend.service.VisitorService;
 public class BidInteractionRecorder implements AuctionObserver {
 
     private final InteractionService interactionService;
-    private final VisitorService visitorService;
+    private final UserService userService;
     private final ArtworkService artworkService;
 
-    public BidInteractionRecorder(InteractionService interactionService, VisitorService visitorService,
+    public BidInteractionRecorder(InteractionService interactionService, UserService userService,
             ArtworkService artworkService) {
         this.interactionService = interactionService;
-        this.visitorService = visitorService;
+        this.userService = userService;
         this.artworkService = artworkService;
     }
 
@@ -32,7 +32,7 @@ public class BidInteractionRecorder implements AuctionObserver {
         if (event.type() != AuctionEventType.BID_PLACED) {
             return;
         }
-        interactionService.save(visitorService.getVisitor(event.bid().visitorId()),
+        interactionService.save(userService.getUser(event.bid().userId()),
                 artworkService.getArtwork(event.artworkId()), InteractionAction.BID, null);
     }
 }

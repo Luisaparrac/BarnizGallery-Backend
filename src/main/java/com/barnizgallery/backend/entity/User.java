@@ -14,16 +14,16 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 /**
- * Visitor of the gallery, identified only by email. Maps the existing table {@code visitors}.
+ * User of the gallery, identified only by email. Maps the existing table {@code users}.
  */
 @Entity
-@Table(name = "visitors")
-public class Visitor {
+@Table(name = "users")
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "visitor_id")
-    private Long visitorId;
+    @Column(name = "user_id")
+    private Long userId;
 
     @Column(name = "name", nullable = false, length = 100)
     private String name;
@@ -42,12 +42,12 @@ public class Visitor {
     @Column(name = "camera_mode", nullable = false, length = 30)
     private CameraMode cameraMode;
 
-    public Long getVisitorId() {
-        return visitorId;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setVisitorId(Long visitorId) {
-        this.visitorId = visitorId;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public String getName() {

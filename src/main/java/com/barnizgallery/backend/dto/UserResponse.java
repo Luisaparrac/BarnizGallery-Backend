@@ -4,10 +4,10 @@ import com.barnizgallery.backend.enums.CameraMode;
 import com.barnizgallery.backend.enums.Language;
 
 /**
- * A visitor.
+ * A user.
  */
-public record VisitorResponse(
-        Long visitorId,
+public record UserResponse(
+        Long userId,
         String name,
         String email,
         String country,

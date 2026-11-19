@@ -1,7 +1,7 @@
 package com.barnizgallery.backend.enums;
 
 /**
- * Kind of interaction a visitor has with an artwork. Stored in {@code interactions.action}.
+ * Kind of interaction a user has with an artwork. Stored in {@code interactions.action}.
  */
 public enum InteractionAction implements DbValueEnum {
 
