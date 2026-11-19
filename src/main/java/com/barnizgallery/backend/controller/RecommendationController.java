@@ -30,8 +30,8 @@ public class RecommendationController {
     }
 
     @PostMapping
-    @Operation(summary = "Compute recommendations (strategy = profile | interactions | hybrid | ai) "
-            + "and replace the previous ones")
+    @Operation(summary = "Compute recommendations (strategy = profile | interactions | hybrid | ai | ai-service) "
+            + "and replace the previous ones; ai-service falls back to hybrid when the AI service fails")
     public List<RecommendationResponse> compute(@PathVariable Long id,
             @RequestParam(defaultValue = "hybrid") String strategy) {
         return recommendationService.compute(id, strategy);
