@@ -1,6 +1,7 @@
 package com.barnizgallery.backend.service;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
 import java.time.Duration;
 import java.util.Locale;
 
@@ -11,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.barnizgallery.backend.dto.AuthResponse;
 import com.barnizgallery.backend.dto.RegisterRequest;
+import com.barnizgallery.backend.dto.UserResponse;
+import com.barnizgallery.backend.entity.AuthToken;
 import com.barnizgallery.backend.entity.User;
 import com.barnizgallery.backend.enums.AuthTokenPurpose;
 import com.barnizgallery.backend.enums.ErrorCode;
@@ -18,6 +21,7 @@ import com.barnizgallery.backend.enums.Language;
 import com.barnizgallery.backend.enums.UserRole;
 import com.barnizgallery.backend.enums.UserStatus;
 import com.barnizgallery.backend.exception.BusinessRuleException;
+import com.barnizgallery.backend.mapper.UserMapper;
 import com.barnizgallery.backend.patterns.adapter.EmailSender;
 import com.barnizgallery.backend.repository.UserRepository;
 
@@ -39,10 +43,11 @@ public class RegistrationService {
     private final EmailSender emailSender;
     private final NotificationService notificationService;
     private final SessionIssuer sessionIssuer;
+    private final Clock clock;
 
     public RegistrationService(UserRepository userRepository, PasswordEncoder passwordEncoder,
             AuthTokenService authTokenService, AccountEmailFactory emails, EmailSender emailSender,
-            NotificationService notificationService, SessionIssuer sessionIssuer) {
+            NotificationService notificationService, SessionIssuer sessionIssuer, Clock clock) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authTokenService = authTokenService;
@@ -50,6 +55,7 @@ public class RegistrationService {
         this.emailSender = emailSender;
         this.notificationService = notificationService;
         this.sessionIssuer = sessionIssuer;
+        this.clock = clock;
     }
 
     /** Creates the customer, sends the verification email, greets the user and opens a session. */
@@ -75,6 +81,31 @@ public class RegistrationService {
         emailSender.send(emails.verification(saved, token, EMAIL_VERIFICATION_VALIDITY));
         notificationService.notify(saved, NotificationService.WELCOME, "/stores", null, saved.getName());
         return sessionIssuer.open(saved);
+    }
+
+    /**
+     * Confirms the email with the token of the verification link (used once): the account becomes
+     * {@code activo}. An unknown, used or expired link → 400 {@code invalid_email_token}.
+     */
+    @Transactional
+    public UserResponse verifyEmail(String rawToken) {
+        AuthToken token = authTokenService.find(rawToken, AuthTokenPurpose.EMAIL_VERIFICATION)
+                .filter(authTokenService::isUsable)
+                .orElseThrow(() -> BusinessRuleException.badRequest(ErrorCode.INVALID_EMAIL_TOKEN));
+        authTokenService.markUsed(token);
+        User user = token.getUser();
+        confirmEmail(user);
+        return UserMapper.toResponse(user);
+    }
+
+    /** Marks the email as verified; a pending account becomes active. Suspended accounts stay suspended. */
+    void confirmEmail(User user) {
+        if (user.getEmailVerifiedAt() == null) {
+            user.setEmailVerifiedAt(clock.instant());
+        }
+        if (user.getStatus() == UserStatus.PENDING) {
+            user.setStatus(UserStatus.ACTIVE);
+        }
     }
 
     /** BCrypt hash of a password; BCrypt only reads 72 bytes, so longer passwords are refused. */
