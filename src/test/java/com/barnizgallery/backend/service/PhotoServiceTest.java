@@ -88,6 +88,7 @@ class PhotoServiceTest {
         photoService.delete(5L);
 
         verify(photoRepository).delete(photo);
+        verify(photoRepository).flush();
         verify(storageService, never()).delete(any());
     }
 

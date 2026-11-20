@@ -52,6 +52,8 @@ public class PhotoArrangementService {
         }
         if (Boolean.TRUE.equals(request.primary())) {
             photos(photo.getArtwork().getArtworkId()).forEach(other -> other.setPrimary(false));
+            // the database allows one primary photo per artwork: clear the old one before marking the new one
+            photoRepository.flush();
             photo.setPrimary(true);
         } else if (Boolean.FALSE.equals(request.primary())) {
             photo.setPrimary(false);

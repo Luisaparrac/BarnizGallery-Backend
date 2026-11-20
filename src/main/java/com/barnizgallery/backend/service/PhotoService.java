@@ -94,6 +94,8 @@ public class PhotoService {
     public void delete(Long photoId) {
         Photo photo = arrangementService.ownedPhoto(photoId);
         photoRepository.delete(photo);
+        // deletes are flushed last; the next primary photo must not coexist with the deleted one
+        photoRepository.flush();
         closeGap(photo);
         if (photo.getStorageKey() == null) {
             return;
