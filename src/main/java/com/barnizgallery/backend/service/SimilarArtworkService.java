@@ -16,7 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.barnizgallery.backend.dto.AiRecommendationItem;
+import com.barnizgallery.backend.dto.AiSimilarItem;
 import com.barnizgallery.backend.dto.AiSimilarRequest;
 import com.barnizgallery.backend.dto.SimilarArtworkResponse;
 import com.barnizgallery.backend.entity.Artwork;
@@ -80,10 +80,10 @@ public class SimilarArtworkService {
 
     private List<SimilarArtworkResponse> fromAi(Artwork base, List<Artwork> candidates, Locale locale) {
         Map<Long, Artwork> byId = candidates.stream().collect(Collectors.toMap(Artwork::getArtworkId, Function.identity()));
-        AiSimilarRequest request = new AiSimilarRequest(AiRequestMapper.toCandidate(base, 0),
-                candidates.stream().map(c -> AiRequestMapper.toCandidate(c, 0)).toList(), LIMIT);
-        List<AiRecommendationItem> items = aiService.similar(request).items();
-        return (items == null ? List.<AiRecommendationItem>of() : items).stream()
+        AiSimilarRequest request = new AiSimilarRequest(AiRequestMapper.toRef(base),
+                candidates.stream().map(AiRequestMapper::toRef).toList(), LIMIT);
+        List<AiSimilarItem> items = aiService.similar(request).items();
+        return (items == null ? List.<AiSimilarItem>of() : items).stream()
                 .filter(item -> item.score() > 0 && byId.containsKey(item.artworkId()))
                 .limit(LIMIT)
                 .map(item -> {
@@ -94,7 +94,7 @@ public class SimilarArtworkService {
     }
 
     /** The service explains in Spanish only: other languages get the reason of the fixed rules. */
-    private static String reason(Artwork base, Artwork artwork, AiRecommendationItem item, Locale locale) {
+    private static String reason(Artwork base, Artwork artwork, AiSimilarItem item, Locale locale) {
         boolean spanish = !Locale.ENGLISH.getLanguage().equals(locale.getLanguage());
         if (spanish && item.explanation() != null && !item.explanation().isBlank()) {
             return item.explanation().strip();

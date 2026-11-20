@@ -15,8 +15,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 import com.barnizgallery.backend.TestEntities;
-import com.barnizgallery.backend.dto.AiRecommendationItem;
-import com.barnizgallery.backend.dto.AiRecommendationResponse;
+import com.barnizgallery.backend.dto.AiSimilarItem;
+import com.barnizgallery.backend.dto.AiSimilarResponse;
 import com.barnizgallery.backend.dto.SimilarArtworkResponse;
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Shape;
@@ -77,9 +77,9 @@ class SimilarArtworkServiceTest {
     void theAiRankingIsUsedWithItsSpanishExplanation() {
         LocaleContextHolder.setLocale(Locale.forLanguageTag("es"));
         when(ai.isAvailable()).thenReturn(true);
-        when(ai.similar(any())).thenReturn(new AiRecommendationResponse("content", List.of(
-                new AiRecommendationItem(3L, 1L, 0.7, null, "Comparte el rojo."),
-                new AiRecommendationItem(99L, 1L, 0.9, null, "No es candidata."))));
+        when(ai.similar(any())).thenReturn(new AiSimilarResponse(1L, "obra-1", List.of(
+                new AiSimilarItem(3L, "obra-3", 1L, 0.7, List.of("rojo"), true, "Comparte el rojo."),
+                new AiSimilarItem(99L, "obra-99", 1L, 0.9, List.of(), false, "No es candidata."))));
 
         List<SimilarArtworkResponse> similar = service.similar(1L);
 

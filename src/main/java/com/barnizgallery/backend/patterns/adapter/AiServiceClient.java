@@ -17,6 +17,7 @@ import com.barnizgallery.backend.dto.AiPricingRequest;
 import com.barnizgallery.backend.dto.AiRecommendationRequest;
 import com.barnizgallery.backend.dto.AiRecommendationResponse;
 import com.barnizgallery.backend.dto.AiSimilarRequest;
+import com.barnizgallery.backend.dto.AiSimilarResponse;
 import com.barnizgallery.backend.exception.AiServiceException;
 
 import tools.jackson.core.JacksonException;
@@ -64,8 +65,8 @@ public class AiServiceClient implements AiServiceGateway {
     }
 
     @Override
-    public AiRecommendationResponse similar(AiSimilarRequest request) {
-        return post("/v1/similar", request, AiRecommendationResponse.class);
+    public AiSimilarResponse similar(AiSimilarRequest request) {
+        return post("/v1/similar", request, AiSimilarResponse.class);
     }
 
     private <T> T post(String path, Object body, Class<T> type) {

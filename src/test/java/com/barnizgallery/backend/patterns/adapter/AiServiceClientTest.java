@@ -23,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 
+import com.barnizgallery.backend.dto.AiArtworkRef;
 import com.barnizgallery.backend.dto.AiCandidate;
 import com.barnizgallery.backend.dto.AiComparable;
 import com.barnizgallery.backend.dto.AiPriceSuggestion;
@@ -31,6 +32,7 @@ import com.barnizgallery.backend.dto.AiPricingRequest;
 import com.barnizgallery.backend.dto.AiRecommendationRequest;
 import com.barnizgallery.backend.dto.AiRecommendationResponse;
 import com.barnizgallery.backend.dto.AiSimilarRequest;
+import com.barnizgallery.backend.dto.AiSimilarResponse;
 import com.barnizgallery.backend.exception.AiServiceException;
 
 /** Uses the JSON examples of the AI service integration guide. No real call is made. */
@@ -157,23 +159,29 @@ class AiServiceClientTest {
     }
 
     @Test
-    void similarSendsTheArtworkAndItsCandidates() {
+    void similarSendsArtworkReferencesAndReadsTheSharedTraits() {
         server.expect(requestTo(BASE_URL + "/v1/similar"))
-                .andExpect(jsonPath("$.artwork.slug").value("bandeja-roja"))
-                .andExpect(jsonPath("$.candidates[0].artwork_id").value(5))
+                .andExpect(jsonPath("$.artwork.artwork_id").value(12))
+                .andExpect(jsonPath("$.artwork.slug").value("jarron-flora-azul"))
+                .andExpect(jsonPath("$.candidates[0].slug").value("bargueno-colonial"))
+                .andExpect(jsonPath("$.candidates[0].store_id").value(1))
                 .andExpect(jsonPath("$.limit").value(6))
                 .andRespond(withSuccess("""
-                        {"strategy": "content", "items": [{"artwork_id": 5, "store_id": 2, "score": 0.8,
-                          "reasons": {"colors": ["rojo"], "shape": false, "style": false, "motifs": [], "budget": null},
-                          "explanation": "Se parece en el color rojo."}]}""",
+                        {"artwork_id": 12, "slug": "jarron-flora-azul", "items": [
+                          {"artwork_id": 13, "slug": "jarron-flora-dorada-fondo-negro", "store_id": 1,
+                           "score": 0.8436, "shared_traits": ["flora", "forma de jarrón"], "same_master": true,
+                           "explanation": "Comparte con «Jarrón Flora Azul»: flora y forma de jarrón."}]}""",
                         MediaType.APPLICATION_JSON));
 
-        AiCandidate artwork = recommendationRequest().candidates().get(0);
-        AiRecommendationResponse response = client.similar(new AiSimilarRequest(artwork, List.of(artwork), 6));
+        AiSimilarResponse response = client.similar(new AiSimilarRequest(new AiArtworkRef(12L, "jarron-flora-azul", 1L),
+                List.of(new AiArtworkRef(11L, "bargueno-colonial", 1L)), 6));
 
+        assertThat(response.slug()).isEqualTo("jarron-flora-azul");
         assertThat(response.items()).singleElement().satisfies(item -> {
-            assertThat(item.score()).isEqualTo(0.8);
-            assertThat(item.explanation()).isEqualTo("Se parece en el color rojo.");
+            assertThat(item.artworkId()).isEqualTo(13L);
+            assertThat(item.score()).isEqualTo(0.8436);
+            assertThat(item.sharedTraits()).containsExactly("flora", "forma de jarrón");
+            assertThat(item.sameMaster()).isTrue();
         });
     }
 

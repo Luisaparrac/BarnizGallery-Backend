@@ -15,6 +15,7 @@ import com.barnizgallery.backend.dto.AiPricingRequest;
 import com.barnizgallery.backend.dto.AiRecommendationRequest;
 import com.barnizgallery.backend.dto.AiRecommendationResponse;
 import com.barnizgallery.backend.dto.AiSimilarRequest;
+import com.barnizgallery.backend.dto.AiSimilarResponse;
 import com.barnizgallery.backend.exception.AiServiceException;
 import com.barnizgallery.backend.patterns.adapter.AiServiceGateway;
 
@@ -65,8 +66,8 @@ public class AiServiceProxy implements AiServiceGateway {
     }
 
     @Override
-    public AiRecommendationResponse similar(AiSimilarRequest request) {
-        return (AiRecommendationResponse) call(request, () -> realGateway.similar(request));
+    public AiSimilarResponse similar(AiSimilarRequest request) {
+        return (AiSimilarResponse) call(request, () -> realGateway.similar(request));
     }
 
     private Object call(Object request, Supplier<Object> realCall) {

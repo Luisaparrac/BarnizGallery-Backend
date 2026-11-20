@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
+import com.barnizgallery.backend.dto.AiArtworkRef;
 import com.barnizgallery.backend.dto.AiBudget;
 import com.barnizgallery.backend.dto.AiCandidate;
 import com.barnizgallery.backend.dto.AiComparable;
@@ -49,6 +50,11 @@ public final class AiRequestMapper {
         return new AiCandidate(artwork.getArtworkId(), slugOf(artwork), artwork.getStore().getStoreId(),
                 ArtworkMapper.colorCodes(artwork), shapeCode(artwork), styleCode(artwork),
                 ArtworkMapper.motifCodes(artwork), artwork.getPrice(), artwork.getCurrency(), popularity);
+    }
+
+    /** Reference of an artwork for {@code /v1/similar}: id, slug (made from the title if missing) and store. */
+    public static AiArtworkRef toRef(Artwork artwork) {
+        return new AiArtworkRef(artwork.getArtworkId(), slugOf(artwork), artwork.getStore().getStoreId());
     }
 
     /** Taste profile as catalog codes; the budget is only sent when its range has a currency. */
