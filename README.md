@@ -179,6 +179,16 @@ Public endpoints; every other call sends `Authorization: Bearer <accessToken>`. 
 
 `AuthResponse` = `{ tokenType: "Bearer", accessToken, accessTokenExpiresAt, refreshToken, refreshTokenExpiresAt, user }`.
 
+### Access by role
+| Who | What |
+|---|---|
+| Anyone | `/api/auth/**`; `GET` of health, gallery, stores (`/api/rooms`), masters, artworks, auctions and catalogs |
+| Logged-in user | Their own account (`/api/users/{id}/**` with their id), notifications, interactions and bids in their own name |
+| Artisan or administrator | Create and edit stores, artworks and photos (an artisan only their own store); suggested prices |
+| Administrator | `/api/admin/**`, masters, creating and closing auctions, any user's data |
+
+A wrong role answers 403 `access_denied`; a missing or expired token answers 401 `unauthorized`.
+
 ### Notifications (logged-in user)
 | Method | Path | Description |
 |---|---|---|

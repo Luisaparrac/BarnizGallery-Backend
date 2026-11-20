@@ -1,5 +1,6 @@
 package com.barnizgallery.backend.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,22 +33,26 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("@access.isSelfOrAdmin(#id)")
     public UserResponse findById(@PathVariable Long id) {
         return userService.findById(id);
     }
 
     @PatchMapping("/{id}/preferences")
+    @PreAuthorize("@access.isSelf(#id)")
     public UserResponse updatePreferences(@PathVariable Long id,
             @Valid @RequestBody UserPreferencesRequest request) {
         return userService.updatePreferences(id, request);
     }
 
     @GetMapping("/{id}/taste-profile")
+    @PreAuthorize("@access.isSelfOrAdmin(#id)")
     public TasteProfileResponse getTasteProfile(@PathVariable Long id) {
         return userService.getTasteProfile(id);
     }
 
     @PutMapping("/{id}/taste-profile")
+    @PreAuthorize("@access.isSelf(#id)")
     public TasteProfileResponse saveTasteProfile(@PathVariable Long id,
             @Valid @RequestBody TasteProfileRequest request) {
         return userService.saveTasteProfile(id, request);

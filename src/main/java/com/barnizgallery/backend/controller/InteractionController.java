@@ -3,6 +3,7 @@ package com.barnizgallery.backend.controller;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,6 +33,7 @@ public class InteractionController {
     }
 
     @PostMapping("/api/interactions")
+    @PreAuthorize("@access.isSelf(#request.userId())")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Record VIEW (durationSeconds required) or ZOOM")
     public InteractionResponse record(@Valid @RequestBody InteractionRequest request) {
@@ -39,6 +41,7 @@ public class InteractionController {
     }
 
     @GetMapping("/api/users/{id}/interactions")
+    @PreAuthorize("@access.isSelfOrAdmin(#id)")
     public List<InteractionResponse> history(@PathVariable Long id) {
         return interactionService.history(id);
     }

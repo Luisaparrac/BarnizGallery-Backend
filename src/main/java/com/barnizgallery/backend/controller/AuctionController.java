@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -78,6 +79,7 @@ public class AuctionController {
     }
 
     @PostMapping("/{id}/bids")
+    @PreAuthorize("@access.isSelf(#request.userId())")
     @Operation(summary = "Place a bid (only in active auctions; 422 invalid amount/currency, 429 too many bids)")
     public ResponseEntity<BidResponse> placeBid(@PathVariable Long id, @Valid @RequestBody BidRequest request) {
         BidResponse created = bidService.placeBid(id, request);

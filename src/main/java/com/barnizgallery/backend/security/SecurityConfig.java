@@ -2,8 +2,10 @@ package com.barnizgallery.backend.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
@@ -17,10 +19,13 @@ import org.springframework.security.web.SecurityFilterChain;
  * <li>the token is a JWT checked by the resource server; its {@code role} claim becomes {@code ROLE_<role>};</li>
  * <li>security errors are answered as JSON (401 and 403).</li>
  * </ul>
- * For now every endpoint stays public, as before; the endpoints are closed by role once users can log in.
+ * Access by role is described in {@link #authorizeRequests}.
  */
 @Configuration
 public class SecurityConfig {
+
+    static final String ADMIN = "ADMIN";
+    static final String ARTISAN = "ARTISAN";
 
     private final JsonAuthenticationEntryPoint authenticationEntryPoint;
     private final JsonAccessDeniedHandler accessDeniedHandler;
@@ -46,8 +51,30 @@ public class SecurityConfig {
                 .exceptionHandling(errors -> errors
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler))
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+                .authorizeHttpRequests(SecurityConfig::authorizeRequests)
                 .build();
+    }
+
+    /**
+     * Who may call what. Reading the public catalog (gallery, stores, masters, artworks, auctions) and the
+     * account endpoints are open; the administration is only for administrators; content changes need an
+     * artisan or an administrator; everything else needs a logged-in user. Rules that depend on the data (own
+     * account, own store) are checked with {@code @PreAuthorize} and in the services.
+     */
+    static void authorizeRequests(
+            AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth) {
+        auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers("/api/auth/**", "/ws/**", "/error").permitAll()
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                .requestMatchers("/api/admin/**").hasRole(ADMIN)
+                .requestMatchers(HttpMethod.GET, "/api/artworks/*/suggested-price").hasAnyRole(ADMIN, ARTISAN)
+                .requestMatchers(HttpMethod.GET, "/api/health", "/api/gallery/**", "/api/rooms/**", "/api/masters/**",
+                        "/api/artworks/**", "/api/auctions/**", "/api/catalogs/**").permitAll()
+                .requestMatchers("/api/masters/**").hasRole(ADMIN)
+                .requestMatchers(HttpMethod.POST, "/api/auctions", "/api/auctions/*/start", "/api/auctions/*/finish",
+                        "/api/auctions/*/cancel").hasRole(ADMIN)
+                .requestMatchers("/api/rooms/**", "/api/artworks/**", "/api/photos/**").hasAnyRole(ADMIN, ARTISAN)
+                .anyRequest().authenticated();
     }
 
     /** Maps the {@code role} claim (for example {@code ADMIN}) to the authority {@code ROLE_ADMIN}. */

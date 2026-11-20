@@ -2,6 +2,7 @@ package com.barnizgallery.backend.controller;
 
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,6 +31,7 @@ public class RecommendationController {
     }
 
     @PostMapping
+    @PreAuthorize("@access.isSelfOrAdmin(#id)")
     @Operation(summary = "Compute recommendations (strategy = profile | interactions | hybrid | ai | ai-service) "
             + "and replace the previous ones; ai-service falls back to hybrid when the AI service fails")
     public List<RecommendationResponse> compute(@PathVariable Long id,
@@ -38,6 +40,7 @@ public class RecommendationController {
     }
 
     @GetMapping
+    @PreAuthorize("@access.isSelfOrAdmin(#id)")
     public List<RecommendationResponse> latest(@PathVariable Long id) {
         return recommendationService.latest(id);
     }
