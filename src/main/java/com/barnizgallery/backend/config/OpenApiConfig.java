@@ -31,7 +31,7 @@ public class OpenApiConfig {
 
     /** Public for GET only. */
     private static final List<String> PUBLIC_READS = List.of("/api/health", "/api/gallery/**", "/api/stores/**",
-            "/api/masters/**", "/api/artworks/**", "/api/auctions/**", "/api/catalogs/**");
+            "/api/masters/**", "/api/artworks/**", "/api/auctions/**", "/api/catalogs/**", "/api/settings/public");
 
     private static final AntPathMatcher MATCHER = new AntPathMatcher();
 

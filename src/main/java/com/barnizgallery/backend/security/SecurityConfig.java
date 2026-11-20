@@ -75,7 +75,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/artisans/**", "/api/artisan/**").hasRole(ARTISAN)
                 .requestMatchers(HttpMethod.GET, "/api/artworks/*/suggested-price").hasAnyRole(ADMIN, ARTISAN)
                 .requestMatchers(HttpMethod.GET, "/api/health", "/api/gallery/**", "/api/stores/**", "/api/masters/**",
-                        "/api/artworks/**", "/api/auctions/**", "/api/catalogs/**").permitAll()
+                        "/api/artworks/**", "/api/auctions/**", "/api/catalogs/**", "/api/settings/public").permitAll()
                 .requestMatchers("/api/masters/**").hasRole(ADMIN)
                 .requestMatchers(HttpMethod.POST, "/api/auctions", "/api/auctions/*/start", "/api/auctions/*/finish",
                         "/api/auctions/*/cancel").hasRole(ADMIN)

@@ -5,6 +5,7 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -91,6 +92,12 @@ public class AppSettingsService {
     /** The value, or 409 {@code setting_not_configured} naming the setting when it is missing or JSON null. */
     private JsonNode require(String key) {
         return find(key).orElseThrow(() -> new BusinessRuleException(ErrorCode.SETTING_NOT_CONFIGURED, key));
+    }
+
+    /** Keys of the existing settings that start with the prefix, sorted. */
+    @Transactional(readOnly = true)
+    public List<String> keysStartingWith(String prefix) {
+        return snapshot().keySet().stream().filter(key -> key.startsWith(prefix)).sorted().toList();
     }
 
     /** Forgets the cached values, so the next read sees a change made right now. */
