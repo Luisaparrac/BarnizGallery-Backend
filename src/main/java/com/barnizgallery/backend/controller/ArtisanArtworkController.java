@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.barnizgallery.backend.dto.ArtworkRequest;
+import com.barnizgallery.backend.dto.ArtworkStatusRequest;
 import com.barnizgallery.backend.dto.ArtworkSummaryResponse;
 import com.barnizgallery.backend.service.ArtisanArtworkService;
 
@@ -45,6 +47,13 @@ public class ArtisanArtworkController {
     @Operation(summary = "Create a draft artwork in the artisan's store")
     public ArtworkSummaryResponse create(@Valid @RequestBody ArtworkRequest request) {
         return artworkService.create(request);
+    }
+
+    @PatchMapping("/{artworkId}/status")
+    @Operation(summary = "Move an artwork between DRAFT, EXHIBITED and ARCHIVED (409 for any other change)")
+    public ArtworkSummaryResponse changeStatus(@PathVariable Long artworkId,
+            @Valid @RequestBody ArtworkStatusRequest request) {
+        return artworkService.changeStatus(artworkId, request.status());
     }
 
     @PutMapping("/{artworkId}")

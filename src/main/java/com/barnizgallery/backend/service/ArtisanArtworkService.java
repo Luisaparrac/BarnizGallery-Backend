@@ -1,5 +1,6 @@
 package com.barnizgallery.backend.service;
 
+import java.time.Clock;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -25,9 +26,11 @@ public class ArtisanArtworkService {
     private final ArtworkRepository artworkRepository;
     private final StoreEditorService editorService;
     private final CatalogCodeResolver catalogResolver;
+    private final Clock clock;
 
     public ArtisanArtworkService(ArtworkRepository artworkRepository, StoreEditorService editorService,
-            CatalogCodeResolver catalogResolver) {
+            CatalogCodeResolver catalogResolver, Clock clock) {
+        this.clock = clock;
         this.artworkRepository = artworkRepository;
         this.editorService = editorService;
         this.catalogResolver = catalogResolver;
@@ -55,6 +58,24 @@ public class ArtisanArtworkService {
     public ArtworkSummaryResponse update(Long artworkId, ArtworkRequest request) {
         Artwork artwork = myArtwork(artworkId);
         apply(request, artwork);
+        return ArtworkMapper.toSummary(artwork);
+    }
+
+    /**
+     * Moves an artwork to another status following {@link ArtworkStatusRules}. The first time it is exhibited its
+     * publication date is set.
+     */
+    @Transactional
+    public ArtworkSummaryResponse changeStatus(Long artworkId, ArtworkStatus status) {
+        Artwork artwork = myArtwork(artworkId);
+        if (artwork.getStatus() == status) {
+            return ArtworkMapper.toSummary(artwork);
+        }
+        ArtworkStatusRules.requireChange(artwork.getStatus(), status);
+        if (status == ArtworkStatus.EXHIBITED && artwork.getPublishedAt() == null) {
+            artwork.setPublishedAt(clock.instant());
+        }
+        artwork.setStatus(status);
         return ArtworkMapper.toSummary(artwork);
     }
 

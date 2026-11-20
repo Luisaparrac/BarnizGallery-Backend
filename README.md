@@ -248,6 +248,7 @@ the artisan) and `ADMIN_APPROVAL` (the administrator's final decision).
 | GET | `/api/artisans/me/artworks` | Every artwork of the store, drafts included |
 | POST | `/api/artisans/me/artworks` | `{ titleEs, titleEn, historyEs?, historyEn?, technique?, widthCm?, heightCm?, depthCm?, weightG?, saleMode?, price?, currency?, stock?, colorCodes?, motifCodes?, shapeCode?, styleCode? }` → 201 `DRAFT` |
 | PUT | `/api/artisans/me/artworks/{artworkId}` | Replace the data of an artwork (the status does not change) |
+| PATCH | `/api/artisans/me/artworks/{artworkId}/status` | `{ status }`: `DRAFT` ↔ `EXHIBITED` ↔ `ARCHIVED`, and `SOLD` → `ARCHIVED`; artworks in auction or reserved change only through the auction or the order (409) |
 
 ### Notifications (logged-in user)
 | Method | Path | Description |
