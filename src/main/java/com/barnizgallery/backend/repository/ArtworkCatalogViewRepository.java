@@ -14,6 +14,9 @@ import com.barnizgallery.backend.entity.ArtworkCatalogView;
  */
 public interface ArtworkCatalogViewRepository extends JpaRepository<ArtworkCatalogView, Long> {
 
+    @Query("select v.artworkId from ArtworkCatalogView v")
+    List<Long> findAllArtworkIds();
+
     /** Gallery page filtered by color, motif, shape and style codes, currency, price range and store slug. */
     @Query(nativeQuery = true, value = """
             SELECT v.* FROM museo.v_artwork_catalog v

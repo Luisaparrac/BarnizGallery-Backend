@@ -124,6 +124,7 @@ Dates are ISO-8601 (UTC). Enum values are in English (`EXHIBITED`, `ACTIVE`, `PE
 | GET | `/api/artworks?color=&motif=&shape=&style=&currency=&minPrice=&maxPrice=&store=&page=&size=` | Public gallery (view `v_artwork_catalog`): exhibited or auctioned artworks of published stores of approved masters, newest first; codes of the catalogs, store slug; a price range needs `currency` (422) |
 | GET | `/api/artworks/{id}` | Artwork + photos + current auction (404 unless it is in the public gallery) |
 | GET | `/api/artworks/{id}/photos` | Photos |
+| GET | `/api/artworks/{id}/similar` | "Similar artworks": up to 6 public artworks ranked by the AI service (`source: ai`), or by the fixed rules (shared colors and motifs, same shape and style; `source: rules`) when it is off or fails |
 | POST | `/api/artworks/{id}/photos` | Register photo by URL `{ fileUrl, angle?, altEs?, altEn? }` (owner artisan) |
 | POST | `/api/artworks/{id}/photos/upload` | Multipart `file` (+ `angle`, `altEs`, `altEn`) uploaded to the storage (503 while disabled); goes last, the first photo is the primary one |
 | PUT | `/api/artworks/{id}/photos/order` | `{ photoIds: [...] }` every photo once, first to last (422 otherwise) |

@@ -22,12 +22,14 @@ import com.barnizgallery.backend.dto.CatalogArtworkResponse;
 import com.barnizgallery.backend.dto.PhotoOrderRequest;
 import com.barnizgallery.backend.dto.PhotoRequest;
 import com.barnizgallery.backend.dto.PhotoResponse;
+import com.barnizgallery.backend.dto.SimilarArtworkResponse;
 import com.barnizgallery.backend.dto.SuggestedPriceResponse;
 import com.barnizgallery.backend.service.ArtworkService;
 import com.barnizgallery.backend.service.GalleryService;
 import com.barnizgallery.backend.service.PhotoArrangementService;
 import com.barnizgallery.backend.service.PhotoService;
 import com.barnizgallery.backend.service.PricingService;
+import com.barnizgallery.backend.service.SimilarArtworkService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -46,9 +48,12 @@ public class ArtworkController {
     private final PricingService pricingService;
     private final PhotoArrangementService arrangementService;
     private final GalleryService galleryService;
+    private final SimilarArtworkService similarArtworkService;
 
     public ArtworkController(ArtworkService artworkService, PhotoService photoService,
-            PricingService pricingService, PhotoArrangementService arrangementService, GalleryService galleryService) {
+            PricingService pricingService, PhotoArrangementService arrangementService, GalleryService galleryService,
+            SimilarArtworkService similarArtworkService) {
+        this.similarArtworkService = similarArtworkService;
         this.galleryService = galleryService;
         this.arrangementService = arrangementService;
         this.artworkService = artworkService;
@@ -94,6 +99,12 @@ public class ArtworkController {
             @RequestParam(required = false) String altEn) {
         PhotoResponse created = photoService.upload(id, file, angle, altEs, altEn);
         return ResponseEntity.created(URI.create("/api/artworks/" + id + "/photos")).body(created);
+    }
+
+    @GetMapping("/{id}/similar")
+    @Operation(summary = "Similar artworks of the public gallery (AI service, or fixed rules if it is off or fails)")
+    public List<SimilarArtworkResponse> similar(@PathVariable Long id) {
+        return similarArtworkService.similar(id);
     }
 
     /** Base price suggested by the AI. Returns 503 while AI is disabled. */
