@@ -239,6 +239,10 @@ the artisan) and `ADMIN_APPROVAL` (the administrator's final decision).
 | Method | Path | Description |
 |---|---|---|
 
+Artwork rules (422): a price needs its currency; an exhibited artwork needs `saleMode`; `SALE` needs
+`price` > 0 and `stock`. The currency cannot change once the artwork has orders or auctions (409, enforced by
+the database).
+
 ### Artisan verification (administrators)
 | Method | Path | Description |
 |---|---|---|

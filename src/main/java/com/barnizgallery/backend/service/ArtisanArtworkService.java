@@ -2,7 +2,9 @@ package com.barnizgallery.backend.service;
 
 import java.time.Clock;
 import java.util.List;
+import java.util.Objects;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +14,8 @@ import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Store;
 import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.enums.ErrorCode;
+import com.barnizgallery.backend.exception.BusinessRuleException;
+import com.barnizgallery.backend.exception.DatabaseErrors;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.mapper.ArtworkMapper;
 import com.barnizgallery.backend.repository.ArtworkRepository;
@@ -50,14 +54,30 @@ public class ArtisanArtworkService {
         artwork.setStore(editorService.myStore());
         artwork.setStatus(ArtworkStatus.DRAFT);
         apply(request, artwork);
+        ArtworkSaleRules.validate(artwork);
         return ArtworkMapper.toSummary(artworkRepository.save(artwork));
     }
 
-    /** Replaces the data of an artwork; its status does not change. */
+    /**
+     * Replaces the data of an artwork; its status does not change. The database keeps the currency once the
+     * artwork has orders or auctions: that rejection is answered with 409.
+     */
     @Transactional
     public ArtworkSummaryResponse update(Long artworkId, ArtworkRequest request) {
         Artwork artwork = myArtwork(artworkId);
+        String currency = artwork.getCurrency();
         apply(request, artwork);
+        ArtworkSaleRules.validate(artwork);
+        if (!Objects.equals(currency, artwork.getCurrency())) {
+            try {
+                artworkRepository.saveAndFlush(artwork);
+            } catch (DataAccessException ex) {
+                if (DatabaseErrors.isRuleViolation(ex)) {
+                    throw new BusinessRuleException(ErrorCode.ARTWORK_CURRENCY_LOCKED, currency);
+                }
+                throw ex;
+            }
+        }
         return ArtworkMapper.toSummary(artwork);
     }
 
@@ -72,10 +92,11 @@ public class ArtisanArtworkService {
             return ArtworkMapper.toSummary(artwork);
         }
         ArtworkStatusRules.requireChange(artwork.getStatus(), status);
+        artwork.setStatus(status);
+        ArtworkSaleRules.validate(artwork);
         if (status == ArtworkStatus.EXHIBITED && artwork.getPublishedAt() == null) {
             artwork.setPublishedAt(clock.instant());
         }
-        artwork.setStatus(status);
         return ArtworkMapper.toSummary(artwork);
     }
 
