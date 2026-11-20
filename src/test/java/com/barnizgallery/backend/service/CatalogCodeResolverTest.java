@@ -51,6 +51,16 @@ class CatalogCodeResolverTest {
     }
 
     @Test
+    void deactivatedCodesAreRejectedLikeUnknownOnes() {
+        Color inactive = color("gris");
+        inactive.setActive(false);
+        when(colorRepository.findByCodeIn(anyCollection())).thenReturn(List.of(color("rojo"), inactive));
+
+        assertThatThrownBy(() -> resolver.colors(List.of("rojo", "gris")))
+                .hasMessage("unknown_color_codes [gris]");
+    }
+
+    @Test
     void emptyOrMissingCodesGiveAnEmptySetWithoutQueries() {
         assertThat(resolver.colors(null)).isEmpty();
         assertThat(resolver.colors(List.of())).isEmpty();
