@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.barnizgallery.backend.dto.OrderItemResponse;
 import com.barnizgallery.backend.dto.OrderResponse;
+import com.barnizgallery.backend.dto.OrderSummaryResponse;
 import com.barnizgallery.backend.dto.PaymentObligationResponse;
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Order;
@@ -24,6 +25,12 @@ public final class OrderMapper {
                 order.getShippingAddress(), order.getPaymentDueAt(), order.getPaidAt(), order.getCreatedAt(),
                 items.stream().map(OrderMapper::toResponse).toList(),
                 obligations.stream().map(OrderMapper::toResponse).toList());
+    }
+
+    public static OrderSummaryResponse toSummary(Order order) {
+        return new OrderSummaryResponse(order.getOrderId(), order.getOrderCode(), order.getOrderType(),
+                order.getStatus(), order.getTotal(), order.getCurrency(), order.getPaymentDueAt(), order.getPaidAt(),
+                order.getCreatedAt());
     }
 
     public static OrderItemResponse toResponse(OrderItem item) {
