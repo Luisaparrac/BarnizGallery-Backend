@@ -17,5 +17,6 @@ public record CartItemResponse(
         int quantity,
         BigDecimal lineTotal,
         Integer stock,
-        boolean available) {
+        boolean available,
+        String coverUrl) {
 }

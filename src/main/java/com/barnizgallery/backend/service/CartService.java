@@ -1,6 +1,9 @@
 package com.barnizgallery.backend.service;
 
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,11 +12,13 @@ import com.barnizgallery.backend.dto.CartResponse;
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Cart;
 import com.barnizgallery.backend.entity.CartItem;
+import com.barnizgallery.backend.entity.Photo;
 import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.exception.BusinessRuleException;
 import com.barnizgallery.backend.mapper.CartMapper;
 import com.barnizgallery.backend.repository.CartItemRepository;
 import com.barnizgallery.backend.repository.CartRepository;
+import com.barnizgallery.backend.repository.PhotoRepository;
 import com.barnizgallery.backend.repository.UserRepository;
 import com.barnizgallery.backend.security.CurrentUser;
 
@@ -28,9 +33,11 @@ public class CartService {
     private final CurrentUser currentUser;
     private final UserRepository userRepository;
     private final ArtworkService artworkService;
+    private final PhotoRepository photoRepository;
 
     public CartService(CartRepository cartRepository, CartItemRepository itemRepository, CurrentUser currentUser,
-            UserRepository userRepository, ArtworkService artworkService) {
+            UserRepository userRepository, ArtworkService artworkService, PhotoRepository photoRepository) {
+        this.photoRepository = photoRepository;
         this.userRepository = userRepository;
         this.artworkService = artworkService;
         this.cartRepository = cartRepository;
@@ -40,8 +47,15 @@ public class CartService {
 
     @Transactional(readOnly = true)
     public CartResponse view() {
-        return CartMapper.toResponse(items().stream()
-                .map(item -> CartMapper.toResponse(item, isAvailable(item)))
+        List<CartItem> items = items();
+        Map<Long, String> covers = new HashMap<>();
+        photoRepository.findByArtworkArtworkIdInOrderBySortOrderAscPhotoIdAsc(
+                items.stream().map(item -> item.getArtwork().getArtworkId()).toList()).stream()
+                .sorted(Comparator.comparing(Photo::isPrimary).reversed())
+                .forEach(photo -> covers.putIfAbsent(photo.getArtwork().getArtworkId(), photo.getFileUrl()));
+        return CartMapper.toResponse(items.stream()
+                .map(item -> CartMapper.toResponse(item, isAvailable(item),
+                        covers.get(item.getArtwork().getArtworkId())))
                 .toList());
     }
 

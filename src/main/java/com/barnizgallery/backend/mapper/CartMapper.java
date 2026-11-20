@@ -18,14 +18,14 @@ public final class CartMapper {
     private CartMapper() {
     }
 
-    public static CartItemResponse toResponse(CartItem item, boolean available) {
+    public static CartItemResponse toResponse(CartItem item, boolean available, String coverUrl) {
         Artwork artwork = item.getArtwork();
         BigDecimal price = artwork.getPrice();
         return new CartItemResponse(artwork.getArtworkId(), artwork.getStore().getStoreId(), artwork.getTitleEs(),
                 artwork.getTitleEs(),
                 artwork.getTitleEn(), price, artwork.getCurrency(), item.getQuantity(),
                 price == null ? null : price.multiply(BigDecimal.valueOf(item.getQuantity())), artwork.getStock(),
-                available);
+                available, coverUrl);
     }
 
     /** The cart with the subtotal of its available lines per currency. */
