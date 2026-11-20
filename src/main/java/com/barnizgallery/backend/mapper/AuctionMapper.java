@@ -19,12 +19,13 @@ public final class AuctionMapper {
      * @param highestBid highest bid amount, or null if there are no bids
      * @param bidCount   number of bids
      */
-    public static AuctionResponse toResponse(Auction auction, BigDecimal highestBid, long bidCount) {
+    public static AuctionResponse toResponse(Auction auction, BigDecimal highestBid, long bidCount, String coverUrl) {
         return new AuctionResponse(auction.getAuctionId(), auction.getArtwork().getArtworkId(),
                 auction.getArtwork().getTitleEs(), auction.getArtwork().getTitleEn(), auction.getBasePrice(),
                 auction.getCurrency(), auction.getStartDate(), auction.getEndDate(), auction.getStatus(), highestBid, bidCount,
                 auction.getAuctionId(), auction.getArtwork().getStore().getStoreId(),
-                auction.getArtwork().getStore().getNameEs(), null, auction.getReservePrice(), auction.getMinIncrement(),
+                auction.getArtwork().getStore().getNameEs(), coverUrl, auction.getReservePrice(),
+                auction.getMinIncrement(),
                 null, auction.getWinningBid() == null ? null : auction.getWinningBid().getBidId(),
                 auction.getOrder() == null ? null : auction.getOrder().getOrderId());
     }

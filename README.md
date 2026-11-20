@@ -180,7 +180,7 @@ Dates are ISO-8601 (UTC). Enum values are in English (`EXHIBITED`, `ACTIVE`, `PE
 ### Auctions and bids
 | Method | Path | Description |
 |---|---|---|
-| | | Auctions also carry `id`, `storeId`, `storeName`, `reservePrice`, `minIncrement`, `winningBidId` and `orderId`; bids carry `id`, `reviewStatus`, `reviewReason`, and the bidder name is masked ("A*** C.") |
+| | | Auctions (filter `?status=SCHEDULED|ACTIVE|FINISHED|CANCELLED`) also carry `id`, `coverUrl` (primary photo), `storeId`, `storeName`, `reservePrice`, `minIncrement`, `winningBidId` and `orderId`; bids carry `id`, `reviewStatus`, `reviewReason`, and the bidder name is masked ("A*** C.") |
 | GET | `/api/auctions?status=` | List with highest bid and bid count |
 | GET | `/api/auctions/{id}` | Detail |
 | POST | `/api/auctions` | `{ artworkId, basePrice?, startDate, endDate }` (Builder) |
@@ -201,6 +201,10 @@ The v1 contact messages were migrated by the database to conversations and messa
 `/api/contact-messages` endpoints were removed; the conversation endpoints replace them.
 
 ### Catalogs
+`GET /api/settings/public` (public) returns only harmless settings: `currency.default`, `languages.available`,
+`auction.min_increment`, `cart.reservation_minutes`, `shipping.fixed_amount` (and `shipping.fixed_amount.<CURRENCY>`),
+null when not configured; nothing about gateways, AI or commissions.
+
 `GET /api/catalogs` (public) returns the active colors, shapes, motifs, styles, budget ranges, avatars and
 store templates, each with its `code` and its names in Spanish and English. Requests always use these
 **codes** (for example `colorCodes: ["rojo"]`, `shapeCode`, `styleCode`), never database ids.
