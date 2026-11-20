@@ -11,9 +11,10 @@ import com.barnizgallery.backend.exception.FeatureDisabledException;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.patterns.adapter.PaymentGateway;
 import com.barnizgallery.backend.patterns.adapter.SimulatedGateway;
+import com.barnizgallery.backend.patterns.decorator.LoggingPaymentGateway;
 
 /**
- * Chooses the payment gateway. A real payment uses the gateway of the obligation currency (COP → Wompi,
+ * Chooses the payment gateway. Every gateway is handed out wrapped in a {@link LoggingPaymentGateway} (Decorator). A real payment uses the gateway of the obligation currency (COP → Wompi,
  * USD → PayPal); the simulated gateway is asked for by code, for demos. Webhooks find their gateway by code.
  */
 @Component
@@ -22,7 +23,7 @@ public class PaymentGatewayRegistry {
     private final List<PaymentGateway> gateways;
 
     public PaymentGatewayRegistry(List<PaymentGateway> gateways) {
-        this.gateways = List.copyOf(gateways);
+        this.gateways = gateways.stream().<PaymentGateway>map(LoggingPaymentGateway::new).toList();
     }
 
     /**
