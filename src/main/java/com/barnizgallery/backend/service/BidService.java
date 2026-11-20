@@ -12,7 +12,6 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.barnizgallery.backend.config.AuctionProperties;
 import com.barnizgallery.backend.dto.AnomalyAlert;
 import com.barnizgallery.backend.dto.BidRequest;
 import com.barnizgallery.backend.dto.BidResponse;
@@ -45,19 +44,19 @@ public class BidService {
     private final AiFacade aiFacade;
     private final AuctionEventPublisher eventPublisher;
     private final SimpMessageSendingOperations messaging;
-    private final AuctionProperties auctionProperties;
+    private final AppSettingsService settings;
     private final Clock clock;
 
     public BidService(BidRepository bidRepository, AuctionService auctionService, UserService userService,
             AiFacade aiFacade, AuctionEventPublisher eventPublisher, SimpMessageSendingOperations messaging,
-            AuctionProperties auctionProperties, Clock clock) {
+            AppSettingsService settings, Clock clock) {
         this.bidRepository = bidRepository;
         this.auctionService = auctionService;
         this.userService = userService;
         this.aiFacade = aiFacade;
         this.eventPublisher = eventPublisher;
         this.messaging = messaging;
-        this.auctionProperties = auctionProperties;
+        this.settings = settings;
         this.clock = clock;
     }
 
@@ -92,7 +91,7 @@ public class BidService {
                 .orElse(null);
         BigDecimal reference = currentTop == null ? auction.getBasePrice()
                 : currentTop.getAmount().max(auction.getBasePrice());
-        BigDecimal minimum = reference.add(auctionProperties.minIncrement());
+        BigDecimal minimum = reference.add(settings.decimal(AppSettingsService.AUCTION_MIN_INCREMENT));
         if (request.amount().compareTo(minimum) < 0) {
             throw BusinessRuleException.unprocessable(ErrorCode.BID_TOO_LOW, minimum, currency);
         }
@@ -100,7 +99,7 @@ public class BidService {
         BidAssessment assessment = aiFacade.assessBid(auction, request.amount(), user.getUserId());
         if (assessment.verdict() == BidVerdict.REJECTED) {
             throw BusinessRuleException.tooManyRequests(ErrorCode.BID_RATE_LIMITED,
-                    auctionProperties.maxBidsPerMinute());
+                    settings.integer(AppSettingsService.AUCTION_MAX_BIDS_PER_MINUTE));
         }
 
         Bid bid = new Bid();

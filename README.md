@@ -91,7 +91,6 @@ Requirements: Java 21 and a local PostgreSQL 18.
 | `FLYWAY_ENABLED` | Run the Flyway migrations on start (baseline 1 on an existing v1 database, then V2) | `true` |
 | `PORT` | HTTP port (set by Render) | `8080` |
 | `CORS_ALLOWED_ORIGINS` | Comma-separated frontend origins (REST and WebSocket) | `http://localhost:5173,http://localhost:3000` |
-| `AUCTION_CURRENCY` | Currency of new auctions | `USD` |
 | `AUCTION_SCHEDULER_ENABLED` | Run the 60-second auction scheduler | `true` |
 | `AI_PROVIDER` | AI provider (not chosen yet; `none` disables AI) | `none` |
 | `AI_SERVICE_URL` | Base URL of the MUSEO AI service, without a trailing `/` (empty disables it) | – |
@@ -154,11 +153,12 @@ Dates are ISO-8601 (UTC). Enum values are in English (`EXHIBITED`, `ACTIVE`, `PE
 | GET | `/api/auctions/{id}/bids` | Bids, highest first |
 | POST | `/api/auctions/{id}/bids` | `{ userId, amount, currency }` |
 
-Bid rules: only in `ACTIVE` auctions; `currency` must equal the auction currency (new auctions use
-`AUCTION_CURRENCY`; historical auctions have none yet and answer 409); `amount` must be at least
-max(highest bid, base price) + `app.auction.min-increment` (422 otherwise); more than 5 bids per minute
-from the same visitor → 429; an amount above 10 × the reference is accepted but reported to
-`/topic/admin/anomalies`.
+Bid rules: only in `ACTIVE` auctions; `currency` must equal the auction currency (new auctions use the
+`currency.default` setting; historical auctions have none yet and answer 409); `amount` must be at least
+max(highest bid, base price) + `auction.min_increment` (422 otherwise); more than `auction.max_bids_per_minute`
+bids per minute from the same user → 429; an amount above `auction.suspicious_multiplier` × the reference is
+accepted but reported to `/topic/admin/anomalies`. These values live in the `app_settings` table; while one of
+them is `null` the operation answers 409 `setting_not_configured` naming it.
 
 ### Contact
 The v1 contact messages were migrated by the database to conversations and messages. The old

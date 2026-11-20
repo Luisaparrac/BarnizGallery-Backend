@@ -7,7 +7,6 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.barnizgallery.backend.config.AuctionProperties;
 import com.barnizgallery.backend.dto.AuctionResponse;
 import com.barnizgallery.backend.dto.CreateAuctionRequest;
 import com.barnizgallery.backend.entity.Artwork;
@@ -42,19 +41,19 @@ public class AuctionService {
     private final AiFacade aiFacade;
     private final AuctionResponseAssembler assembler;
     private final AuctionEventPublisher eventPublisher;
-    private final AuctionProperties auctionProperties;
+    private final AppSettingsService settings;
     private final Clock clock;
 
     public AuctionService(AuctionRepository auctionRepository, BidRepository bidRepository,
             ArtworkService artworkService, AiFacade aiFacade, AuctionResponseAssembler assembler,
-            AuctionEventPublisher eventPublisher, AuctionProperties auctionProperties, Clock clock) {
+            AuctionEventPublisher eventPublisher, AppSettingsService settings, Clock clock) {
         this.auctionRepository = auctionRepository;
         this.bidRepository = bidRepository;
         this.artworkService = artworkService;
         this.aiFacade = aiFacade;
         this.assembler = assembler;
         this.eventPublisher = eventPublisher;
-        this.auctionProperties = auctionProperties;
+        this.settings = settings;
         this.clock = clock;
     }
 
@@ -72,7 +71,7 @@ public class AuctionService {
     }
 
     /**
-     * Creates an auction with the Builder, in the configured auction currency. If it starts now, the artwork
+     * Creates an auction with the Builder, in the default currency of {@code app_settings}. If it starts now, the artwork
      * goes to "in auction".
      */
     @Transactional
@@ -80,7 +79,7 @@ public class AuctionService {
         Artwork artwork = artworkService.getArtwork(request.artworkId());
         AuctionBuilder builder = new AuctionBuilder(auctionRepository, clock)
                 .forArtwork(artwork)
-                .currency(auctionProperties.currency())
+                .currency(settings.text(AppSettingsService.CURRENCY_DEFAULT))
                 .startsAt(request.startDate())
                 .endsAt(request.endDate());
         if (request.basePrice() != null) {

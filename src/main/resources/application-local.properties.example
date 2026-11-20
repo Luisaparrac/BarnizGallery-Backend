@@ -7,4 +7,4 @@ spring.datasource.username=<USERNAME>
 spring.datasource.password=<PASSWORD>
 
 # The auction scheduler updates auction statuses every 60 s. Keep it off while testing migrated data.
-app.auction.scheduler-enabled=false
+app.scheduler.auctions-enabled=false

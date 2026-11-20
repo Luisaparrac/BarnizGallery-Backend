@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.barnizgallery.backend.config.AuctionProperties;
 import com.barnizgallery.backend.dto.SuggestedPriceResponse;
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.enums.ErrorCode;
@@ -20,12 +19,12 @@ public class PricingService {
 
     private final AiFacade aiFacade;
     private final ArtworkService artworkService;
-    private final AuctionProperties auctionProperties;
+    private final AppSettingsService settings;
 
-    public PricingService(AiFacade aiFacade, ArtworkService artworkService, AuctionProperties auctionProperties) {
+    public PricingService(AiFacade aiFacade, ArtworkService artworkService, AppSettingsService settings) {
         this.aiFacade = aiFacade;
         this.artworkService = artworkService;
-        this.auctionProperties = auctionProperties;
+        this.settings = settings;
     }
 
     /** Suggested base price; 503 when AI is disabled or cannot give a price. */
@@ -37,6 +36,6 @@ public class PricingService {
         }
         BigDecimal price = aiFacade.suggestBasePrice(artwork)
                 .orElseThrow(() -> new FeatureDisabledException(ErrorCode.PRICE_SUGGESTION_UNAVAILABLE));
-        return new SuggestedPriceResponse(artworkId, price, auctionProperties.currency());
+        return new SuggestedPriceResponse(artworkId, price, settings.text(AppSettingsService.CURRENCY_DEFAULT));
     }
 }

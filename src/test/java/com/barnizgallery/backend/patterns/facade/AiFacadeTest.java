@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import com.barnizgallery.backend.TestEntities;
-import com.barnizgallery.backend.config.AuctionProperties;
+import com.barnizgallery.backend.TestSettings;
 import com.barnizgallery.backend.dto.AiPriceSuggestion;
 import com.barnizgallery.backend.dto.AiPricingRequest;
 import com.barnizgallery.backend.entity.Artwork;
@@ -33,6 +33,7 @@ import com.barnizgallery.backend.patterns.adapter.DisabledAiServiceGateway;
 import com.barnizgallery.backend.patterns.strategy.RecommendationStrategyResolver;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.BidRepository;
+import com.barnizgallery.backend.service.AppSettingsService;
 
 class AiFacadeTest {
 
@@ -40,8 +41,7 @@ class AiFacadeTest {
     private final ArtworkRepository artworkRepository = mock(ArtworkRepository.class);
     private final AiServiceGateway aiService = mock(AiServiceGateway.class);
     private final RecommendationStrategyResolver resolver = mock(RecommendationStrategyResolver.class);
-    private final AuctionProperties properties = new AuctionProperties("USD", BigDecimal.ONE, 5, BigDecimal.TEN,
-            false);
+    private final AppSettingsService properties = TestSettings.auctionRules();
 
     private final Artwork artwork = TestEntities.artwork(3, TestEntities.store(1, TestEntities.master(1)),
             ArtworkStatus.IN_AUCTION);

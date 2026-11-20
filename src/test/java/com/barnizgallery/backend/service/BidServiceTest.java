@@ -23,7 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 
 import com.barnizgallery.backend.TestEntities;
-import com.barnizgallery.backend.config.AuctionProperties;
+import com.barnizgallery.backend.TestSettings;
 import com.barnizgallery.backend.dto.AnomalyAlert;
 import com.barnizgallery.backend.dto.BidRequest;
 import com.barnizgallery.backend.dto.BidResponse;
@@ -54,8 +54,7 @@ class BidServiceTest {
     private final AiFacade aiFacade = mock(AiFacade.class);
     private final AuctionEventPublisher publisher = mock(AuctionEventPublisher.class);
     private final SimpMessageSendingOperations messaging = mock(SimpMessageSendingOperations.class);
-    private final AuctionProperties properties = new AuctionProperties("USD", BigDecimal.ONE, 5, BigDecimal.TEN,
-            false);
+    private final AppSettingsService properties = TestSettings.auctionRules();
 
     private BidService bidService;
     private Auction auction;

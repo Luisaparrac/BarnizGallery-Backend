@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 /**
  * Every 60 seconds, starts the scheduled auctions whose start date has arrived and
  * finishes the active ones whose end date has passed. Disabled with
- * {@code app.auction.scheduler-enabled=false}.
+ * {@code app.scheduler.auctions-enabled=false}.
  */
 @Component
-@ConditionalOnProperty(name = "app.auction.scheduler-enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(name = "app.scheduler.auctions-enabled", havingValue = "true", matchIfMissing = true)
 public class AuctionScheduler {
 
     private static final Logger log = LoggerFactory.getLogger(AuctionScheduler.class);
