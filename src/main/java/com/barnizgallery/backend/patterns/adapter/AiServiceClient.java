@@ -11,6 +11,8 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
+import com.barnizgallery.backend.dto.AiBidAssessRequest;
+import com.barnizgallery.backend.dto.AiBidAssessment;
 import com.barnizgallery.backend.dto.AiDesignRequest;
 import com.barnizgallery.backend.dto.AiDesignResponse;
 import com.barnizgallery.backend.dto.AiError;
@@ -80,6 +82,11 @@ public class AiServiceClient implements AiServiceGateway {
     @Override
     public AiDesignResponse generateDesigns(AiDesignRequest request) {
         return post(designClient, "/v1/designs", request, AiDesignResponse.class);
+    }
+
+    @Override
+    public AiBidAssessment assessBid(AiBidAssessRequest request) {
+        return post("/v1/bids/assess", request, AiBidAssessment.class);
     }
 
     private <T> T post(String path, Object body, Class<T> type) {

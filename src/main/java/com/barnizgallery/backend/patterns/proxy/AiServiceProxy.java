@@ -10,6 +10,8 @@ import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.barnizgallery.backend.dto.AiBidAssessRequest;
+import com.barnizgallery.backend.dto.AiBidAssessment;
 import com.barnizgallery.backend.dto.AiDesignRequest;
 import com.barnizgallery.backend.dto.AiDesignResponse;
 import com.barnizgallery.backend.dto.AiPriceSuggestion;
@@ -75,12 +77,22 @@ public class AiServiceProxy implements AiServiceGateway {
     /** Images cost money: never answered from the cache, but the cool-down still protects the service. */
     @Override
     public AiDesignResponse generateDesigns(AiDesignRequest request) {
+        return (AiDesignResponse) uncached(() -> realGateway.generateDesigns(request));
+    }
+
+    /** Every bid is different: not cached, but it goes through the cool-down. */
+    @Override
+    public AiBidAssessment assessBid(AiBidAssessRequest request) {
+        return (AiBidAssessment) uncached(() -> realGateway.assessBid(request));
+    }
+
+    private Object uncached(Supplier<Object> realCall) {
         Instant now = clock.instant();
         if (closedUntil.isAfter(now)) {
             throw new AiServiceException(503, "service_cooling_down", "The AI service failed recently");
         }
         try {
-            return realGateway.generateDesigns(request);
+            return realCall.get();
         } catch (AiServiceException ex) {
             if (ex.getStatus() >= 500) {
                 closedUntil = now.plus(coolDown);

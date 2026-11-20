@@ -18,6 +18,7 @@ import com.barnizgallery.backend.dto.BidResponse;
 import com.barnizgallery.backend.entity.Auction;
 import com.barnizgallery.backend.entity.Bid;
 import com.barnizgallery.backend.entity.User;
+import com.barnizgallery.backend.enums.BidReviewStatus;
 import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.exception.BusinessRuleException;
 import com.barnizgallery.backend.mapper.AuctionMapper;
@@ -45,11 +46,12 @@ public class BidService {
     private final AuctionEventPublisher eventPublisher;
     private final SimpMessageSendingOperations messaging;
     private final AppSettingsService settings;
+    private final BidRiskAssessor riskAssessor;
     private final Clock clock;
 
     public BidService(BidRepository bidRepository, AuctionService auctionService, UserService userService,
             AiFacade aiFacade, AuctionEventPublisher eventPublisher, SimpMessageSendingOperations messaging,
-            AppSettingsService settings, Clock clock) {
+            AppSettingsService settings, BidRiskAssessor riskAssessor, Clock clock) {
         this.bidRepository = bidRepository;
         this.auctionService = auctionService;
         this.userService = userService;
@@ -57,6 +59,7 @@ public class BidService {
         this.eventPublisher = eventPublisher;
         this.messaging = messaging;
         this.settings = settings;
+        this.riskAssessor = riskAssessor;
         this.clock = clock;
     }
 
@@ -69,7 +72,8 @@ public class BidService {
      * amount must beat
      * max(highest bid, base price) by at least the minimum increment (HTTP 422);</li>
      * <li>the AI Facade reviews it: flooding is rejected (HTTP 429), huge amounts are accepted
-     * but reported to {@code /topic/admin/anomalies};</li>
+     * but reported to {@code /topic/admin/anomalies}; a bid that passes the rules is also assessed by the AI
+     * service, which can only mark it as suspicious (stored in {@code review_status} and {@code review_reason});</li>
      * <li>after saving, a BID_PLACED event is published to the observers.</li>
      * </ol>
      */
@@ -101,6 +105,9 @@ public class BidService {
             throw BusinessRuleException.tooManyRequests(ErrorCode.BID_RATE_LIMITED,
                     settings.integer(AppSettingsService.AUCTION_MAX_BIDS_PER_MINUTE));
         }
+        if (assessment.verdict() == BidVerdict.OK) {
+            assessment = riskAssessor.assess(auction, request.amount(), user, minimum.subtract(reference));
+        }
 
         Bid bid = new Bid();
         bid.setAuction(auction);
@@ -108,6 +115,10 @@ public class BidService {
         bid.setAmount(request.amount());
         bid.setCurrency(currency);
         bid.setBidDate(LocalDateTime.now(clock));
+        if (assessment.verdict() == BidVerdict.SUSPICIOUS) {
+            bid.setReviewStatus(BidReviewStatus.SUSPICIOUS);
+            bid.setReviewReason(assessment.reason());
+        }
         BidResponse saved = AuctionMapper.toResponse(bidRepository.save(bid));
 
         if (assessment.verdict() == BidVerdict.SUSPICIOUS) {

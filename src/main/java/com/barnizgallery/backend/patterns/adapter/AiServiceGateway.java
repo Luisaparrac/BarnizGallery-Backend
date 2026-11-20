@@ -1,5 +1,7 @@
 package com.barnizgallery.backend.patterns.adapter;
 
+import com.barnizgallery.backend.dto.AiBidAssessRequest;
+import com.barnizgallery.backend.dto.AiBidAssessment;
 import com.barnizgallery.backend.dto.AiDesignRequest;
 import com.barnizgallery.backend.dto.AiDesignResponse;
 import com.barnizgallery.backend.dto.AiPriceSuggestion;
@@ -39,4 +41,7 @@ public interface AiServiceGateway {
      * retried. Fails with {@code content_rejected} or {@code budget_exceeded}.
      */
     AiDesignResponse generateDesigns(AiDesignRequest request);
+
+    /** {@code POST /v1/bids/assess}: OK or SUSPICIOUS for a bid that is about to be saved. Never rejects it. */
+    AiBidAssessment assessBid(AiBidAssessRequest request);
 }

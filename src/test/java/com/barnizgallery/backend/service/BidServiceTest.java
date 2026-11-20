@@ -33,6 +33,7 @@ import com.barnizgallery.backend.entity.Bid;
 import com.barnizgallery.backend.entity.User;
 import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.enums.AuctionStatus;
+import com.barnizgallery.backend.enums.BidReviewStatus;
 import com.barnizgallery.backend.enums.Language;
 import com.barnizgallery.backend.exception.BusinessRuleException;
 import com.barnizgallery.backend.patterns.facade.AiFacade;
@@ -55,6 +56,7 @@ class BidServiceTest {
     private final AuctionEventPublisher publisher = mock(AuctionEventPublisher.class);
     private final SimpMessageSendingOperations messaging = mock(SimpMessageSendingOperations.class);
     private final AppSettingsService properties = TestSettings.auctionRules();
+    private final BidRiskAssessor riskAssessor = mock(BidRiskAssessor.class);
 
     private BidService bidService;
     private Auction auction;
@@ -63,7 +65,8 @@ class BidServiceTest {
     @BeforeEach
     void setUp() {
         bidService = new BidService(bidRepository, auctionService, userService, aiFacade, publisher, messaging,
-                properties, Clock.fixed(NOW.atZone(ZONE).toInstant(), ZONE));
+                properties, riskAssessor, Clock.fixed(NOW.atZone(ZONE).toInstant(), ZONE));
+        when(riskAssessor.assess(any(), any(), any(), any())).thenReturn(BidAssessment.ok());
         givenAuction(AuctionStatus.ACTIVE);
         when(userService.getUser(3L)).thenReturn(user);
         when(aiFacade.assessBid(any(), any(), eq(3L))).thenReturn(BidAssessment.ok());
@@ -164,6 +167,18 @@ class BidServiceTest {
 
         verify(bidRepository).save(any(Bid.class));
         verify(messaging).convertAndSend(eq(BidService.ANOMALIES_TOPIC), any(AnomalyAlert.class));
+    }
+
+    @Test
+    void aBidTheAiServiceFindsSuspiciousIsSavedWithTheMark() {
+        when(riskAssessor.assess(any(), any(), any(), any())).thenReturn(BidAssessment.suspicious("AI: salto"));
+
+        bidService.placeBid(1L, bid("500", "USD"));
+
+        ArgumentCaptor<Bid> saved = ArgumentCaptor.forClass(Bid.class);
+        verify(bidRepository).save(saved.capture());
+        assertThat(saved.getValue().getReviewStatus()).isEqualTo(BidReviewStatus.SUSPICIOUS);
+        assertThat(saved.getValue().getReviewReason()).isEqualTo("AI: salto");
     }
 
     @Test
