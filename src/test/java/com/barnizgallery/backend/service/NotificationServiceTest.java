@@ -64,7 +64,8 @@ class NotificationServiceTest {
     @Test
     void pusherSendsToTheUserTopic() {
         SimpMessageSendingOperations messaging = mock(SimpMessageSendingOperations.class);
-        NotificationResponse notification = new NotificationResponse(5L, "welcome", "t", "b", null, null, null, NOW);
+        NotificationResponse notification = new NotificationResponse(5L, "SYSTEM", "t", "b", null, null, null, NOW, 5L,
+                "welcome");
 
         new NotificationPusher(messaging).push(new NotificationCreated(7L, notification));
 

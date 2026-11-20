@@ -16,5 +16,7 @@ public record NotificationResponse(
         String link,
         @JsonRawValue String payload,
         Instant readAt,
-        Instant createdAt) {
+        Instant createdAt,
+        Long id,
+        String code) {
 }

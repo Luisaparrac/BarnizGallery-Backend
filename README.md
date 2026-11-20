@@ -358,6 +358,7 @@ the database).
 
 ### Notifications (logged-in user)
 | GET | `/api/notifications/unread-count` | `{ count }` of unread notifications |
+| | | Every notification carries `id`, `type` as the frontend names it (`PAYMENT_APPROVED`, `PAYMENT_REJECTED`, `NEW_ORDER`, `ORDER_SHIPPED`, `NEW_MESSAGE`, `VERIFICATION_APPROVED`, `VERIFICATION_REJECTED`, `OUTBID`, … or `SYSTEM`) and the stored type in `code` |
 | Method | Path | Description |
 |---|---|---|
 | GET | `/api/notifications?unreadOnly=false` | Latest 100 notifications, newest first, in the user's language |
