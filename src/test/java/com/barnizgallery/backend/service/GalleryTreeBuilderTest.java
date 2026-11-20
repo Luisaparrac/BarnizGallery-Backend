@@ -10,12 +10,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
 
 import com.barnizgallery.backend.TestEntities;
 import com.barnizgallery.backend.dto.GalleryNodeResponse;
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Store;
 import com.barnizgallery.backend.enums.ArtworkStatus;
+import com.barnizgallery.backend.enums.MasterVerificationStatus;
+import com.barnizgallery.backend.enums.StoreStatus;
 import com.barnizgallery.backend.patterns.composite.GalleryComposite;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.PhotoRepository;
@@ -39,9 +42,10 @@ class GalleryTreeBuilderTest {
         Store store2 = TestEntities.store(2, TestEntities.master(2));
         Artwork a1 = TestEntities.artwork(10, store1, ArtworkStatus.EXHIBITED);
         Artwork a2 = TestEntities.artwork(11, store1, ArtworkStatus.IN_AUCTION);
-        Artwork a3 = TestEntities.artwork(12, store2, ArtworkStatus.SOLD);
-        when(storeRepository.findAllWithMaster()).thenReturn(List.of(store1, store2));
-        when(artworkRepository.findAllByOrderByArtworkIdAsc()).thenReturn(List.of(a1, a2, a3));
+        Artwork a3 = TestEntities.artwork(12, store2, ArtworkStatus.EXHIBITED);
+        when(storeRepository.findByStatusWithMaster(StoreStatus.PUBLISHED,
+                MasterVerificationStatus.APPROVED)).thenReturn(List.of(store1, store2));
+        when(artworkRepository.findByDeletedAtIsNullAndStatusInOrderByArtworkIdAsc(ArtworkStatus.PUBLIC, Pageable.unpaged())).thenReturn(List.of(a1, a2, a3));
         when(photoRepository.findFirstPhotoOfEachArtwork()).thenReturn(List.of(TestEntities.photo(1, a2, "a2.jpg")));
 
         GalleryComposite gallery = builder.build();
@@ -58,8 +62,9 @@ class GalleryTreeBuilderTest {
 
     @Test
     void emptyDatabaseGivesEmptyGallery() {
-        when(storeRepository.findAllWithMaster()).thenReturn(List.of());
-        when(artworkRepository.findAllByOrderByArtworkIdAsc()).thenReturn(List.of());
+        when(storeRepository.findByStatusWithMaster(StoreStatus.PUBLISHED,
+                MasterVerificationStatus.APPROVED)).thenReturn(List.of());
+        when(artworkRepository.findByDeletedAtIsNullAndStatusInOrderByArtworkIdAsc(ArtworkStatus.PUBLIC, Pageable.unpaged())).thenReturn(List.of());
         when(photoRepository.findFirstPhotoOfEachArtwork()).thenReturn(List.of());
 
         GalleryNodeResponse root = builder.build().toNode();

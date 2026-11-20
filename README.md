@@ -112,7 +112,7 @@ Dates are ISO-8601 (UTC). Enum values are in English (`EXHIBITED`, `ACTIVE`, `PE
 ### Catalog
 | Method | Path | Description |
 |---|---|---|
-| GET | `/api/gallery` | Full tree Gallery → Stores → Artworks (Composite) |
+| GET | `/api/gallery` | Full tree Gallery → Stores → Artworks (Composite): published stores of approved masters and their exhibited or auctioned artworks |
 | GET | `/api/masters` | Masters |
 | GET | `/api/masters/{id}` | Master + its store |
 | POST / PUT | `/api/masters`, `/api/masters/{id}` | Create / update master |
