@@ -20,6 +20,11 @@ import com.barnizgallery.backend.mapper.AddressMapper;
 import com.barnizgallery.backend.mapper.OrderMapper;
 import com.barnizgallery.backend.patterns.builder.BuiltOrder;
 import com.barnizgallery.backend.patterns.builder.OrderBuilder;
+import com.barnizgallery.backend.patterns.chain.CartNotEmptyCheck;
+import com.barnizgallery.backend.patterns.chain.CheckoutCheck;
+import com.barnizgallery.backend.patterns.chain.ForSaleCheck;
+import com.barnizgallery.backend.patterns.chain.SingleCurrencyCheck;
+import com.barnizgallery.backend.patterns.chain.StockCheck;
 import com.barnizgallery.backend.repository.CartItemRepository;
 import com.barnizgallery.backend.repository.OrderItemRepository;
 import com.barnizgallery.backend.repository.OrderRepository;
@@ -40,6 +45,7 @@ import tools.jackson.databind.json.JsonMapper;
 public class CheckoutService {
 
     private static final JsonMapper JSON = JsonMapper.builder().build();
+    private static final CheckoutCheck CHECKS = checks();
 
     private final CartService cartService;
     private final AddressService addressService;
@@ -109,21 +115,17 @@ public class CheckoutService {
         }
     }
 
-    /** 409 when the cart is empty, a line cannot be bought or the lines mix currencies. */
+    /** 409 when the cart is empty, a line cannot be bought or the lines mix currencies (Chain of Responsibility). */
     private static String requireSingleCurrency(List<CartItem> lines) {
-        if (lines.isEmpty()) {
-            throw new BusinessRuleException(ErrorCode.CART_EMPTY);
-        }
-        for (CartItem line : lines) {
-            PurchaseRules.requirePurchasable(line.getArtwork());
-            if (line.getQuantity() > line.getArtwork().getStock()) {
-                throw new BusinessRuleException(ErrorCode.NOT_ENOUGH_STOCK, line.getArtwork().getStock());
-            }
-        }
-        List<String> currencies = lines.stream().map(line -> line.getArtwork().getCurrency()).distinct().toList();
-        if (currencies.size() > 1) {
-            throw new BusinessRuleException(ErrorCode.CART_MIXED_CURRENCIES, String.join(", ", currencies));
-        }
-        return currencies.get(0);
+        CHECKS.handle(lines);
+        return lines.get(0).getArtwork().getCurrency();
+    }
+
+    private static CheckoutCheck checks() {
+        CheckoutCheck first = new CartNotEmptyCheck();
+        first.then(new ForSaleCheck(PurchaseRules::isPurchasable))
+                .then(new StockCheck())
+                .then(new SingleCurrencyCheck());
+        return first;
     }
 }
