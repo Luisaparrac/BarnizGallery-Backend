@@ -48,6 +48,7 @@ class RecommendationServiceTest {
     void computeReplacesPreviousRecommendations() {
         User user = TestEntities.user(1, Language.ES);
         when(userService.getUser(1L)).thenReturn(user);
+        when(aiFacade.strategyName("profile")).thenReturn("profile");
         when(aiFacade.recommendStores(user, "profile")).thenReturn(List.of(
                 RecommendationResult.of(2L, 80, "reason 2"), RecommendationResult.of(1L, 40, "reason 1")));
         when(storeRepository.findAllById(List.of(2L, 1L))).thenReturn(List.of(
@@ -58,6 +59,7 @@ class RecommendationServiceTest {
 
         assertThat(saved).extracting(RecommendationResponse::storeId).containsExactly(2L, 1L);
         assertThat(saved.get(0).storeNameEn()).isEqualTo("Store 2");
+        assertThat(saved.get(0).strategy()).isEqualTo("profile");
         InOrder order = inOrder(recommendationRepository);
         order.verify(recommendationRepository).deleteStoresByUserId(1L);
         order.verify(recommendationRepository).saveAll(anyList());

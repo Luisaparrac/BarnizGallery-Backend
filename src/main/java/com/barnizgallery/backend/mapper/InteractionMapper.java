@@ -27,6 +27,7 @@ public final class InteractionMapper {
         return new RecommendationResponse(recommendation.getRecommendationId(),
                 recommendation.getUser().getUserId(), artworkId, store == null ? null : store.getStoreId(),
                 store == null ? null : store.getNameEs(), store == null ? null : store.getNameEn(),
-                recommendation.getScore(), recommendation.getReason(), recommendation.getRecommendationDate());
+                recommendation.getScore(), recommendation.getReason(), recommendation.getStrategy(),
+                recommendation.getRecommendationDate());
     }
 }

@@ -70,6 +70,7 @@ public class RecommendationService {
         Map<Long, Artwork> artworkMap = artworks ? artworkRepository.findAllById(ids).stream()
                 .collect(Collectors.toMap(Artwork::getArtworkId, Function.identity())) : Map.of();
 
+        String strategy = aiFacade.strategyName(strategyName);
         LocalDateTime now = LocalDateTime.now();
         List<Recommendation> saved = new ArrayList<>();
         for (RecommendationResult result : results) {
@@ -83,6 +84,7 @@ public class RecommendationService {
             if (recommendation.getArtwork() == null && recommendation.getStore() == null) {
                 continue;
             }
+            recommendation.setStrategy(strategy);
             recommendation.setScore(result.score());
             recommendation.setReason(result.reason());
             recommendation.setRecommendationDate(now);

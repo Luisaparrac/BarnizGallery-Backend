@@ -85,6 +85,11 @@ public class AiFacade {
         return strategyResolver.resolve(strategyName).recommend(user);
     }
 
+    /** The name of the strategy that a request uses ({@code null} or blank means the default one). */
+    public String strategyName(String requested) {
+        return strategyResolver.resolve(requested).name();
+    }
+
     /** Recommends available artworks with the strategy chosen by name (Strategy pattern). */
     public List<RecommendationResult> recommendArtworks(User user, String strategyName) {
         return strategyResolver.resolve(strategyName).recommendArtworks(user);

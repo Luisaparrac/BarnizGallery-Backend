@@ -15,5 +15,6 @@ public record RecommendationResponse(
         String storeNameEn,
         BigDecimal score,
         String reason,
+        String strategy,
         LocalDateTime recommendationDate) {
 }
