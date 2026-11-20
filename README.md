@@ -88,6 +88,7 @@ Requirements: Java 21 and a local PostgreSQL 18.
 | `WOMPI_BASE_URL` | Wompi Web Checkout URL | `https://checkout.wompi.co/p/` |
 | `PAYPAL_CLIENT_ID` / `PAYPAL_CLIENT_SECRET` / `PAYPAL_WEBHOOK_ID` | PayPal REST app and webhook for USD payments (empty = PayPal disabled) | – |
 | `PAYPAL_BASE_URL` | PayPal REST API base URL | `https://api-m.sandbox.paypal.com` |
+| `TRUSTED_PROXY_HOPS` | Proxies in front of the app that append to `X-Forwarded-For` (set `1` on Render); used to find the real client IP for the login limit | `0` |
 | `FLYWAY_ENABLED` | Run the Flyway migrations on start (baseline 1 on an existing v1 database, then V2) | `true` |
 | `PORT` | HTTP port (set by Render) | `8080` |
 | `CORS_ALLOWED_ORIGINS` | Comma-separated frontend origins (REST and WebSocket) | `http://localhost:5173,http://localhost:3000` |
@@ -260,6 +261,23 @@ reconnect (for example with `@stomp/stompjs` `reconnectDelay`) and re-subscribe.
    (the same region as the database, required for the internal URL).
 2. Set the environment variables above (use the **internal** database URL, without `sslmode`).
 3. Health check path: `/api/health`.
+4. Set `TRUSTED_PROXY_HOPS=1`: Render's proxy appends the client address to `X-Forwarded-For`, and only that
+   entry is trusted for the login attempt limit (earlier entries can be forged by the client). Check it on the
+   first deploy.
+
+### First administrator
+
+The backend never creates administrators and **no migration may contain a password or a password hash**.
+To create the first one:
+
+1. The person signs up through the API like any customer (`POST /api/auth/register`). Their password only
+   exists as the BCrypt hash the backend stores.
+2. The database owner promotes the account with a manual `UPDATE`, run directly on the database and **never
+   committed** to this repository:
+   ```sql
+   UPDATE museo.users SET role = 'administrador' WHERE lower(email) = lower('<their email>');
+   ```
+3. The person logs in again: the new role travels in the next access token.
 
 The free plan has 512 MB of RAM (hence the JVM flags) and an ephemeral disk (uploaded files are never
 stored on the server). Read requests never change data: auction statuses are synced by the scheduler and

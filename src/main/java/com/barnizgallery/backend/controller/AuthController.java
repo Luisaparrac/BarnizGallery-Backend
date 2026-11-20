@@ -16,6 +16,7 @@ import com.barnizgallery.backend.dto.RefreshTokenRequest;
 import com.barnizgallery.backend.dto.RegisterRequest;
 import com.barnizgallery.backend.dto.ResetPasswordRequest;
 import com.barnizgallery.backend.dto.UserResponse;
+import com.barnizgallery.backend.security.ClientIpResolver;
 import com.barnizgallery.backend.service.LoginService;
 import com.barnizgallery.backend.service.PasswordResetService;
 import com.barnizgallery.backend.service.RegistrationService;
@@ -39,13 +40,16 @@ public class AuthController {
     private final LoginService loginService;
     private final SessionService sessionService;
     private final PasswordResetService passwordResetService;
+    private final ClientIpResolver clientIpResolver;
 
     public AuthController(RegistrationService registrationService, LoginService loginService,
-            SessionService sessionService, PasswordResetService passwordResetService) {
+            SessionService sessionService, PasswordResetService passwordResetService,
+            ClientIpResolver clientIpResolver) {
         this.registrationService = registrationService;
         this.loginService = loginService;
         this.sessionService = sessionService;
         this.passwordResetService = passwordResetService;
+        this.clientIpResolver = clientIpResolver;
     }
 
     @PostMapping("/register")
@@ -57,7 +61,7 @@ public class AuthController {
     @PostMapping("/login")
     @Operation(summary = "Log in with email and password (429 after too many failures)")
     public AuthResponse login(@Valid @RequestBody LoginRequest request, HttpServletRequest http) {
-        return loginService.login(request, http.getRemoteAddr());
+        return loginService.login(request, clientIpResolver.resolve(http));
     }
 
     @PostMapping("/refresh")
