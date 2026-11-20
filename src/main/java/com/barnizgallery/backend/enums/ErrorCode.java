@@ -22,6 +22,8 @@ public enum ErrorCode {
     UNAUTHORIZED,
     ACCESS_DENIED,
     TOO_MANY_LOGIN_ATTEMPTS,
+    EMAIL_ALREADY_REGISTERED,
+    PASSWORD_TOO_LONG,
 
     // Missing resources
     ARTWORK_NOT_FOUND,
