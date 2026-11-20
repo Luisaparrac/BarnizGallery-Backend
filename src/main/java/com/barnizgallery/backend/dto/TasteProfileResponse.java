@@ -14,5 +14,10 @@ public record TasteProfileResponse(
         List<String> styleCodes,
         List<String> motifCodes,
         String budgetRangeCode,
-        LocalDateTime updatedAt) {
+        LocalDateTime updatedAt,
+        List<Long> colorIds,
+        List<Long> shapeIds,
+        List<Long> styleIds,
+        List<Long> motifIds,
+        Long budgetRangeId) {
 }

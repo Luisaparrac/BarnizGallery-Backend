@@ -164,7 +164,7 @@ Dates are ISO-8601 (UTC). Enum values are in English (`EXHIBITED`, `ACTIVE`, `PE
 | GET | `/api/favorites` | Same list as `/api/users/me/favorites` (customers) |
 | POST | `/api/favorites/{artworkId}/toggle` | Add or remove a favorite → `{ favorite }` (customers) |
 | PUT / DELETE | `/api/users/me/favorites/{artworkId}` | Add (only artworks of the public gallery) or remove a favorite; both idempotent, 204 |
-| GET / PUT | `/api/users/me/taste-profile` | Same questionnaire for the logged-in user (catalog codes; unknown or inactive codes → 422) |
+| GET / PUT | `/api/users/me/taste-profile` | Same questionnaire for the logged-in user: catalog codes (`colorCodes`…) **or** ids as the frontend keeps them (`colorIds`, `shapeIds`, `styleIds`, `motifIds`, `budgetRangeId`); the answer carries both. GET answers an empty body when there is no profile yet; unknown or inactive values → 422 |
 | GET / PUT | `/api/users/{id}/taste-profile` | Read / save the initial questionnaire as catalog codes `{ colorCodes, shapeCodes, styleCodes, motifCodes, budgetRangeCode }` |
 
 ### Interactions and recommendations

@@ -1,6 +1,9 @@
 package com.barnizgallery.backend.service;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +15,7 @@ import com.barnizgallery.backend.dto.UserPreferencesRequest;
 import com.barnizgallery.backend.dto.UserResponse;
 import com.barnizgallery.backend.entity.TasteProfile;
 import com.barnizgallery.backend.entity.User;
+import com.barnizgallery.backend.enums.CatalogKind;
 import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.mapper.UserMapper;
@@ -74,10 +78,10 @@ public class UserService {
         return UserMapper.toResponse(user);
     }
 
-    /** Taste profile of the logged-in user. */
+    /** Taste profile of the logged-in user, or null when they have not answered the questionnaire yet. */
     @Transactional(readOnly = true)
     public TasteProfileResponse myTasteProfile() {
-        return getTasteProfile(currentUser.requireId());
+        return tasteProfileRepository.findByUserUserId(currentUser.requireId()).map(UserMapper::toResponse).orElse(null);
     }
 
     /** Creates or replaces the taste profile of the logged-in user (active catalog codes). */
@@ -113,13 +117,28 @@ public class UserService {
             created.setUser(user);
             return created;
         });
-        profile.setColors(catalogResolver.colors(request.colorCodes()));
-        profile.setShapes(catalogResolver.shapes(request.shapeCodes()));
-        profile.setStyles(catalogResolver.styles(request.styleCodes()));
-        profile.setMotifs(catalogResolver.motifs(request.motifCodes()));
-        profile.setBudgetRange(catalogResolver.budgetRange(request.budgetRangeCode()));
+        profile.setColors(catalogResolver.colors(merge(request.colorCodes(),
+                catalogResolver.codesOf(CatalogKind.COLORS, request.colorIds()))));
+        profile.setShapes(catalogResolver.shapes(merge(request.shapeCodes(),
+                catalogResolver.codesOf(CatalogKind.SHAPES, request.shapeIds()))));
+        profile.setStyles(catalogResolver.styles(merge(request.styleCodes(),
+                catalogResolver.codesOf(CatalogKind.STYLES, request.styleIds()))));
+        profile.setMotifs(catalogResolver.motifs(merge(request.motifCodes(),
+                catalogResolver.codesOf(CatalogKind.MOTIFS, request.motifIds()))));
+        profile.setBudgetRange(catalogResolver.budgetRange(request.budgetRangeCode() != null
+                ? request.budgetRangeCode() : catalogResolver.budgetRangeCodeOf(request.budgetRangeId())));
         profile.setUpdatedAt(LocalDateTime.now());
         return UserMapper.toResponse(tasteProfileRepository.save(profile));
+    }
+
+    /** Codes given directly plus the codes of the given ids, without repeats. */
+    private static List<String> merge(List<String> codes, List<String> codesOfIds) {
+        Set<String> all = new LinkedHashSet<>();
+        if (codes != null) {
+            all.addAll(codes);
+        }
+        all.addAll(codesOfIds);
+        return List.copyOf(all);
     }
 
     /** Loads a user or throws 404. Used by other services too. */

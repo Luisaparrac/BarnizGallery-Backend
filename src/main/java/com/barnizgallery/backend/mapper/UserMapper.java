@@ -31,7 +31,12 @@ public final class UserMapper {
                 profile.getShapes().stream().map(Shape::getCode).sorted().toList(),
                 profile.getStyles().stream().map(Style::getCode).sorted().toList(),
                 profile.getMotifs().stream().map(Motif::getCode).sorted().toList(),
-                budgetRangeCode, profile.getUpdatedAt());
+                budgetRangeCode, profile.getUpdatedAt(),
+                profile.getColors().stream().map(Color::getColorId).sorted().toList(),
+                profile.getShapes().stream().map(Shape::getShapeId).sorted().toList(),
+                profile.getStyles().stream().map(Style::getStyleId).sorted().toList(),
+                profile.getMotifs().stream().map(Motif::getMotifId).sorted().toList(),
+                profile.getBudgetRange() == null ? null : profile.getBudgetRange().getBudgetRangeId());
     }
 
     /** Preferred color codes of the profile, sorted. */

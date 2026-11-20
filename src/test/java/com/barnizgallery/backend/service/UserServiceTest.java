@@ -72,7 +72,7 @@ class UserServiceTest {
         when(catalogResolver.colors(List.of("rojo"))).thenReturn(Set.of(TestEntities.color("rojo")));
 
         TasteProfileResponse saved = userService.saveTasteProfile(1L,
-                new TasteProfileRequest(List.of("rojo"), null, null, null, null));
+                new TasteProfileRequest(List.of("rojo"), null, null, null, null, null, null, null, null, null));
 
         assertThat(saved.colorCodes()).containsExactly("rojo");
         assertThat(saved.budgetRangeCode()).isNull();

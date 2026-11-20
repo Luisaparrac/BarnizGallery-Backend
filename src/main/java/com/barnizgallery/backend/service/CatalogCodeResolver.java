@@ -15,6 +15,7 @@ import com.barnizgallery.backend.entity.Color;
 import com.barnizgallery.backend.entity.Motif;
 import com.barnizgallery.backend.entity.Shape;
 import com.barnizgallery.backend.entity.Style;
+import com.barnizgallery.backend.enums.CatalogKind;
 import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.exception.BusinessRuleException;
 import com.barnizgallery.backend.repository.AvatarRepository;
@@ -78,6 +79,40 @@ public class CatalogCodeResolver {
         }
         return budgetRangeRepository.findByCode(code)
                 .orElseThrow(() -> BusinessRuleException.unprocessable(ErrorCode.UNKNOWN_BUDGET_RANGE, code));
+    }
+
+    /**
+     * Catalog codes of the entries with these ids (the frontend keeps catalog ids); an unknown id → 422. The codes
+     * then go through the usual check (active entries only).
+     */
+    @Transactional(readOnly = true)
+    public List<String> codesOf(CatalogKind kind, Collection<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        CatalogEntryRepository<? extends CatalogEntry> repository = switch (kind) {
+            case COLORS -> colorRepository;
+            case SHAPES -> shapeRepository;
+            case STYLES -> styleRepository;
+            case MOTIFS -> motifRepository;
+            case AVATARS -> avatarRepository;
+        };
+        Set<Long> wanted = new LinkedHashSet<>(ids);
+        List<? extends CatalogEntry> found = repository.findAllById(wanted);
+        if (found.size() != wanted.size()) {
+            throw BusinessRuleException.unprocessable(ErrorCode.UNKNOWN_CATALOG_ID);
+        }
+        return found.stream().map(CatalogEntry::getCode).toList();
+    }
+
+    /** Code of the budget range with this id, or null when no id is given (422 when unknown). */
+    @Transactional(readOnly = true)
+    public String budgetRangeCodeOf(Long id) {
+        if (id == null) {
+            return null;
+        }
+        return budgetRangeRepository.findById(id).map(BudgetRange::getCode)
+                .orElseThrow(() -> BusinessRuleException.unprocessable(ErrorCode.UNKNOWN_CATALOG_ID));
     }
 
     /** The active avatar with this code, or null when no code is given. */

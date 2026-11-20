@@ -10,5 +10,10 @@ public record TasteProfileRequest(
         List<String> shapeCodes,
         List<String> styleCodes,
         List<String> motifCodes,
-        String budgetRangeCode) {
+        String budgetRangeCode,
+        List<Long> colorIds,
+        List<Long> shapeIds,
+        List<Long> styleIds,
+        List<Long> motifIds,
+        Long budgetRangeId) {
 }
