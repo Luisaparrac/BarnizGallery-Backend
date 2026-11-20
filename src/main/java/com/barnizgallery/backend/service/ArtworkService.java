@@ -7,12 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.barnizgallery.backend.dto.ArtworkDetailResponse;
-import com.barnizgallery.backend.dto.ArtworkRequest;
 import com.barnizgallery.backend.dto.ArtworkSummaryResponse;
 import com.barnizgallery.backend.dto.AuctionResponse;
 import com.barnizgallery.backend.dto.PhotoResponse;
 import com.barnizgallery.backend.entity.Artwork;
-import com.barnizgallery.backend.entity.Store;
 import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.enums.AuctionStatus;
 import com.barnizgallery.backend.enums.ErrorCode;
@@ -21,11 +19,9 @@ import com.barnizgallery.backend.mapper.ArtworkMapper;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.AuctionRepository;
 import com.barnizgallery.backend.repository.PhotoRepository;
-import com.barnizgallery.backend.security.OwnershipGuard;
 
 /**
- * Business logic for artworks. The status of an artwork is never changed here:
- * it is managed by the auction lifecycle.
+ * Read side of the artworks. Artisans write their own artworks through {@link ArtisanArtworkService}.
  */
 @Service
 public class ArtworkService {
@@ -34,20 +30,13 @@ public class ArtworkService {
     private final PhotoRepository photoRepository;
     private final AuctionRepository auctionRepository;
     private final AuctionResponseAssembler auctionAssembler;
-    private final StoreService storeService;
-    private final CatalogCodeResolver catalogResolver;
-    private final OwnershipGuard ownershipGuard;
 
     public ArtworkService(ArtworkRepository artworkRepository, PhotoRepository photoRepository,
-            AuctionRepository auctionRepository, AuctionResponseAssembler auctionAssembler,
-            StoreService storeService, CatalogCodeResolver catalogResolver, OwnershipGuard ownershipGuard) {
-        this.ownershipGuard = ownershipGuard;
+            AuctionRepository auctionRepository, AuctionResponseAssembler auctionAssembler) {
         this.artworkRepository = artworkRepository;
         this.photoRepository = photoRepository;
         this.auctionRepository = auctionRepository;
         this.auctionAssembler = auctionAssembler;
-        this.storeService = storeService;
-        this.catalogResolver = catalogResolver;
     }
 
     /** Lists artworks, optionally filtered by store and/or status. */
@@ -79,39 +68,6 @@ public class ArtworkService {
                 .map(auctionAssembler::toResponse)
                 .orElse(null);
         return ArtworkMapper.toDetail(artwork, photos, currentAuction);
-    }
-
-    @Transactional
-    public ArtworkSummaryResponse create(ArtworkRequest request) {
-        Store store = storeService.getStore(request.storeId());
-        ownershipGuard.requireStore(store);
-        Artwork artwork = new Artwork();
-        artwork.setStore(store);
-        artwork.setStatus(ArtworkStatus.EXHIBITED);
-        ArtworkMapper.apply(request, artwork);
-        applyCatalogs(request, artwork);
-        return ArtworkMapper.toSummary(artworkRepository.save(artwork));
-    }
-
-    @Transactional
-    public ArtworkSummaryResponse update(Long artworkId, ArtworkRequest request) {
-        Artwork artwork = getArtwork(artworkId);
-        ownershipGuard.requireStore(artwork.getStore());
-        if (!artwork.getStore().getStoreId().equals(request.storeId())) {
-            Store newStore = storeService.getStore(request.storeId());
-            ownershipGuard.requireStore(newStore);
-            artwork.setStore(newStore);
-        }
-        ArtworkMapper.apply(request, artwork);
-        applyCatalogs(request, artwork);
-        return ArtworkMapper.toSummary(artwork);
-    }
-
-    private void applyCatalogs(ArtworkRequest request, Artwork artwork) {
-        artwork.setColors(catalogResolver.colors(request.colorCodes()));
-        artwork.setMotifs(catalogResolver.motifs(request.motifCodes()));
-        artwork.setShape(catalogResolver.shape(request.shapeCode()));
-        artwork.setStyle(catalogResolver.style(request.styleCode()));
     }
 
     /** Loads an artwork or throws 404. Used by other services too. */

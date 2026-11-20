@@ -120,7 +120,6 @@ Dates are ISO-8601 (UTC). Enum values are in English (`EXHIBITED`, `ACTIVE`, `PE
 | GET | `/api/stores/{slug}` | Public page of a published store (approved master): visible sections in order and exhibited or auctioned artworks; 404 otherwise |
 | GET | `/api/artworks?storeId=&status=` | Filterable list |
 | GET | `/api/artworks/{id}` | Artwork + photos + current auction |
-| POST / PUT | `/api/artworks`, `/api/artworks/{id}` | Create / update artwork (status is managed by auctions) |
 | GET | `/api/artworks/{id}/photos` | Photos |
 | POST | `/api/artworks/{id}/photos` | Register photo by URL `{ fileUrl, angle }` |
 | POST | `/api/artworks/{id}/photos/upload` | Multipart upload (503 while storage is disabled) |
@@ -236,12 +235,19 @@ the artisan) and `ADMIN_APPROVAL` (the administrator's final decision).
 | POST | `/api/artisans/me/store/publish` | Publish the store; the database rejects it while the master is not approved (409) |
 | PUT | `/api/artisans/me/store/sections/order` | `{ sectionIds: [...] }` every section once, top to bottom (422 otherwise) |
 
+### Artworks (artisans)
+| Method | Path | Description |
+|---|---|---|
+
 ### Artisan verification (administrators)
 | Method | Path | Description |
 |---|---|---|
 | GET | `/api/admin/verifications` | Masters waiting for a decision with their open steps (view `v_pending_verifications`) |
 | PUT | `/api/admin/verifications/{verificationId}` | `{ decision: APPROVED \| REJECTED, notes? }` for `IDENTITY`, `WORKSHOP` or `SAMPLES`; the artisan is notified |
 | POST | `/api/admin/artisans/{masterId}/approve` | Final approval when the other four steps are approved (409 naming the missing ones): master `APPROVED`, account `ACTIVE`, notification |
+| GET | `/api/artisans/me/artworks` | Every artwork of the store, drafts included |
+| POST | `/api/artisans/me/artworks` | `{ titleEs, titleEn, historyEs?, historyEn?, technique?, widthCm?, heightCm?, depthCm?, weightG?, saleMode?, price?, currency?, stock?, colorCodes?, motifCodes?, shapeCode?, styleCode? }` → 201 `DRAFT` |
+| PUT | `/api/artisans/me/artworks/{artworkId}` | Replace the data of an artwork (the status does not change) |
 
 ### Notifications (logged-in user)
 | Method | Path | Description |

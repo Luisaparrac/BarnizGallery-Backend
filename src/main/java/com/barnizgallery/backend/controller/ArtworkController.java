@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.barnizgallery.backend.dto.ArtworkDetailResponse;
-import com.barnizgallery.backend.dto.ArtworkRequest;
 import com.barnizgallery.backend.dto.ArtworkSummaryResponse;
 import com.barnizgallery.backend.dto.PhotoRequest;
 import com.barnizgallery.backend.dto.PhotoResponse;
@@ -58,17 +56,6 @@ public class ArtworkController {
     @GetMapping("/{id}")
     public ArtworkDetailResponse findById(@PathVariable Long id) {
         return artworkService.findById(id);
-    }
-
-    @PostMapping
-    public ResponseEntity<ArtworkSummaryResponse> create(@Valid @RequestBody ArtworkRequest request) {
-        ArtworkSummaryResponse created = artworkService.create(request);
-        return ResponseEntity.created(URI.create("/api/artworks/" + created.artworkId())).body(created);
-    }
-
-    @PutMapping("/{id}")
-    public ArtworkSummaryResponse update(@PathVariable Long id, @Valid @RequestBody ArtworkRequest request) {
-        return artworkService.update(id, request);
     }
 
     @GetMapping("/{id}/photos")

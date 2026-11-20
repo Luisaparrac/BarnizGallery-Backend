@@ -2,13 +2,11 @@ package com.barnizgallery.backend.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,17 +18,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.barnizgallery.backend.TestEntities;
 import com.barnizgallery.backend.dto.ArtworkDetailResponse;
-import com.barnizgallery.backend.dto.ArtworkRequest;
 import com.barnizgallery.backend.dto.ArtworkSummaryResponse;
 import com.barnizgallery.backend.entity.Artwork;
-import com.barnizgallery.backend.entity.Color;
 import com.barnizgallery.backend.entity.Store;
 import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.AuctionRepository;
 import com.barnizgallery.backend.repository.PhotoRepository;
-import com.barnizgallery.backend.security.OwnershipGuard;
 
 @ExtendWith(MockitoExtension.class)
 class ArtworkServiceTest {
@@ -43,12 +38,6 @@ class ArtworkServiceTest {
     private AuctionRepository auctionRepository;
     @Mock
     private AuctionResponseAssembler auctionAssembler;
-    @Mock
-    private StoreService storeService;
-    @Mock
-    private CatalogCodeResolver catalogResolver;
-    @Mock
-    private OwnershipGuard ownershipGuard;
     @InjectMocks
     private ArtworkService artworkService;
 
@@ -88,36 +77,6 @@ class ArtworkServiceTest {
 
         assertThat(detail.photos()).hasSize(1);
         assertThat(detail.currentAuction()).isNull();
-    }
-
-    @Test
-    void createStartsAsExhibited() {
-        when(storeService.getStore(1L)).thenReturn(store);
-        when(artworkRepository.save(any(Artwork.class))).thenAnswer(inv -> inv.getArgument(0));
-        Color red = new Color();
-        red.setCode("rojo");
-        when(catalogResolver.colors(List.of("rojo"))).thenReturn(new LinkedHashSet<>(List.of(red)));
-        when(catalogResolver.motifs(List.of())).thenReturn(new LinkedHashSet<>());
-
-        ArtworkSummaryResponse created = artworkService.create(
-                new ArtworkRequest(1L, "Obra", "Artwork", null, null, null, null, null, null, null,
-                        null, null, null, null, List.of("rojo"), List.of(), null, null));
-
-        assertThat(created.status()).isEqualTo(ArtworkStatus.EXHIBITED);
-        assertThat(created.colorCodes()).containsExactly("rojo");
-    }
-
-    @Test
-    void updateDoesNotChangeStatus() {
-        Artwork artwork = TestEntities.artwork(3, store, ArtworkStatus.IN_AUCTION);
-        when(artworkRepository.findById(3L)).thenReturn(Optional.of(artwork));
-
-        ArtworkSummaryResponse updated = artworkService.update(3L,
-                new ArtworkRequest(1L, "Nuevo", "New", null, null, null, null, null, null, null,
-                        null, null, null, null, null, null, null, null));
-
-        assertThat(updated.titleEn()).isEqualTo("New");
-        assertThat(updated.status()).isEqualTo(ArtworkStatus.IN_AUCTION);
     }
 
     @Test

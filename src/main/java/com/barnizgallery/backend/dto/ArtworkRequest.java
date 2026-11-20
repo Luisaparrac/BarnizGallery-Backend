@@ -6,13 +6,13 @@ import java.util.List;
 import com.barnizgallery.backend.enums.SaleMode;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
 /**
- * Body to create or update an artwork. The status is managed by auctions.
+ * Body to create or update an artwork of the artisan's own store. The status changes through its own endpoint
+ * and through auctions and orders.
  *
  * @param currency   ISO 4217 code of the price (for example USD)
  * @param colorCodes codes of the color catalog
@@ -21,7 +21,6 @@ import jakarta.validation.constraints.Size;
  * @param styleCode  code of the style catalog, or null
  */
 public record ArtworkRequest(
-        @NotNull Long storeId,
         @NotBlank @Size(max = 150) String titleEs,
         @NotBlank @Size(max = 150) String titleEn,
         String historyEs,
