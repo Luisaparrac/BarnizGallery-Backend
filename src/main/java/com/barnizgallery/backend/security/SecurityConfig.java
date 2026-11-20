@@ -2,13 +2,22 @@ package com.barnizgallery.backend.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
- * HTTP security of the API. For now every endpoint stays public, as before; the endpoints are closed by role
- * once users can log in. Security errors are answered as JSON.
+ * Stateless HTTP security of the API:
+ * <ul>
+ * <li>no session and no CSRF: every request carries its access token ({@code Authorization: Bearer ...});</li>
+ * <li>CORS from {@code CorsConfigurationSource}, answered before authentication;</li>
+ * <li>the token is a JWT checked by the resource server; its {@code role} claim becomes {@code ROLE_<role>};</li>
+ * <li>security errors are answered as JSON (401 and 403).</li>
+ * </ul>
+ * For now every endpoint stays public, as before; the endpoints are closed by role once users can log in.
  */
 @Configuration
 public class SecurityConfig {
@@ -25,12 +34,29 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
+                .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
+                .httpBasic(basic -> basic.disable())
+                .formLogin(form -> form.disable())
+                .logout(logout -> logout.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .oauth2ResourceServer(resourceServer -> resourceServer
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                        .authenticationEntryPoint(authenticationEntryPoint))
                 .exceptionHandling(errors -> errors
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler))
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
                 .build();
+    }
+
+    /** Maps the {@code role} claim (for example {@code ADMIN}) to the authority {@code ROLE_ADMIN}. */
+    static JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter authorities = new JwtGrantedAuthoritiesConverter();
+        authorities.setAuthoritiesClaimName(AccessTokenService.ROLE_CLAIM);
+        authorities.setAuthorityPrefix("ROLE_");
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+        converter.setJwtGrantedAuthoritiesConverter(authorities);
+        return converter;
     }
 }
