@@ -255,6 +255,7 @@ the artisan) and `ADMIN_APPROVAL` (the administrator's final decision).
 |---|---|---|
 | GET | `/api/admin/payouts` | Every payout, newest first |
 | POST | `/api/admin/payouts` | Create `PENDING` payouts from delivered lines not paid out yet, one per master and currency (amount = sum of the artisan net amounts) |
+| POST | `/api/admin/payouts/{payoutId}/paid` | `{ reference }`: `PENDING` → `PAID` with `paidAt`; the artisan is notified |
 
 ### Cart and orders
 | Method | Path | Description |
