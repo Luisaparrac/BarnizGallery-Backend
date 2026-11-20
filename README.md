@@ -175,6 +175,10 @@ store templates, each with its `code` and its names in Spanish and English. Requ
 | POST | `/api/admin/catalogs/{catalog}` | `{ code, nameEs, nameEn, sortOrder?, active?, hex? (colors), imageUrl (avatars, https) }` → 201 (409 if the code exists) |
 | PUT | `/api/admin/catalogs/{catalog}/{code}` | Edit names, order, extra fields or `active`; the code never changes |
 
+Store templates: `GET/POST /api/admin/store-templates` and `PUT /api/admin/store-templates/{code}` with
+`{ code, nameEs, nameEn, descriptionEs?, descriptionEn?, previewUrl?, defaultLayout?, defaultTheme?, active? }`
+(the layout and theme are JSON objects).
+
 Budget ranges: `GET/POST /api/admin/catalogs/budget-ranges` and `PUT/DELETE .../budget-ranges/{code}` with
 `{ code, minAmount, maxAmount?, currency }`; a range used by a taste profile cannot be deleted (409).
 
