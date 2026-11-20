@@ -79,7 +79,7 @@ class ArtisanVerificationFlowTest {
                 notifications, mock(SessionIssuer.class));
 
         service.register(new RegisterArtisanRequest(new RegisterRequest("Ana Maestra", "ana@taller.test",
-                "una-clave-segura", "CO", Language.ES), "Taller Ana", "Pasto", null, null, null));
+                "una-clave-segura", "CO", Language.ES, null, null, null, null, null), "Taller Ana", "Pasto", null, null, null));
 
         ArgumentCaptor<Master> saved = ArgumentCaptor.forClass(Master.class);
         verify(masters).save(saved.capture());

@@ -61,7 +61,8 @@ class RegistrationServiceTest {
 
     @Test
     void registerCreatesAPendingCustomerAndSendsTheVerificationEmail() {
-        service.register(new RegisterRequest(" Ana ", " Ana@Mail.COM ", "una-clave-segura", "CO", Language.EN));
+        service.register(new RegisterRequest(" Ana ", " Ana@Mail.COM ", "una-clave-segura", "CO", Language.EN,
+                null, null, null, null, null));
 
         ArgumentCaptor<User> saved = ArgumentCaptor.forClass(User.class);
         verify(userRepository).save(saved.capture());
@@ -84,7 +85,7 @@ class RegistrationServiceTest {
                 Language.ES)));
 
         assertThatThrownBy(() -> service.register(new RegisterRequest("Ana", "ana@mail.com", "una-clave-segura", null,
-                null))).hasMessage("email_already_registered");
+                null, null, null, null, null, null))).hasMessage("email_already_registered");
         verify(userRepository, never()).save(any());
     }
 

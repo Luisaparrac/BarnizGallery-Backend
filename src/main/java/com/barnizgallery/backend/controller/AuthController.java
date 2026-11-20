@@ -25,6 +25,7 @@ import com.barnizgallery.backend.service.PasswordChangeService;
 import com.barnizgallery.backend.service.PasswordResetService;
 import com.barnizgallery.backend.service.RegistrationService;
 import com.barnizgallery.backend.service.SessionService;
+import com.barnizgallery.backend.service.SignUpService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -47,11 +48,14 @@ public class AuthController {
     private final ClientIpResolver clientIpResolver;
     private final ArtisanRegistrationService artisanRegistrationService;
     private final PasswordChangeService passwordChangeService;
+    private final SignUpService signUpService;
 
     public AuthController(RegistrationService registrationService, LoginService loginService,
             SessionService sessionService, PasswordResetService passwordResetService,
             ClientIpResolver clientIpResolver, ArtisanRegistrationService artisanRegistrationService,
-            PasswordChangeService passwordChangeService) {
+            PasswordChangeService passwordChangeService,
+            SignUpService signUpService) {
+        this.signUpService = signUpService;
         this.passwordChangeService = passwordChangeService;
         this.registrationService = registrationService;
         this.loginService = loginService;
@@ -62,9 +66,10 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    @Operation(summary = "Create a customer account (201) and open a session; a verification email is sent")
+    @Operation(summary = "Create a customer (or, with role ARTISAN, an artisan) account and open a session (201); "
+            + "role ADMIN answers 403; a verification email is sent")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(registrationService.register(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(signUpService.register(request));
     }
 
     @PostMapping("/register-artisan")

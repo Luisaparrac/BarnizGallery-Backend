@@ -79,8 +79,12 @@ public class RegistrationService {
         if (userRepository.findByEmailIgnoreCase(email).isPresent()) {
             throw new BusinessRuleException(ErrorCode.EMAIL_ALREADY_REGISTERED);
         }
+        String name = request.displayName();
+        if (name == null || name.isBlank()) {
+            throw BusinessRuleException.unprocessable(ErrorCode.NAME_REQUIRED);
+        }
         User user = new User();
-        user.setName(request.name().trim());
+        user.setName(name.trim());
         user.setEmail(email);
         user.setPasswordHash(encodePassword(request.password()));
         user.setRole(role);
