@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.barnizgallery.backend.dto.ArtworkDetailResponse;
 import com.barnizgallery.backend.dto.ArtworkRequest;
 import com.barnizgallery.backend.dto.ArtworkStatusRequest;
 import com.barnizgallery.backend.dto.ArtworkSummaryResponse;
@@ -41,6 +42,12 @@ public class ArtisanArtworkController {
     @Operation(summary = "Every artwork of the artisan's store, drafts included")
     public List<ArtworkSummaryResponse> mine() {
         return artworkService.mine();
+    }
+
+    @GetMapping("/{artworkId}")
+    @Operation(summary = "Full detail of an artwork of the artisan's store, drafts included")
+    public ArtworkDetailResponse detail(@PathVariable Long artworkId) {
+        return artworkService.detail(artworkId);
     }
 
     @PostMapping

@@ -17,17 +17,19 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.barnizgallery.backend.dto.ArtworkDetailResponse;
-import com.barnizgallery.backend.dto.ArtworkSummaryResponse;
+import com.barnizgallery.backend.dto.ArtworkFilter;
+import com.barnizgallery.backend.dto.CatalogArtworkResponse;
 import com.barnizgallery.backend.dto.PhotoOrderRequest;
 import com.barnizgallery.backend.dto.PhotoRequest;
 import com.barnizgallery.backend.dto.PhotoResponse;
 import com.barnizgallery.backend.dto.SuggestedPriceResponse;
-import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.service.ArtworkService;
+import com.barnizgallery.backend.service.GalleryService;
 import com.barnizgallery.backend.service.PhotoArrangementService;
 import com.barnizgallery.backend.service.PhotoService;
 import com.barnizgallery.backend.service.PricingService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
@@ -43,9 +45,11 @@ public class ArtworkController {
     private final PhotoService photoService;
     private final PricingService pricingService;
     private final PhotoArrangementService arrangementService;
+    private final GalleryService galleryService;
 
     public ArtworkController(ArtworkService artworkService, PhotoService photoService,
-            PricingService pricingService, PhotoArrangementService arrangementService) {
+            PricingService pricingService, PhotoArrangementService arrangementService, GalleryService galleryService) {
+        this.galleryService = galleryService;
         this.arrangementService = arrangementService;
         this.artworkService = artworkService;
         this.photoService = photoService;
@@ -53,9 +57,10 @@ public class ArtworkController {
     }
 
     @GetMapping
-    public List<ArtworkSummaryResponse> findAll(@RequestParam(required = false) Long storeId,
-            @RequestParam(required = false) ArtworkStatus status) {
-        return artworkService.findAll(storeId, status);
+    @Operation(summary = "Public gallery: exhibited or auctioned artworks of published stores, filtered by color, motif, "
+            + "shape and style codes, currency and price range, and store slug; newest first")
+    public List<CatalogArtworkResponse> gallery(@Valid ArtworkFilter filter) {
+        return galleryService.artworks(filter);
     }
 
     @GetMapping("/{id}")

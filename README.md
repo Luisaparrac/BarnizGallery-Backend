@@ -118,8 +118,8 @@ Dates are ISO-8601 (UTC). Enum values are in English (`EXHIBITED`, `ACTIVE`, `PE
 | POST / PUT | `/api/masters`, `/api/masters/{id}` | Create / update master |
 | GET | `/api/stores` | Published stores of approved masters, newest first, with slug, logo, banner and count of public artworks |
 | GET | `/api/stores/{slug}` | Public page of a published store (approved master): visible sections in order and exhibited or auctioned artworks; 404 otherwise |
-| GET | `/api/artworks?storeId=&status=` | Filterable list |
-| GET | `/api/artworks/{id}` | Artwork + photos + current auction |
+| GET | `/api/artworks?color=&motif=&shape=&style=&currency=&minPrice=&maxPrice=&store=&page=&size=` | Public gallery (view `v_artwork_catalog`): exhibited or auctioned artworks of published stores of approved masters, newest first; codes of the catalogs, store slug; a price range needs `currency` (422) |
+| GET | `/api/artworks/{id}` | Artwork + photos + current auction (404 unless it is in the public gallery) |
 | GET | `/api/artworks/{id}/photos` | Photos |
 | POST | `/api/artworks/{id}/photos` | Register photo by URL `{ fileUrl, angle?, altEs?, altEn? }` (owner artisan) |
 | POST | `/api/artworks/{id}/photos/upload` | Multipart `file` (+ `angle`, `altEs`, `altEn`) uploaded to the storage (503 while disabled); goes last, the first photo is the primary one |
@@ -253,6 +253,7 @@ the database).
 | PUT | `/api/admin/verifications/{verificationId}` | `{ decision: APPROVED \| REJECTED, notes? }` for `IDENTITY`, `WORKSHOP` or `SAMPLES`; the artisan is notified |
 | POST | `/api/admin/artisans/{masterId}/approve` | Final approval when the other four steps are approved (409 naming the missing ones): master `APPROVED`, account `ACTIVE`, notification |
 | GET | `/api/artisans/me/artworks` | Every artwork of the store, drafts included |
+| GET | `/api/artisans/me/artworks/{artworkId}` | Full detail of an own artwork, whatever its status |
 | POST | `/api/artisans/me/artworks` | `{ titleEs, titleEn, historyEs?, historyEn?, technique?, widthCm?, heightCm?, depthCm?, weightG?, saleMode?, price?, currency?, stock?, colorCodes?, motifCodes?, shapeCode?, styleCode? }` → 201 `DRAFT` |
 | PUT | `/api/artisans/me/artworks/{artworkId}` | Replace the data of an artwork (the status does not change) |
 | PATCH | `/api/artisans/me/artworks/{artworkId}/status` | `{ status }`: `DRAFT` ↔ `EXHIBITED` ↔ `ARCHIVED`, and `SOLD` → `ARCHIVED`; artworks in auction or reserved change only through the auction or the order (409) |

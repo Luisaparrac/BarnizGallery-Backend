@@ -8,6 +8,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.barnizgallery.backend.dto.ArtworkDetailResponse;
 import com.barnizgallery.backend.dto.ArtworkRequest;
 import com.barnizgallery.backend.dto.ArtworkSummaryResponse;
 import com.barnizgallery.backend.entity.Artwork;
@@ -31,9 +32,11 @@ public class ArtisanArtworkService {
     private final StoreEditorService editorService;
     private final CatalogCodeResolver catalogResolver;
     private final Clock clock;
+    private final ArtworkService artworkService;
 
     public ArtisanArtworkService(ArtworkRepository artworkRepository, StoreEditorService editorService,
-            CatalogCodeResolver catalogResolver, Clock clock) {
+            CatalogCodeResolver catalogResolver, Clock clock, ArtworkService artworkService) {
+        this.artworkService = artworkService;
         this.clock = clock;
         this.artworkRepository = artworkRepository;
         this.editorService = editorService;
@@ -47,6 +50,12 @@ public class ArtisanArtworkService {
                 .findByStoreStoreIdAndDeletedAtIsNullOrderByArtworkIdAsc(editorService.myStore().getStoreId()).stream()
                 .map(ArtworkMapper::toSummary)
                 .toList();
+    }
+
+    /** Full detail of an artwork of the store, whatever its status. */
+    @Transactional(readOnly = true)
+    public ArtworkDetailResponse detail(Long artworkId) {
+        return artworkService.detail(myArtwork(artworkId));
     }
 
     @Transactional

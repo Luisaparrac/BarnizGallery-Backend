@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -18,11 +17,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.barnizgallery.backend.TestEntities;
 import com.barnizgallery.backend.dto.ArtworkDetailResponse;
-import com.barnizgallery.backend.dto.ArtworkSummaryResponse;
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Store;
 import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
+import com.barnizgallery.backend.repository.ArtworkCatalogViewRepository;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.AuctionRepository;
 import com.barnizgallery.backend.repository.PhotoRepository;
@@ -38,35 +37,24 @@ class ArtworkServiceTest {
     private AuctionRepository auctionRepository;
     @Mock
     private AuctionResponseAssembler auctionAssembler;
+    @Mock
+    private ArtworkCatalogViewRepository catalogRepository;
     @InjectMocks
     private ArtworkService artworkService;
 
     private final Store store = TestEntities.store(1, TestEntities.master(1));
 
     @Test
-    void findAllUsesTheRightFilter() {
-        when(artworkRepository.findByStoreStoreIdAndStatusOrderByArtworkIdAsc(1L, ArtworkStatus.SOLD))
-                .thenReturn(List.of(TestEntities.artwork(7, store, ArtworkStatus.SOLD)));
+    void artworksOutsideThePublicGalleryAreNotFound() {
+        when(catalogRepository.existsById(4L)).thenReturn(false);
 
-        List<ArtworkSummaryResponse> result = artworkService.findAll(1L, ArtworkStatus.SOLD);
-
-        assertThat(result).singleElement().satisfies(a -> {
-            assertThat(a.artworkId()).isEqualTo(7);
-            assertThat(a.status()).isEqualTo(ArtworkStatus.SOLD);
-        });
-    }
-
-    @Test
-    void findAllWithoutFiltersReturnsEverything() {
-        when(artworkRepository.findAllByOrderByArtworkIdAsc()).thenReturn(List.of());
-
-        assertThat(artworkService.findAll(null, null)).isEmpty();
-        verify(artworkRepository).findAllByOrderByArtworkIdAsc();
+        assertThatThrownBy(() -> artworkService.findById(4L)).hasMessage("artwork_not_found [4]");
     }
 
     @Test
     void detailIncludesPhotosAndNoAuctionWhenAbsent() {
         Artwork artwork = TestEntities.artwork(3, store, ArtworkStatus.EXHIBITED);
+        when(catalogRepository.existsById(3L)).thenReturn(true);
         when(artworkRepository.findById(3L)).thenReturn(Optional.of(artwork));
         when(photoRepository.findByArtworkArtworkIdOrderBySortOrderAscPhotoIdAsc(3L))
                 .thenReturn(List.of(TestEntities.photo(1, artwork, "https://img/1.jpg")));

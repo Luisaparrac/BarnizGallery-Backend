@@ -7,15 +7,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.barnizgallery.backend.dto.ArtworkDetailResponse;
-import com.barnizgallery.backend.dto.ArtworkSummaryResponse;
 import com.barnizgallery.backend.dto.AuctionResponse;
 import com.barnizgallery.backend.dto.PhotoResponse;
 import com.barnizgallery.backend.entity.Artwork;
-import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.enums.AuctionStatus;
 import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.mapper.ArtworkMapper;
+import com.barnizgallery.backend.repository.ArtworkCatalogViewRepository;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.AuctionRepository;
 import com.barnizgallery.backend.repository.PhotoRepository;
@@ -30,35 +29,40 @@ public class ArtworkService {
     private final PhotoRepository photoRepository;
     private final AuctionRepository auctionRepository;
     private final AuctionResponseAssembler auctionAssembler;
+    private final ArtworkCatalogViewRepository catalogRepository;
 
     public ArtworkService(ArtworkRepository artworkRepository, PhotoRepository photoRepository,
-            AuctionRepository auctionRepository, AuctionResponseAssembler auctionAssembler) {
+            AuctionRepository auctionRepository, AuctionResponseAssembler auctionAssembler,
+            ArtworkCatalogViewRepository catalogRepository) {
+        this.catalogRepository = catalogRepository;
         this.artworkRepository = artworkRepository;
         this.photoRepository = photoRepository;
         this.auctionRepository = auctionRepository;
         this.auctionAssembler = auctionAssembler;
     }
 
-    /** Lists artworks, optionally filtered by store and/or status. */
-    @Transactional(readOnly = true)
-    public List<ArtworkSummaryResponse> findAll(Long storeId, ArtworkStatus status) {
-        List<Artwork> artworks;
-        if (storeId != null && status != null) {
-            artworks = artworkRepository.findByStoreStoreIdAndStatusOrderByArtworkIdAsc(storeId, status);
-        } else if (storeId != null) {
-            artworks = artworkRepository.findByStoreStoreIdOrderByArtworkIdAsc(storeId);
-        } else if (status != null) {
-            artworks = artworkRepository.findByStatusOrderByArtworkIdAsc(status);
-        } else {
-            artworks = artworkRepository.findAllByOrderByArtworkIdAsc();
-        }
-        return artworks.stream().map(ArtworkMapper::toSummary).toList();
-    }
-
-    /** Full detail: data, photos and current (scheduled or active) auction. */
+    /**
+     * Public detail: data, photos and current (scheduled or active) auction. Only artworks of the public gallery
+     * exist for the public (404 otherwise).
+     */
     @Transactional(readOnly = true)
     public ArtworkDetailResponse findById(Long artworkId) {
-        Artwork artwork = getArtwork(artworkId);
+        return detail(requirePublic(artworkId));
+    }
+
+    /** 404 unless the artwork is in the public gallery. */
+    @Transactional(readOnly = true)
+    public Artwork requirePublic(Long artworkId) {
+        if (!catalogRepository.existsById(artworkId)) {
+            throw new ResourceNotFoundException(ErrorCode.ARTWORK_NOT_FOUND, artworkId);
+        }
+        return getArtwork(artworkId);
+    }
+
+    /** Data, photos in order and current (scheduled or active) auction of an artwork. */
+    @Transactional(readOnly = true)
+    public ArtworkDetailResponse detail(Artwork artwork) {
+        Long artworkId = artwork.getArtworkId();
         List<PhotoResponse> photos = photoRepository.findByArtworkArtworkIdOrderBySortOrderAscPhotoIdAsc(artworkId).stream()
                 .map(ArtworkMapper::toPhotoResponse)
                 .toList();

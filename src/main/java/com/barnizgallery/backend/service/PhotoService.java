@@ -49,7 +49,7 @@ public class PhotoService {
 
     @Transactional(readOnly = true)
     public List<PhotoResponse> findByArtwork(Long artworkId) {
-        artworkService.getArtwork(artworkId);
+        artworkService.requirePublic(artworkId);
         return photoRepository.findByArtworkArtworkIdOrderBySortOrderAscPhotoIdAsc(artworkId).stream()
                 .map(ArtworkMapper::toPhotoResponse)
                 .toList();
