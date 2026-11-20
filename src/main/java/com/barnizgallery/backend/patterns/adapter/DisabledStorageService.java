@@ -18,7 +18,12 @@ import com.barnizgallery.backend.exception.FeatureDisabledException;
 public class DisabledStorageService implements StorageService {
 
     @Override
-    public String upload(MultipartFile file, String folder) {
+    public StoredImage upload(MultipartFile file, String folder) {
+        throw new FeatureDisabledException(ErrorCode.STORAGE_DISABLED);
+    }
+
+    @Override
+    public void delete(String storageKey) {
         throw new FeatureDisabledException(ErrorCode.STORAGE_DISABLED);
     }
 
