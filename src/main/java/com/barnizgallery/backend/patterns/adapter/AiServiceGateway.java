@@ -4,6 +4,7 @@ import com.barnizgallery.backend.dto.AiPriceSuggestion;
 import com.barnizgallery.backend.dto.AiPricingRequest;
 import com.barnizgallery.backend.dto.AiRecommendationRequest;
 import com.barnizgallery.backend.dto.AiRecommendationResponse;
+import com.barnizgallery.backend.dto.AiSimilarRequest;
 
 /**
  * <b>Adapter pattern – Target.</b>
@@ -23,4 +24,7 @@ public interface AiServiceGateway {
 
     /** {@code POST /v1/recommendations}. */
     AiRecommendationResponse recommend(AiRecommendationRequest request);
+
+    /** {@code POST /v1/similar}: artworks that look like one artwork, best first, with the same item format. */
+    AiRecommendationResponse similar(AiSimilarRequest request);
 }

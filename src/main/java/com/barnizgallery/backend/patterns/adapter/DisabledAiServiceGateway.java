@@ -4,6 +4,7 @@ import com.barnizgallery.backend.dto.AiPriceSuggestion;
 import com.barnizgallery.backend.dto.AiPricingRequest;
 import com.barnizgallery.backend.dto.AiRecommendationRequest;
 import com.barnizgallery.backend.dto.AiRecommendationResponse;
+import com.barnizgallery.backend.dto.AiSimilarRequest;
 import com.barnizgallery.backend.exception.AiServiceException;
 
 /**
@@ -26,6 +27,11 @@ public class DisabledAiServiceGateway implements AiServiceGateway {
 
     @Override
     public AiRecommendationResponse recommend(AiRecommendationRequest request) {
+        throw disabled();
+    }
+
+    @Override
+    public AiRecommendationResponse similar(AiSimilarRequest request) {
         throw disabled();
     }
 
