@@ -17,7 +17,10 @@ public interface ArtworkCatalogViewRepository extends JpaRepository<ArtworkCatal
     @Query("select v.artworkId from ArtworkCatalogView v")
     List<Long> findAllArtworkIds();
 
-    /** Gallery page filtered by color, motif, shape and style codes, currency, price range and store slug. */
+    /**
+     * Gallery page filtered by color, motif, shape and style codes, currency, price range, store slug and a text
+     * search, sorted by {@code recent} (default), {@code priceAsc}, {@code priceDesc} or {@code popular}.
+     */
     @Query(nativeQuery = true, value = """
             SELECT v.* FROM museo.v_artwork_catalog v
             JOIN museo.artworks a ON a.artwork_id = v.artwork_id
@@ -31,9 +34,18 @@ public interface ArtworkCatalogViewRepository extends JpaRepository<ArtworkCatal
               AND (CAST(:minPrice AS numeric) IS NULL OR v.price >= CAST(:minPrice AS numeric))
               AND (CAST(:maxPrice AS numeric) IS NULL OR v.price <= CAST(:maxPrice AS numeric))
               AND (CAST(:store AS text) IS NULL OR v.store_slug = CAST(:store AS text))
-            ORDER BY v.artwork_id DESC
+              AND (CAST(:search AS text) IS NULL
+                   OR v.title_es ILIKE '%' || CAST(:search AS text) || '%'
+                   OR v.title_en ILIKE '%' || CAST(:search AS text) || '%'
+                   OR v.master_name ILIKE '%' || CAST(:search AS text) || '%')
+            ORDER BY
+              CASE WHEN CAST(:sort AS text) = 'priceAsc' THEN v.price END ASC NULLS LAST,
+              CASE WHEN CAST(:sort AS text) = 'priceDesc' THEN v.price END DESC NULLS LAST,
+              CASE WHEN CAST(:sort AS text) = 'popular'
+                   THEN (SELECT count(*) FROM museo.favorites f WHERE f.artwork_id = v.artwork_id) END DESC NULLS LAST,
+              v.artwork_id DESC
             LIMIT :limit OFFSET :offset
             """)
     List<ArtworkCatalogView> search(String color, String motif, String shape, String style, String currency,
-            BigDecimal minPrice, BigDecimal maxPrice, String store, int limit, int offset);
+            BigDecimal minPrice, BigDecimal maxPrice, String store, String search, String sort, int limit, int offset);
 }

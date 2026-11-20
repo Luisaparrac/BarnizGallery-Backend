@@ -10,7 +10,9 @@ import jakarta.validation.constraints.Size;
 
 /**
  * Filters of the public gallery (query parameters, all optional). Catalog values are codes; a price range needs
- * its currency. {@code page} starts at 0 and {@code size} is 24 by default (100 at most).
+ * its currency. {@code page} starts at 0 and {@code size} is 24 by default (100 at most). {@code search} looks in
+ * the titles and the master name; {@code sort} is {@code recent} (default), {@code priceAsc}, {@code priceDesc} or
+ * {@code popular} (most saved as favorite).
  */
 public record ArtworkFilter(
         @Size(max = 60) String color,
@@ -22,5 +24,7 @@ public record ArtworkFilter(
         @PositiveOrZero BigDecimal maxPrice,
         @Size(max = 80) String store,
         @Min(0) Integer page,
-        @Min(1) @Max(100) Integer size) {
+        @Min(1) @Max(100) Integer size,
+        @Size(max = 100) String search,
+        @Pattern(regexp = "recent|priceAsc|priceDesc|popular") String sort) {
 }

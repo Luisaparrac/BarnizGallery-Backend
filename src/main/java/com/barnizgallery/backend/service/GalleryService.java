@@ -62,8 +62,9 @@ public class GalleryService {
         int size = filter.size() == null ? DEFAULT_PAGE_SIZE : filter.size();
         int page = filter.page() == null ? 0 : filter.page();
         List<ArtworkCatalogView> rows = catalogRepository.search(filter.color(), filter.motif(), filter.shape(),
-                filter.style(), filter.currency(), filter.minPrice(), filter.maxPrice(), filter.store(), size,
-                page * size);
+                filter.style(), filter.currency(), filter.minPrice(), filter.maxPrice(), filter.store(),
+                filter.search() == null || filter.search().isBlank() ? null : filter.search().strip(), filter.sort(),
+                size, page * size);
         List<Long> ids = rows.stream().map(ArtworkCatalogView::getArtworkId).toList();
         Map<Long, Artwork> artworks = artworkRepository.findAllById(ids).stream()
                 .collect(Collectors.toMap(Artwork::getArtworkId, Function.identity()));

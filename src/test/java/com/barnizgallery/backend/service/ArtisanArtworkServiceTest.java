@@ -123,10 +123,11 @@ class ArtisanArtworkServiceTest {
                 mock(com.barnizgallery.backend.repository.FavoriteRepository.class));
 
         assertThatThrownBy(() -> gallery.artworks(new ArtworkFilter(null, null, null, null, null,
-                BigDecimal.ONE, null, null, null, null))).hasMessage("price_filter_currency_required");
-        gallery.artworks(new ArtworkFilter("rojo", null, null, null, "USD", BigDecimal.ONE, null, null, 2, null));
+                BigDecimal.ONE, null, null, null, null, null, null))).hasMessage("price_filter_currency_required");
+        gallery.artworks(new ArtworkFilter("rojo", null, null, null, "USD", BigDecimal.ONE, null, null, 2, null,
+                " jarron ", "priceAsc"));
 
-        verify(catalog).search("rojo", null, null, null, "USD", BigDecimal.ONE, null, null,
+        verify(catalog).search("rojo", null, null, null, "USD", BigDecimal.ONE, null, null, "jarron", "priceAsc",
                 GalleryService.DEFAULT_PAGE_SIZE, 2 * GalleryService.DEFAULT_PAGE_SIZE);
     }
 
