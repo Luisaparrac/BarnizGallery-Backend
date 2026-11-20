@@ -1,5 +1,6 @@
 package com.barnizgallery.backend.service;
 
+import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.barnizgallery.backend.entity.AppSetting;
+import com.barnizgallery.backend.enums.ErrorCode;
+import com.barnizgallery.backend.exception.BusinessRuleException;
 import com.barnizgallery.backend.repository.AppSettingRepository;
 
 import tools.jackson.core.JacksonException;
@@ -22,10 +25,16 @@ import tools.jackson.databind.json.JsonMapper;
 /**
  * Business settings from {@code app_settings} (commission, shipping, auction rules...), kept in memory for a
  * short time ({@value #TTL_SECONDS} s) so each request does not read the table. A setting whose value is JSON
- * {@code null} is "not configured yet": the backend never invents a default for it.
+ * {@code null} is "not configured yet": the backend never invents a default for it, and an operation that needs
+ * it answers 409 naming the missing setting.
  */
 @Service
 public class AppSettingsService {
+
+    public static final String CURRENCY_DEFAULT = "currency.default";
+    public static final String AUCTION_MIN_INCREMENT = "auction.min_increment";
+    public static final String AUCTION_MAX_BIDS_PER_MINUTE = "auction.max_bids_per_minute";
+    public static final String AUCTION_SUSPICIOUS_MULTIPLIER = "auction.suspicious_multiplier";
 
     static final long TTL_SECONDS = 30;
 
@@ -47,6 +56,41 @@ public class AppSettingsService {
     public Optional<JsonNode> find(String key) {
         JsonNode value = snapshot().get(key);
         return value == null || value.isNull() ? Optional.empty() : Optional.of(value);
+    }
+
+    /** A number setting (for example {@code platform.commission_rate}). */
+    @Transactional(readOnly = true)
+    public BigDecimal decimal(String key) {
+        JsonNode value = require(key);
+        if (!value.isNumber()) {
+            throw new BusinessRuleException(ErrorCode.SETTING_INVALID, key);
+        }
+        return value.decimalValue();
+    }
+
+    /** A whole-number setting (for example {@code auction.max_bids_per_minute}). */
+    @Transactional(readOnly = true)
+    public int integer(String key) {
+        JsonNode value = require(key);
+        if (!value.isIntegralNumber() || !value.canConvertToInt()) {
+            throw new BusinessRuleException(ErrorCode.SETTING_INVALID, key);
+        }
+        return value.intValue();
+    }
+
+    /** A text setting (for example {@code currency.default}). */
+    @Transactional(readOnly = true)
+    public String text(String key) {
+        JsonNode value = require(key);
+        if (!value.isString() || value.asString().isBlank()) {
+            throw new BusinessRuleException(ErrorCode.SETTING_INVALID, key);
+        }
+        return value.asString();
+    }
+
+    /** The value, or 409 {@code setting_not_configured} naming the setting when it is missing or JSON null. */
+    private JsonNode require(String key) {
+        return find(key).orElseThrow(() -> new BusinessRuleException(ErrorCode.SETTING_NOT_CONFIGURED, key));
     }
 
     /** Forgets the cached values, so the next read sees a change made right now. */

@@ -45,6 +45,10 @@ public enum ErrorCode {
     IMAGE_TOO_LARGE,
     IMAGE_TYPE_NOT_ALLOWED,
 
+    // Business settings
+    SETTING_NOT_CONFIGURED,
+    SETTING_INVALID,
+
     // Payments
     PAYMENT_CURRENCY_NOT_SUPPORTED,
     PAYMENT_GATEWAY_DISABLED,
