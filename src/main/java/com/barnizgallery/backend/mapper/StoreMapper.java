@@ -21,8 +21,9 @@ public final class StoreMapper {
 
     public static StoreSummaryResponse toSummary(Store store, long artworkCount) {
         Master master = store.getMaster();
-        return new StoreSummaryResponse(store.getStoreId(), master.getMasterId(), master.getName(), store.getNameEs(),
-                store.getNameEn(), store.getDescriptionEs(), store.getDescriptionEn(), store.getStatus(), artworkCount);
+        return new StoreSummaryResponse(store.getStoreId(), store.getSlug(), master.getMasterId(), master.getName(),
+                store.getNameEs(), store.getNameEn(), store.getDescriptionEs(), store.getDescriptionEn(),
+                store.getLogoUrl(), store.getBannerUrl(), store.getStatus(), artworkCount);
     }
 
     public static StoreDetailResponse toDetail(Store store, List<ArtworkSummaryResponse> artworks) {

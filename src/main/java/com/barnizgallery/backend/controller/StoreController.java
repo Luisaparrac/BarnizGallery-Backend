@@ -1,11 +1,14 @@
 package com.barnizgallery.backend.controller;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.barnizgallery.backend.dto.StorePageResponse;
+import com.barnizgallery.backend.dto.StoreSummaryResponse;
 import com.barnizgallery.backend.service.StoreService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,6 +26,12 @@ public class StoreController {
 
     public StoreController(StoreService storeService) {
         this.storeService = storeService;
+    }
+
+    @GetMapping
+    @Operation(summary = "Published stores of approved masters, newest first, with their number of public artworks")
+    public List<StoreSummaryResponse> findPublished() {
+        return storeService.findPublished();
     }
 
     @GetMapping("/{slug}")

@@ -28,6 +28,11 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
 
     boolean existsBySlug(String slug);
 
+    /** Stores with the given status whose master has the given verification, with the master loaded. */
+    @Query("select s from Store s join fetch s.master m where s.status = :status "
+            + "and m.verificationStatus = :verification order by s.publishedAt desc, s.storeId")
+    List<Store> findByStatusWithMaster(StoreStatus status, MasterVerificationStatus verification);
+
     /** A store by slug with its master, when it has the given status and its master the given verification. */
     @Query("select s from Store s join fetch s.master m where s.slug = :slug and s.status = :status "
             + "and m.verificationStatus = :verification")

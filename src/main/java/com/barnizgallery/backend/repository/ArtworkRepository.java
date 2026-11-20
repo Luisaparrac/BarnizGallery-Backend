@@ -37,6 +37,11 @@ public interface ArtworkRepository extends JpaRepository<Artwork, Long> {
             + "and a.currency = :currency and a.artworkId <> :artworkId order by a.artworkId desc")
     List<Artwork> findPriceComparables(String currency, Long artworkId, Pageable page);
 
+    /** Count of the not deleted artworks with one of the statuses, per store, in a single query. */
+    @Query("select a.store.storeId as storeId, count(a) as artworkCount from Artwork a "
+            + "where a.deletedAt is null and a.status in :statuses group by a.store.storeId")
+    List<StoreArtworkCount> countGroupedByStore(Collection<ArtworkStatus> statuses);
+
     /** Artwork count of every store in a single query. */
     @Query("select a.store.storeId as storeId, count(a) as artworkCount from Artwork a group by a.store.storeId")
     List<StoreArtworkCount> countGroupedByStore();

@@ -116,6 +116,7 @@ Dates are ISO-8601 (UTC). Enum values are in English (`EXHIBITED`, `ACTIVE`, `PE
 | GET | `/api/masters` | Masters |
 | GET | `/api/masters/{id}` | Master + its store |
 | POST / PUT | `/api/masters`, `/api/masters/{id}` | Create / update master |
+| GET | `/api/stores` | Published stores of approved masters, newest first, with slug, logo, banner and count of public artworks |
 | GET | `/api/stores/{slug}` | Public page of a published store (approved master): visible sections in order and exhibited or auctioned artworks; 404 otherwise |
 | GET | `/api/rooms` | Stores with master and artwork count (legacy path) |
 | GET | `/api/rooms/{id}` | Store + artworks (legacy path) |

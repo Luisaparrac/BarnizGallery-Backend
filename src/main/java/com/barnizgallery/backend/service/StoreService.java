@@ -77,6 +77,16 @@ public class StoreService {
         return StoreMapper.toDetail(store, artworks);
     }
 
+    /** Published stores of approved masters, newest first, with their number of public artworks. */
+    @Transactional(readOnly = true)
+    public List<StoreSummaryResponse> findPublished() {
+        Map<Long, Long> counts = artworkRepository.countGroupedByStore(ArtworkStatus.PUBLIC).stream()
+                .collect(Collectors.toMap(StoreArtworkCount::getStoreId, StoreArtworkCount::getArtworkCount));
+        return storeRepository.findByStatusWithMaster(StoreStatus.PUBLISHED, MasterVerificationStatus.APPROVED).stream()
+                .map(store -> StoreMapper.toSummary(store, counts.getOrDefault(store.getStoreId(), 0L)))
+                .toList();
+    }
+
     /**
      * Public page of a store by its slug. Only published stores of approved masters exist for the public (404
      * otherwise); hidden sections and artworks that are not exhibited or in auction are left out.
