@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.barnizgallery.backend.dto.ArtworkSummaryResponse;
+import com.barnizgallery.backend.dto.FavoriteToggleResponse;
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Favorite;
 import com.barnizgallery.backend.entity.FavoriteId;
@@ -56,6 +57,17 @@ public class FavoriteService {
         favorite.setUser(userRepository.getReferenceById(userId));
         favorite.setArtwork(artwork);
         favoriteRepository.save(favorite);
+    }
+
+    /** Adds the artwork when it is not a favorite and removes it when it is. */
+    @Transactional
+    public FavoriteToggleResponse toggle(Long artworkId) {
+        if (favoriteRepository.existsById(new FavoriteId(currentUser.requireId(), artworkId))) {
+            remove(artworkId);
+            return new FavoriteToggleResponse(false);
+        }
+        add(artworkId);
+        return new FavoriteToggleResponse(true);
     }
 
     @Transactional
