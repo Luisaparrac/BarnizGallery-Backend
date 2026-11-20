@@ -42,21 +42,22 @@ HTTP / WebSocket
 
 ## Design patterns
 
-The first eight were seen in class; the last four were researched for this project. Every pattern class has a
-short Javadoc that names its role in the pattern.
+Six were seen in class (Adapter, Builder, Factory Method, Facade, Proxy and Decorator); the other six were
+researched for this project (Composite, Observer, State, Strategy, Chain of Responsibility and Template Method).
+Every pattern class has a short Javadoc that names its role in the pattern.
 
 | # | Pattern | Origin | Where (`src/main/java/com/barnizgallery/backend/…`) | What it does here |
 |---|---|---|---|---|
 | 1 | Adapter | Seen in class | `patterns/adapter/` (`PaymentGateway` → `WompiGateway`, `PayPalGateway`, `SimulatedGateway`; `StorageService` → `CloudinaryStorageService`; `EmailSender` → `BrevoEmailSender`; `AiServiceGateway` → `AiServiceClient`) | One interface per external service; each provider is translated by its adapter, and a disabled adapter keeps the app working without keys |
 | 2 | Builder | Seen in class | `patterns/builder/AuctionBuilder`, `patterns/builder/OrderBuilder` | Builds an auction (base price, dates, currency) and a checkout order with amounts that match the database rules exactly |
-| 3 | Composite | Seen in class | `patterns/composite/` (`GalleryComposite` → `StoreComposite` → `ArtworkLeaf`) | The public gallery as a tree: gallery → published stores → public artworks |
+| 3 | Factory Method | Seen in class | `patterns/factorymethod/` (`InteractionFactory` and one factory per action) | Creates each kind of interaction (view, zoom, favorite, add to cart, share, bid, purchase, store visit, custom order) |
 | 4 | Facade | Seen in class | `patterns/facade/AiFacade` | One entry point for AI features: suggested prices, recommendation strategies and bid review |
-| 5 | Factory Method | Seen in class | `patterns/factorymethod/` (`InteractionFactory` and one factory per action) | Creates each kind of interaction (view, zoom, favorite, add to cart, share, bid, purchase, store visit, custom order) |
-| 6 | Observer | Seen in class | `patterns/observer/` (`AuctionEventPublisher`, `LiveAuctionBroadcaster`, `OutbidNotifier`, `MatchingAuctionNotifier`, `BidInteractionRecorder`) | Auction events reach WebSocket subscribers, notifications and interaction history |
-| 7 | State | Seen in class | `patterns/state/` (`AuctionContext`, `ScheduledState`, `ActiveState`, `FinishedState`, `CancelledState`) | The auction lifecycle: each state decides which transitions and bids are allowed |
-| 8 | Strategy | Seen in class | `patterns/strategy/` (`ProfileBasedStrategy`, `InteractionBasedStrategy`, `HybridStrategy`, `AiStrategy`, `AiServiceStrategy`) | Interchangeable recommendation algorithms chosen per request |
-| 9 | Proxy | Researched | `patterns/proxy/AiServiceProxy` | Stands in front of the AI service client with the same interface: caches answers for 2 minutes and stops calling for 30 s after a server failure, so callers fall back at once |
-| 10 | Decorator | Researched | `patterns/decorator/LoggingPaymentGateway` | Wraps every payment gateway and adds an audit trail in the log (payment references, amounts, webhook events, failures) without changing the gateways |
+| 5 | Proxy | Seen in class | `patterns/proxy/AiServiceProxy` | Stands in front of the AI service client with the same interface: caches answers for 2 minutes and stops calling for 30 s after a server failure, so callers fall back at once |
+| 6 | Decorator | Seen in class | `patterns/decorator/LoggingPaymentGateway` | Wraps every payment gateway and adds an audit trail in the log (payment references, amounts, webhook events, failures) without changing the gateways |
+| 7 | Composite | Researched | `patterns/composite/` (`GalleryComposite` → `StoreComposite` → `ArtworkLeaf`) | The public gallery as a tree: gallery → published stores → public artworks |
+| 8 | Observer | Researched | `patterns/observer/` (`AuctionEventPublisher`, `LiveAuctionBroadcaster`, `OutbidNotifier`, `MatchingAuctionNotifier`, `BidInteractionRecorder`) | Auction events reach WebSocket subscribers, notifications and interaction history |
+| 9 | State | Researched | `patterns/state/` (`AuctionContext`, `ScheduledState`, `ActiveState`, `FinishedState`, `CancelledState`) | The auction lifecycle: each state decides which transitions and bids are allowed |
+| 10 | Strategy | Researched | `patterns/strategy/` (`ProfileBasedStrategy`, `InteractionBasedStrategy`, `HybridStrategy`, `AiStrategy`, `AiServiceStrategy`) | Interchangeable recommendation algorithms chosen per request |
 | 11 | Chain of Responsibility | Researched | `patterns/chain/` (`CheckoutCheck` → `CartNotEmptyCheck` → `ForSaleCheck` → `StockCheck` → `SingleCurrencyCheck`) | The checkout checks run one after the other; the first broken rule stops the chain with a 409 |
 | 12 | Template Method | Researched | `patterns/templatemethod/` (`FulfillmentStep` → `ShipStep`, `DeliverStep`) | Every shipping step follows the same algorithm (check status → record data → move the line → move the order); subclasses fill in the steps |
 
