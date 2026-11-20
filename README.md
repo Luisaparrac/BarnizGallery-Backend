@@ -84,6 +84,8 @@ Requirements: Java 21 and a local PostgreSQL 18.
 | `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` | Cloudinary account for photos (empty = upload disabled) | – |
 | `FRONTEND_URL` | Frontend base URL used in the email links (set it in production) | `http://localhost:5173` |
 | `BREVO_API_KEY` / `MAIL_FROM` / `MAIL_FROM_NAME` | Brevo API key and the verified sender of the account emails (empty = emails disabled) | – / – / `MUSEO Barniz de Pasto` |
+| `WOMPI_PUBLIC_KEY` / `WOMPI_INTEGRITY_SECRET` / `WOMPI_EVENTS_SECRET` | Wompi keys for COP payments (empty = Wompi disabled; `pub_test_` keys use the sandbox) | – |
+| `WOMPI_BASE_URL` | Wompi Web Checkout URL | `https://checkout.wompi.co/p/` |
 | `FLYWAY_ENABLED` | Run the Flyway migrations on start (baseline 1 on an existing v1 database, then V2) | `true` |
 | `PORT` | HTTP port (set by Render) | `8080` |
 | `CORS_ALLOWED_ORIGINS` | Comma-separated frontend origins (REST and WebSocket) | `http://localhost:5173,http://localhost:3000` |
