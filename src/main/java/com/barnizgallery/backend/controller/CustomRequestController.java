@@ -12,8 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.barnizgallery.backend.dto.AcceptOfferResponse;
 import com.barnizgallery.backend.dto.CustomRequestInput;
 import com.barnizgallery.backend.dto.CustomRequestResponse;
+import com.barnizgallery.backend.dto.OfferInput;
+import com.barnizgallery.backend.service.CustomOfferService;
 import com.barnizgallery.backend.service.CustomRequestService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,9 +32,36 @@ import jakarta.validation.Valid;
 public class CustomRequestController {
 
     private final CustomRequestService requestService;
+    private final CustomOfferService offerService;
 
-    public CustomRequestController(CustomRequestService requestService) {
+    public CustomRequestController(CustomRequestService requestService, CustomOfferService offerService) {
         this.requestService = requestService;
+        this.offerService = offerService;
+    }
+
+    @PostMapping("/{id}/offers")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Approved artisan: send an offer (ACCEPT_PRICE or COUNTER_OFFER) on an open request")
+    public CustomRequestResponse sendOffer(@PathVariable Long id, @Valid @RequestBody OfferInput input) {
+        return offerService.send(id, input);
+    }
+
+    @PostMapping("/{id}/offers/{offerId}/withdraw")
+    @Operation(summary = "Approved artisan: withdraw an own active offer")
+    public CustomRequestResponse withdraw(@PathVariable Long id, @PathVariable Long offerId) {
+        return offerService.withdraw(id, offerId);
+    }
+
+    @PostMapping("/{id}/offers/{offerId}/accept")
+    @Operation(summary = "Accept an offer: the others are rejected and an order with deposit and balance is created")
+    public AcceptOfferResponse accept(@PathVariable Long id, @PathVariable Long offerId) {
+        return offerService.accept(id, offerId);
+    }
+
+    @PostMapping("/{id}/offers/{offerId}/reject")
+    @Operation(summary = "Reject an active offer")
+    public CustomRequestResponse reject(@PathVariable Long id, @PathVariable Long offerId) {
+        return offerService.reject(id, offerId);
     }
 
     @GetMapping

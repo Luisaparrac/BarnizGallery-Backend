@@ -21,7 +21,10 @@ public final class NotificationMapper {
             Map.entry("verification_step_rejected", "VERIFICATION_REJECTED"),
             Map.entry("outbid", "OUTBID"),
             Map.entry("matching_auction", "MATCHING_AUCTION"),
-            Map.entry("auction_won", "AUCTION_WON"));
+            Map.entry("auction_won", "AUCTION_WON"),
+            Map.entry("new_custom_offer", "NEW_CUSTOM_OFFER"),
+            Map.entry("offer_accepted", "OFFER_ACCEPTED"),
+            Map.entry("offer_rejected", "OFFER_REJECTED"));
 
     private NotificationMapper() {
     }
