@@ -30,9 +30,11 @@ public class PaymentWebhookService {
     private final PaymentEventRepository eventRepository;
     private final PaymentRepository paymentRepository;
     private final Clock clock;
+    private final PaymentResultApplier resultApplier;
 
     public PaymentWebhookService(PaymentGatewayRegistry gatewayRegistry, PaymentEventRepository eventRepository,
-            PaymentRepository paymentRepository, Clock clock) {
+            PaymentRepository paymentRepository, Clock clock, PaymentResultApplier resultApplier) {
+        this.resultApplier = resultApplier;
         this.gatewayRegistry = gatewayRegistry;
         this.eventRepository = eventRepository;
         this.paymentRepository = paymentRepository;
@@ -63,6 +65,8 @@ public class PaymentWebhookService {
         saved.setPayload(event.payload());
         saved.setReceivedAt(clock.instant());
         eventRepository.save(saved);
+        resultApplier.apply(payment, event);
+        saved.setProcessedAt(clock.instant());
         return true;
     }
 }

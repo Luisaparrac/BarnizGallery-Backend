@@ -264,7 +264,7 @@ rounded half up to cents; artisan net = line total − fee; total = subtotal + s
 | Method | Path | Description |
 |---|---|---|
 | POST | `/api/orders/{orderId}/payments` | `{ obligationId?, simulated? }` → 201 `{ paymentId, gateway, reference, redirectUrl, amount, currency, status }`. Gateway by obligation currency (COP → Wompi, USD → PayPal; other → 409, no credentials → 503); `simulated: true` only while `payments.test_mode` is true. 409 when nothing is pending, the deadline passed or a payment is already pending |
-| POST | `/api/payments/webhooks/{gateway}` | Public; the adapter verifies the signature (400 if wrong). Each event is saved once in `payment_events` (same gateway + event id → ignored) and applied in the same transaction |
+| POST | `/api/payments/webhooks/{gateway}` | Public; the adapter verifies the signature (400 if wrong). Each event is saved once in `payment_events` (same gateway + event id → ignored) and applied in the same transaction: an approved payment marks its obligation paid and, when all are paid, the database consumes the reserved stock and moves the order to `PAID` |
 
 Artwork rules (422): a price needs its currency; an exhibited artwork needs `saleMode`; `SALE` needs
 `price` > 0 and `stock`. The currency cannot change once the artwork has orders or auctions (409, enforced by
