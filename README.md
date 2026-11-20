@@ -168,6 +168,16 @@ The v1 contact messages were migrated by the database to conversations and messa
 store templates, each with its `code` and its names in Spanish and English. Requests always use these
 **codes** (for example `colorCodes: ["rojo"]`), never database ids.
 
+### Catalog administration (administrators)
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/admin/catalogs/{catalog}` | Every entry, active or not |
+| POST | `/api/admin/catalogs/{catalog}` | `{ code, nameEs, nameEn, sortOrder?, active?, hex? }` → 201 (409 if the code exists) |
+| PUT | `/api/admin/catalogs/{catalog}/{code}` | Edit names, order, extra fields or `active`; the code never changes |
+
+`{catalog}`: `colors`. Entries are never deleted: `active=false` hides them from `/api/catalogs` and from new
+requests.
+
 ### Authentication
 Public endpoints; every other call sends `Authorization: Bearer <accessToken>`. The access token lasts
 `JWT_ACCESS_MINUTES` (15); the refresh token lasts `JWT_REFRESH_DAYS` (7) and works only once.
