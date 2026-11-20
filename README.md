@@ -164,6 +164,13 @@ them is `null` the operation answers 409 `setting_not_configured` naming it.
 The v1 contact messages were migrated by the database to conversations and messages. The old
 `/api/contact-messages` endpoints were removed; the conversation endpoints replace them.
 
+### Notifications (logged-in user)
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/notifications?unreadOnly=false` | Latest 100 notifications, newest first, in the user's language |
+| POST | `/api/notifications/{id}/read` | Mark one as read (another user's notification answers 404) |
+| POST | `/api/notifications/read-all` | Mark all as read: `{ "updated": n }` |
+
 ### Errors
 Every error has the same shape:
 ```json
