@@ -37,6 +37,12 @@ public class ArtisanOrderController {
         return fulfillmentService.lines();
     }
 
+    @PostMapping("/items/{orderItemId}/deliver")
+    @Operation(summary = "Mark a shipped line as delivered; the order is delivered when all its lines are")
+    public ArtisanOrderLineResponse deliver(@PathVariable Long orderItemId) {
+        return fulfillmentService.deliver(orderItemId);
+    }
+
     @PostMapping("/items/{orderItemId}/ship")
     @Operation(summary = "Mark a paid line as shipped with carrier and tracking number; the buyer is notified")
     public ArtisanOrderLineResponse ship(@PathVariable Long orderItemId, @Valid @RequestBody ShipmentRequest request) {

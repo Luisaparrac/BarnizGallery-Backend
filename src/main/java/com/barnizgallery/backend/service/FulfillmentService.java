@@ -62,6 +62,24 @@ public class FulfillmentService {
         return OrderMapper.toArtisanLine(item);
     }
 
+    /**
+     * Marks a shipped line as delivered. When every line of the order is delivered the order becomes
+     * {@code entregado}.
+     */
+    @Transactional
+    public ArtisanOrderLineResponse deliver(Long orderItemId) {
+        OrderItem item = myLine(orderItemId);
+        if (item.getFulfillmentStatus() != FulfillmentStatus.SHIPPED) {
+            throw new BusinessRuleException(ErrorCode.FULFILLMENT_STEP_INVALID, item.getFulfillmentStatus());
+        }
+        item.setFulfillmentStatus(FulfillmentStatus.DELIVERED);
+        Order order = item.getOrder();
+        if (lines(order).stream().allMatch(line -> line.getFulfillmentStatus() == FulfillmentStatus.DELIVERED)) {
+            order.setStatus(OrderStatus.DELIVERED);
+        }
+        return OrderMapper.toArtisanLine(item);
+    }
+
     /** A paid line of the artisan's store (404 otherwise). */
     OrderItem myLine(Long orderItemId) {
         Long storeId = editorService.myStore().getStoreId();
