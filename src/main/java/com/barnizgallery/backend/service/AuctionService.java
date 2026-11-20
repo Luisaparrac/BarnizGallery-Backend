@@ -77,6 +77,7 @@ public class AuctionService {
     @Transactional
     public AuctionResponse create(CreateAuctionRequest request) {
         Artwork artwork = artworkService.getArtwork(request.artworkId());
+        ActiveMasterRule.requireActive(artwork.getStore().getMaster());
         AuctionBuilder builder = new AuctionBuilder(auctionRepository, clock)
                 .forArtwork(artwork)
                 .currency(settings.text(AppSettingsService.CURRENCY_DEFAULT))

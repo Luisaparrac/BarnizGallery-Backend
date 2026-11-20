@@ -11,7 +11,7 @@ import com.barnizgallery.backend.exception.BusinessRuleException;
 
 /**
  * When an artwork can be bought directly: exhibited for sale, not deleted, with price, currency and stock, in a
- * published store of an approved master. Stock itself is checked and reserved by the database at checkout.
+ * published store of an active, approved master. Stock itself is checked and reserved by the database at checkout.
  */
 final class PurchaseRules {
 
@@ -25,6 +25,7 @@ final class PurchaseRules {
                 && artwork.getSaleMode() == SaleMode.SALE
                 && artwork.getPrice() != null && artwork.getCurrency() != null && artwork.getStock() != null
                 && store.getStatus() == StoreStatus.PUBLISHED
+                && store.getMaster().isActive()
                 && store.getMaster().getVerificationStatus() == MasterVerificationStatus.APPROVED;
     }
 

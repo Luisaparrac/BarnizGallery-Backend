@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -133,6 +134,20 @@ public class GlobalExceptionHandler {
         log.warn("Data integrity violation on {}: {}", request.getRequestURI(),
                 ex.getMostSpecificCause().getMessage());
         return build(HttpStatus.CONFLICT, ErrorCode.DATA_CONFLICT, request, null);
+    }
+
+    /**
+     * A business rule raised by a database function or trigger that no service translated first: answered as 409
+     * with a generic message, because the database text is only in Spanish.
+     */
+    @ExceptionHandler(DataAccessException.class)
+    public ResponseEntity<ErrorResponse> handleDataAccess(DataAccessException ex, HttpServletRequest request) {
+        if (DatabaseErrors.isRuleViolation(ex)) {
+            log.warn("Database rule rejected {}: {}", request.getRequestURI(), ex.getMostSpecificCause().getMessage());
+            return build(HttpStatus.CONFLICT, ErrorCode.DATABASE_RULE_REJECTED, request, null);
+        }
+        log.error("Database error on {}", request.getRequestURI(), ex);
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_ERROR, request, null);
     }
 
     @ExceptionHandler(Exception.class)

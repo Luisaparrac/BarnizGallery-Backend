@@ -172,10 +172,13 @@ public class StoreEditorService {
                         master.getMasterId()));
     }
 
+    /** The master profile of the logged-in artisan; 409 when it is archived. */
     private Master myMaster() {
         Long userId = currentUser.requireId();
-        return masterRepository.findByUserUserId(userId)
+        Master master = masterRepository.findByUserUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.ARTISAN_PROFILE_NOT_FOUND, userId));
+        ActiveMasterRule.requireActive(master);
+        return master;
     }
 
     private String freeSlug(String wanted) {

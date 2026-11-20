@@ -48,7 +48,10 @@ Important rules:
   comes from the Flyway migrations in `src/main/resources/db/migration`, written by the database team.
 - Business rules that live in the database (stock reservations, payment triggers, audit, currency
   checks) are called from the backend, not re-implemented in Java.
-- There is **no seed data**: an empty table returns an empty list.
+- There is **no seed data** from the backend: an empty table returns an empty list. Catalog rows, the
+  masters roster and the seed artworks come from the migrations (V2, V4).
+- **Archived masters** (`is_active = false`, V4) keep their history but take no new operations (409
+  `master_archived`); a database rule that rejects an operation is answered with 409 `database_rule_rejected`.
 - Masters and stores **cannot be deleted** through the API (the database cascades deletes).
 - All times are **UTC**.
 
