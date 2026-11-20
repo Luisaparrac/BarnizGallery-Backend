@@ -242,7 +242,8 @@ Public endpoints; every other call sends `Authorization: Bearer <accessToken>`. 
 | Artisan or administrator | Create and edit stores, artworks and photos (an artisan only their own store); suggested prices |
 | Administrator | `/api/admin/**`, masters, creating and closing auctions, any user's data |
 
-A wrong role (or someone else's store) answers 403 `forbidden`, a suspended or deleted account 403 `suspended`, and a
+Cart, checkout, orders, payments, bids, favorites and addresses are only for customers (`CUSTOMER`); artisans and
+administrators get 403. A wrong role (or someone else's store) answers 403 `forbidden`, a suspended or deleted account 403 `suspended`, and a
 missing or expired token 401 `unauthorized`. Someone else's order, payment, address or favorite answers 404.
 
 ### Artisan verification (artisans)

@@ -26,6 +26,7 @@ public class SecurityConfig {
 
     static final String ADMIN = "ADMIN";
     static final String ARTISAN = "ARTISAN";
+    static final String CUSTOMER = "CUSTOMER";
 
     private final JsonAuthenticationEntryPoint authenticationEntryPoint;
     private final JsonAccessDeniedHandler accessDeniedHandler;
@@ -58,7 +59,9 @@ public class SecurityConfig {
     /**
      * Who may call what. Reading the public catalog (gallery, stores, masters, artworks, auctions) and the
      * account endpoints are open; the administration is only for administrators; content changes need an
-     * artisan or an administrator; everything else needs a logged-in user. Rules that depend on the data (own
+     * artisan or an administrator; shopping (cart, checkout, orders, payments, bids, favorites, addresses) is only
+     * for customers (403 {@code forbidden} for artisans and administrators); everything else needs a logged-in
+     * user. Rules that depend on the data (own
      * account, own store) are checked with {@code @PreAuthorize} and in the services.
      */
     static void authorizeRequests(
@@ -75,6 +78,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/masters/**").hasRole(ADMIN)
                 .requestMatchers(HttpMethod.POST, "/api/auctions", "/api/auctions/*/start", "/api/auctions/*/finish",
                         "/api/auctions/*/cancel").hasRole(ADMIN)
+                .requestMatchers("/api/cart/**", "/api/orders/**", "/api/payments/**", "/api/favorites/**",
+                        "/api/users/me/addresses/**", "/api/users/me/favorites/**").hasRole(CUSTOMER)
+                .requestMatchers(HttpMethod.POST, "/api/auctions/*/bids").hasRole(CUSTOMER)
                 .requestMatchers("/api/artworks/**", "/api/photos/**").hasAnyRole(ADMIN, ARTISAN)
                 .anyRequest().authenticated();
     }
