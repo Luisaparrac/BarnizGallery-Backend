@@ -3,7 +3,9 @@ package com.barnizgallery.backend.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -11,8 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.barnizgallery.backend.dto.CreateStoreRequest;
 import com.barnizgallery.backend.dto.StoreEditorResponse;
+import com.barnizgallery.backend.dto.StoreSectionRequest;
+import com.barnizgallery.backend.dto.StoreSectionResponse;
 import com.barnizgallery.backend.dto.UpdateStoreRequest;
 import com.barnizgallery.backend.service.StoreEditorService;
+import com.barnizgallery.backend.service.StoreSectionService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,9 +32,25 @@ import jakarta.validation.Valid;
 public class ArtisanStoreController {
 
     private final StoreEditorService editorService;
+    private final StoreSectionService sectionService;
 
-    public ArtisanStoreController(StoreEditorService editorService) {
+    public ArtisanStoreController(StoreEditorService editorService, StoreSectionService sectionService) {
         this.editorService = editorService;
+        this.sectionService = sectionService;
+    }
+
+    @PostMapping("/sections")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Add a visible section at the end of the store page")
+    public StoreSectionResponse addSection(@Valid @RequestBody StoreSectionRequest request) {
+        return sectionService.add(request);
+    }
+
+    @PutMapping("/sections/{sectionId}")
+    @Operation(summary = "Replace the content of a section of the artisan's store")
+    public StoreSectionResponse updateSection(@PathVariable Long sectionId,
+            @Valid @RequestBody StoreSectionRequest request) {
+        return sectionService.update(sectionId, request);
     }
 
     @PostMapping
