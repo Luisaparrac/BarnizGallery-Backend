@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.barnizgallery.backend.dto.CreateStoreRequest;
 import com.barnizgallery.backend.dto.StoreEditorResponse;
+import com.barnizgallery.backend.dto.UpdateStoreRequest;
 import com.barnizgallery.backend.entity.Master;
 import com.barnizgallery.backend.entity.Store;
 import com.barnizgallery.backend.entity.StoreSection;
@@ -77,6 +78,51 @@ public class StoreEditorService {
         Store saved = storeRepository.save(store);
         List<StoreSection> sections = sectionRepository.saveAll(sectionsOf(template, saved));
         return StoreEditorMapper.toResponse(saved, sections);
+    }
+
+    /** Changes names, descriptions, slug, images, theme or custom orders; 409 when the slug is taken. */
+    @Transactional
+    public StoreEditorResponse update(UpdateStoreRequest request) {
+        Store store = myStore();
+        if (request.nameEs() != null) {
+            store.setNameEs(request.nameEs().trim());
+        }
+        if (request.nameEn() != null) {
+            store.setNameEn(request.nameEn().trim());
+        }
+        if (request.descriptionEs() != null) {
+            store.setDescriptionEs(request.descriptionEs());
+        }
+        if (request.descriptionEn() != null) {
+            store.setDescriptionEn(request.descriptionEn());
+        }
+        if (request.slug() != null && !request.slug().equals(store.getSlug())) {
+            if (storeRepository.existsBySlug(request.slug())) {
+                throw new BusinessRuleException(ErrorCode.SLUG_TAKEN, request.slug());
+            }
+            store.setSlug(request.slug());
+        }
+        if (request.logoUrl() != null) {
+            store.setLogoUrl(request.logoUrl());
+        }
+        if (request.bannerUrl() != null) {
+            store.setBannerUrl(request.bannerUrl());
+        }
+        if (request.theme() != null) {
+            store.setTheme(jsonObject(request.theme()));
+        }
+        if (request.acceptsCustomOrders() != null) {
+            store.setAcceptsCustomOrders(request.acceptsCustomOrders());
+        }
+        return mine();
+    }
+
+    /** A JSON object as text; any other JSON value → 422. */
+    static String jsonObject(JsonNode value) {
+        if (!value.isObject()) {
+            throw BusinessRuleException.unprocessable(ErrorCode.JSON_OBJECT_REQUIRED);
+        }
+        return value.toString();
     }
 
     /** The artisan's store with all its sections. */

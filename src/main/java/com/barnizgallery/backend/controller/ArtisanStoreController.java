@@ -2,6 +2,7 @@ package com.barnizgallery.backend.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.barnizgallery.backend.dto.CreateStoreRequest;
 import com.barnizgallery.backend.dto.StoreEditorResponse;
+import com.barnizgallery.backend.dto.UpdateStoreRequest;
 import com.barnizgallery.backend.service.StoreEditorService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,6 +37,12 @@ public class ArtisanStoreController {
     @Operation(summary = "Create the store from a template (draft); 409 if the master already has one")
     public StoreEditorResponse create(@Valid @RequestBody CreateStoreRequest request) {
         return editorService.create(request);
+    }
+
+    @PatchMapping
+    @Operation(summary = "Change names, descriptions, slug, logo, banner, theme or custom orders (409 if the slug is taken)")
+    public StoreEditorResponse update(@Valid @RequestBody UpdateStoreRequest request) {
+        return editorService.update(request);
     }
 
     @GetMapping

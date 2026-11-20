@@ -230,6 +230,7 @@ the artisan) and `ADMIN_APPROVAL` (the administrator's final decision).
 |---|---|---|
 | POST | `/api/artisans/me/store` | `{ templateCode, nameEs, nameEn, descriptionEs?, descriptionEn?, slug?, acceptsCustomOrders? }` → 201 draft store with the template theme and sections |
 | GET | `/api/artisans/me/store` | The artisan's store with every section |
+| PATCH | `/api/artisans/me/store` | `{ nameEs?, nameEn?, descriptionEs?, descriptionEn?, slug?, logoUrl?, bannerUrl?, theme?, acceptsCustomOrders? }` (409 if the slug is taken) |
 
 ### Artisan verification (administrators)
 | Method | Path | Description |
