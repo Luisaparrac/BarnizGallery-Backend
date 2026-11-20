@@ -123,7 +123,7 @@ public class PayPalGateway implements PaymentGateway {
     static PaymentStatus captureStatus(String paypalStatus) {
         return switch (paypalStatus) {
             case "COMPLETED" -> PaymentStatus.APPROVED;
-            case "DECLINED", "FAILED" -> PaymentStatus.DECLINED;
+            case "DECLINED", "FAILED" -> PaymentStatus.REJECTED;
             case "REFUNDED", "PARTIALLY_REFUNDED" -> PaymentStatus.REFUNDED;
             default -> PaymentStatus.PENDING;
         };

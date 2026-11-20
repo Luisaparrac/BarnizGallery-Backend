@@ -130,7 +130,7 @@ public class WompiGateway implements PaymentGateway {
     static PaymentStatus toPaymentStatus(String wompiStatus) {
         return switch (wompiStatus) {
             case "APPROVED" -> PaymentStatus.APPROVED;
-            case "DECLINED", "VOIDED", "ERROR" -> PaymentStatus.DECLINED;
+            case "DECLINED", "VOIDED", "ERROR" -> PaymentStatus.REJECTED;
             default -> PaymentStatus.PENDING;
         };
     }

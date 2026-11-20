@@ -71,7 +71,7 @@ class FulfillmentAndPayoutTest {
     @Test
     void shippingAndDeliveringMovesTheOrderWhenEveryLineIsDone() {
         fulfillment.ship(11L, new ShipmentRequest("Servientrega", "SV-1"));
-        assertThat(order.getStatus()).isEqualTo(OrderStatus.IN_PREPARATION);
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.PREPARING);
         verify(notifications).notify(eq(order.getBuyer()), eq(FulfillmentService.ORDER_SHIPPED), anyString(),
                 any(), eq("MUS-TEST"), eq("Servientrega"), eq("SV-1"));
 

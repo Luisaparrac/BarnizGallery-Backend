@@ -53,7 +53,7 @@ public class PaymentSimulationService {
         if (!paymentSettings.testMode()) {
             throw new BusinessRuleException(ErrorCode.SIMULATED_PAYMENTS_DISABLED);
         }
-        if (!EnumSet.of(PaymentStatus.APPROVED, PaymentStatus.DECLINED).contains(outcome)) {
+        if (!EnumSet.of(PaymentStatus.APPROVED, PaymentStatus.REJECTED).contains(outcome)) {
             throw BusinessRuleException.unprocessable(ErrorCode.SIMULATED_OUTCOME_INVALID);
         }
         String eventId = "sim-" + UUID.randomUUID();

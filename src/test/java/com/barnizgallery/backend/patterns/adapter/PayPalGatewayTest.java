@@ -150,7 +150,7 @@ class PayPalGatewayTest {
                 {"id": "WH-EVENT-2", "event_type": "PAYMENT.CAPTURE.DECLINED",
                  "resource": {"id": "3C679366HH908993F", "status": "DECLINED", "custom_id": "PAY-1"}}""")).orElseThrow();
 
-        assertThat(event.status()).isEqualTo(PaymentStatus.DECLINED);
+        assertThat(event.status()).isEqualTo(PaymentStatus.REJECTED);
         assertThat(event.reference()).isEqualTo("PAY-1");
     }
 
@@ -171,7 +171,7 @@ class PayPalGatewayTest {
     @Test
     void captureStatusesMapToPaymentStatuses() {
         assertThat(PayPalGateway.captureStatus("COMPLETED")).isEqualTo(PaymentStatus.APPROVED);
-        assertThat(PayPalGateway.captureStatus("FAILED")).isEqualTo(PaymentStatus.DECLINED);
+        assertThat(PayPalGateway.captureStatus("FAILED")).isEqualTo(PaymentStatus.REJECTED);
         assertThat(PayPalGateway.captureStatus("REFUNDED")).isEqualTo(PaymentStatus.REFUNDED);
         assertThat(PayPalGateway.captureStatus("PENDING")).isEqualTo(PaymentStatus.PENDING);
     }

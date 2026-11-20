@@ -7,7 +7,7 @@ public enum OrderStatus implements DbValueEnum {
 
     PENDING_PAYMENT("pendiente_pago"),
     PAID("pagado"),
-    IN_PREPARATION("en_preparacion"),
+    PREPARING("en_preparacion"),
     SHIPPED("enviado"),
     DELIVERED("entregado"),
     CANCELLED("cancelado"),

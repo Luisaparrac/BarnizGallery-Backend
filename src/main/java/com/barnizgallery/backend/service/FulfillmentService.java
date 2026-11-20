@@ -26,7 +26,7 @@ import com.barnizgallery.backend.repository.OrderItemRepository;
 @Service
 public class FulfillmentService {
 
-    static final Set<OrderStatus> TO_FULFIL = EnumSet.of(OrderStatus.PAID, OrderStatus.IN_PREPARATION,
+    static final Set<OrderStatus> TO_FULFIL = EnumSet.of(OrderStatus.PAID, OrderStatus.PREPARING,
             OrderStatus.SHIPPED, OrderStatus.DELIVERED);
 
     private final OrderItemRepository itemRepository;

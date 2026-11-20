@@ -280,8 +280,8 @@ the artisan) and `ADMIN_APPROVAL` (the administrator's final decision).
 ### Shipping (artisans)
 | Method | Path | Description |
 |---|---|---|
-| GET | `/api/artisans/me/orders` | Paid lines of the store (`PAID`, `IN_PREPARATION`, `SHIPPED`, `DELIVERED` orders) with buyer address, amounts and `fulfillmentStatus` |
-| POST | `/api/artisans/me/orders/items/{orderItemId}/ship` | `{ carrier, trackingNumber }`: line `PENDING` → `SHIPPED`; the order goes to `IN_PREPARATION`, and to `SHIPPED` when every line is shipped; the buyer is notified |
+| GET | `/api/artisans/me/orders` | Paid lines of the store (`PAID`, `PREPARING`, `SHIPPED`, `DELIVERED` orders) with buyer address, amounts and `fulfillmentStatus` |
+| POST | `/api/artisans/me/orders/items/{orderItemId}/ship` | `{ carrier, trackingNumber }`: line `PENDING` → `SHIPPED`; the order goes to `PREPARING`, and to `SHIPPED` when every line is shipped; the buyer is notified |
 | POST | `/api/artisans/me/orders/items/{orderItemId}/deliver` | Line `SHIPPED` → `DELIVERED`; when every line is delivered the order becomes `DELIVERED` |
 
 ### Payouts (administrators)
@@ -328,7 +328,7 @@ rounded half up to cents; artisan net = line total − fee; total = subtotal + s
 | POST | `/api/orders/{orderId}/payments` | `{ obligationId?, simulated? }` → 201 `{ paymentId, gateway, reference, redirectUrl, amount, currency, status }`. Gateway by obligation currency (COP → Wompi, USD → PayPal; other → 409, no credentials → 503); `simulated: true` only while `payments.test_mode` is true. 409 when nothing is pending, the deadline passed or a payment is already pending |
 | GET | `/api/payments/{paymentId}` | A payment of an own order `{ id, orderId, gateway, reference, status, amount, currency, createdAt, approvedAt }` (404 otherwise) |
 | POST | `/api/payments/webhooks/{gateway}` | Public; the adapter verifies the signature (400 if wrong). Each event is saved once in `payment_events` (same gateway + event id → ignored) and applied in the same transaction: an approved payment marks its obligation paid and, when all are paid, the database consumes the reserved stock and moves the order to `PAID`; a declined or expired payment lets the database release the reservations once their time is over |
-| POST | `/api/payments/{paymentId}/simulate` | Demo, buyer only: `{ outcome: APPROVED \| DECLINED }` for a `simulated` payment while `payments.test_mode` is true; it follows the webhook path |
+| POST | `/api/payments/{paymentId}/simulate` | Demo, buyer only: `{ outcome: APPROVED \| REJECTED }` for a `simulated` payment while `payments.test_mode` is true; it follows the webhook path |
 
 Artwork rules (422): a price needs its currency; an exhibited artwork needs `saleMode`; `SALE` needs
 `price` > 0 and `stock`. The currency cannot change once the artwork has orders or auctions (409, enforced by

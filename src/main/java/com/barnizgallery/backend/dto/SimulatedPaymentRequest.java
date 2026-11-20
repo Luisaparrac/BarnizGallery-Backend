@@ -5,7 +5,7 @@ import com.barnizgallery.backend.enums.PaymentStatus;
 import jakarta.validation.constraints.NotNull;
 
 /**
- * Result to simulate for a demo payment: {@code APPROVED} or {@code DECLINED}.
+ * Result to simulate for a demo payment: {@code APPROVED} or {@code REJECTED}.
  */
 public record SimulatedPaymentRequest(@NotNull PaymentStatus outcome) {
 }

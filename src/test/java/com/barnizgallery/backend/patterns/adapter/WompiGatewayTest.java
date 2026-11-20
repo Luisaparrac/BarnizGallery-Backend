@@ -94,7 +94,7 @@ class WompiGatewayTest {
         GatewayEvent event = gateway.readEvent(new WebhookCall(Map.of("X-Event-Checksum",
                 checksum.toUpperCase()), body)).orElseThrow();
 
-        assertThat(event.status()).isEqualTo(PaymentStatus.DECLINED);
+        assertThat(event.status()).isEqualTo(PaymentStatus.REJECTED);
     }
 
     @Test
@@ -115,8 +115,8 @@ class WompiGatewayTest {
 
     @Test
     void wompiStatusesMapToPaymentStatuses() {
-        assertThat(WompiGateway.toPaymentStatus("VOIDED")).isEqualTo(PaymentStatus.DECLINED);
-        assertThat(WompiGateway.toPaymentStatus("ERROR")).isEqualTo(PaymentStatus.DECLINED);
+        assertThat(WompiGateway.toPaymentStatus("VOIDED")).isEqualTo(PaymentStatus.REJECTED);
+        assertThat(WompiGateway.toPaymentStatus("ERROR")).isEqualTo(PaymentStatus.REJECTED);
         assertThat(WompiGateway.toPaymentStatus("PENDING")).isEqualTo(PaymentStatus.PENDING);
     }
 

@@ -39,6 +39,6 @@ public class ShipStep extends FulfillmentStep {
     @Override
     protected OrderStatus orderStatusAfter(List<OrderItem> orderLines) {
         boolean allShipped = orderLines.stream().allMatch(l -> l.getFulfillmentStatus() != FulfillmentStatus.PENDING);
-        return allShipped ? OrderStatus.SHIPPED : OrderStatus.IN_PREPARATION;
+        return allShipped ? OrderStatus.SHIPPED : OrderStatus.PREPARING;
     }
 }

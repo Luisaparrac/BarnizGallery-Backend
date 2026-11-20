@@ -7,8 +7,8 @@ public enum PaymentStatus implements DbValueEnum {
 
     PENDING("pendiente"),
     APPROVED("aprobado"),
-    DECLINED("rechazado"),
-    EXPIRED("expirado"),
+    REJECTED("rechazado"),
+    VOIDED("expirado"),
     REFUNDED("reembolsado");
 
     private final String dbValue;

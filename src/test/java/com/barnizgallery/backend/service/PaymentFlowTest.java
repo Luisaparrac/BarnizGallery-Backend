@@ -132,11 +132,11 @@ class PaymentFlowTest {
     @Test
     void lateEventsDoNotChangeAFinishedPaymentAndUnknownReferencesAre404() {
         Payment payment = pendingPayment();
-        payment.setStatus(PaymentStatus.DECLINED);
+        payment.setStatus(PaymentStatus.REJECTED);
 
         webhooks.process(event("evt-2", PaymentStatus.APPROVED));
 
-        assertThat(payment.getStatus()).isEqualTo(PaymentStatus.DECLINED);
+        assertThat(payment.getStatus()).isEqualTo(PaymentStatus.REJECTED);
         verify(notifier, never()).paymentChanged(any());
         assertThatThrownBy(() -> webhooks.process(new GatewayEvent("wompi", "evt-3", "OTHER-1", "tx", PaymentStatus.APPROVED,
                 "{}"))).hasMessage("payment_not_found [OTHER-1]");

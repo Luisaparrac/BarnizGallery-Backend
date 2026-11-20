@@ -24,8 +24,8 @@ import com.barnizgallery.backend.repository.PaymentRepository;
 @Component
 public class PaymentResultApplier {
 
-    private static final Set<PaymentStatus> FINAL = EnumSet.of(PaymentStatus.APPROVED, PaymentStatus.DECLINED,
-            PaymentStatus.EXPIRED);
+    private static final Set<PaymentStatus> FINAL = EnumSet.of(PaymentStatus.APPROVED, PaymentStatus.REJECTED,
+            PaymentStatus.VOIDED);
 
     private final PaymentRepository paymentRepository;
 

@@ -26,7 +26,7 @@ class FulfillmentStepTest {
         new ShipStep(" Servientrega ", "SV-1").apply(first, lines);
         assertThat(first.getCarrier()).isEqualTo("Servientrega");
         assertThat(first.getFulfillmentStatus()).isEqualTo(FulfillmentStatus.SHIPPED);
-        assertThat(order.getStatus()).isEqualTo(OrderStatus.IN_PREPARATION);
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.PREPARING);
 
         new ShipStep("Servientrega", "SV-2").apply(second, lines);
         assertThat(order.getStatus()).isEqualTo(OrderStatus.SHIPPED);
