@@ -270,6 +270,8 @@ the artisan) and `ADMIN_APPROVAL` (the administrator's final decision).
 | POST | `/api/admin/masters/{masterId}/approve` | Approve an active master (roster masters directly; signed-up artisans only when their steps pass); archived → 409 `master_archived` |
 | GET | `/api/admin/stores` | Every store with status, slug and its master's verification and `active` flag |
 | POST | `/api/admin/stores/{storeId}/publish` | `{ slug? }` (required when the store has none): publish the store of an active, approved master (409 otherwise) |
+| GET | `/api/admin/artworks?storeId=` | Every artwork of a store, drafts included |
+| PATCH | `/api/admin/artworks/{artworkId}` | `{ price?, currency?, stock?, saleMode?, status? }`; same sale rules as artisans (422), auction/reserved statuses stay managed by auctions and orders (409) |
 
 ### Cart and orders
 | Method | Path | Description |
