@@ -18,6 +18,10 @@ public enum ErrorCode {
     DATA_CONFLICT,
     INTERNAL_ERROR,
 
+    // Authentication and authorization
+    UNAUTHORIZED,
+    ACCESS_DENIED,
+
     // Missing resources
     ARTWORK_NOT_FOUND,
     AUCTION_NOT_FOUND,
