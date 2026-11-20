@@ -215,6 +215,15 @@ Public endpoints; every other call sends `Authorization: Bearer <accessToken>`. 
 
 A wrong role answers 403 `access_denied`; a missing or expired token answers 401 `unauthorized`.
 
+### Artisan verification (artisans)
+Steps: `EMAIL` (approved by itself when the email is confirmed), `IDENTITY`, `WORKSHOP`, `SAMPLES` (evidence from
+the artisan) and `ADMIN_APPROVAL` (the administrator's final decision).
+
+| Method | Path | Description |
+|---|---|---|
+| PUT | `/api/artisans/me/verification/{step}` | `{ evidenceUrl }` (https) for `IDENTITY`, `WORKSHOP` or `SAMPLES` → step `SUBMITTED` |
+| POST | `/api/artisans/me/verification/{step}/evidence` | Multipart `file` (JPEG/PNG/WebP) uploaded to the photo storage (503 while disabled) |
+
 ### Notifications (logged-in user)
 | Method | Path | Description |
 |---|---|---|
