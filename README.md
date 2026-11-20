@@ -242,6 +242,7 @@ the artisan) and `ADMIN_APPROVAL` (the administrator's final decision).
 Artwork rules (422): a price needs its currency; an exhibited artwork needs `saleMode`; `SALE` needs
 `price` > 0 and `stock`. The currency cannot change once the artwork has orders or auctions (409, enforced by
 the database).
+| DELETE | `/api/artisans/me/artworks/{artworkId}` | Soft delete (`deletedAt`); 409 while in auction or reserved |
 
 ### Artisan verification (administrators)
 | Method | Path | Description |

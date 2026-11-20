@@ -40,10 +40,11 @@ public class ArtisanArtworkService {
         this.catalogResolver = catalogResolver;
     }
 
-    /** Every artwork of the store, drafts included. */
+    /** Every artwork of the store that is not deleted, drafts included. */
     @Transactional(readOnly = true)
     public List<ArtworkSummaryResponse> mine() {
-        return artworkRepository.findByStoreStoreIdOrderByArtworkIdAsc(editorService.myStore().getStoreId()).stream()
+        return artworkRepository
+                .findByStoreStoreIdAndDeletedAtIsNullOrderByArtworkIdAsc(editorService.myStore().getStoreId()).stream()
                 .map(ArtworkMapper::toSummary)
                 .toList();
     }
@@ -100,10 +101,24 @@ public class ArtisanArtworkService {
         return ArtworkMapper.toSummary(artwork);
     }
 
+    /**
+     * Soft delete: the artwork gets {@code deleted_at} and disappears from the store, the gallery and the editor.
+     * Orders and auctions keep pointing to it. An artwork in auction or reserved cannot be deleted (409).
+     */
+    @Transactional
+    public void delete(Long artworkId) {
+        Artwork artwork = myArtwork(artworkId);
+        if (artwork.getStatus() == ArtworkStatus.IN_AUCTION || artwork.getStatus() == ArtworkStatus.RESERVED) {
+            throw new BusinessRuleException(ErrorCode.ARTWORK_IN_USE, artwork.getStatus());
+        }
+        artwork.setDeletedAt(clock.instant());
+    }
+
     Artwork myArtwork(Long artworkId) {
         Store store = editorService.myStore();
         return artworkRepository.findById(artworkId)
-                .filter(artwork -> artwork.getStore().getStoreId().equals(store.getStoreId()))
+                .filter(artwork -> artwork.getDeletedAt() == null
+                        && artwork.getStore().getStoreId().equals(store.getStoreId()))
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.ARTWORK_NOT_FOUND, artworkId));
     }
 

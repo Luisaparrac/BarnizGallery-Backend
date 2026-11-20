@@ -70,10 +70,11 @@ public class ArtworkService {
         return ArtworkMapper.toDetail(artwork, photos, currentAuction);
     }
 
-    /** Loads an artwork or throws 404. Used by other services too. */
+    /** Loads an artwork that is not deleted or throws 404. Used by other services too. */
     @Transactional(readOnly = true)
     public Artwork getArtwork(Long artworkId) {
         return artworkRepository.findById(artworkId)
+                .filter(artwork -> artwork.getDeletedAt() == null)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.ARTWORK_NOT_FOUND, artworkId));
     }
 }

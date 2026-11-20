@@ -3,6 +3,7 @@ package com.barnizgallery.backend.controller;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -54,6 +55,13 @@ public class ArtisanArtworkController {
     public ArtworkSummaryResponse changeStatus(@PathVariable Long artworkId,
             @Valid @RequestBody ArtworkStatusRequest request) {
         return artworkService.changeStatus(artworkId, request.status());
+    }
+
+    @DeleteMapping("/{artworkId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Soft delete an artwork (409 while it is in auction or reserved)")
+    public void delete(@PathVariable Long artworkId) {
+        artworkService.delete(artworkId);
     }
 
     @PutMapping("/{artworkId}")

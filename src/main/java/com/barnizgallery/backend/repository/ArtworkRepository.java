@@ -19,6 +19,8 @@ public interface ArtworkRepository extends JpaRepository<Artwork, Long> {
 
     List<Artwork> findByStoreStoreIdOrderByArtworkIdAsc(Long storeId);
 
+    List<Artwork> findByStoreStoreIdAndDeletedAtIsNullOrderByArtworkIdAsc(Long storeId);
+
     List<Artwork> findByStatusOrderByArtworkIdAsc(ArtworkStatus status);
 
     List<Artwork> findByStoreStoreIdAndStatusOrderByArtworkIdAsc(Long storeId, ArtworkStatus status);
