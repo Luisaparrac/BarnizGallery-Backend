@@ -39,6 +39,11 @@ public enum ErrorCode {
     PRICE_SUGGESTION_UNAVAILABLE,
     STORAGE_DISABLED,
 
+    // Image uploads
+    IMAGE_REQUIRED,
+    IMAGE_TOO_LARGE,
+    IMAGE_TYPE_NOT_ALLOWED,
+
     // Catalogs and recommendations
     UNKNOWN_COLOR_CODES,
     UNKNOWN_SHAPE_CODES,

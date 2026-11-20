@@ -12,6 +12,7 @@ import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.util.unit.DataSize;
 
 import com.barnizgallery.backend.config.LocaleConfig;
 import com.barnizgallery.backend.config.MessageConfig;
@@ -26,7 +27,8 @@ class GlobalExceptionHandlerTest {
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(new ErrorTestController())
-                .setControllerAdvice(new GlobalExceptionHandler(new MessageConfig().messageSource()))
+                .setControllerAdvice(new GlobalExceptionHandler(new MessageConfig().messageSource(),
+                        DataSize.ofMegabytes(5)))
                 .setLocaleResolver(new LocaleConfig().localeResolver())
                 .build();
     }

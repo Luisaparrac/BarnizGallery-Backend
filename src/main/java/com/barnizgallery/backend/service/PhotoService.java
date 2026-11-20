@@ -32,12 +32,14 @@ public class PhotoService {
     private final PhotoRepository photoRepository;
     private final ArtworkService artworkService;
     private final StorageService storageService;
+    private final ImageUploadValidator imageValidator;
 
     public PhotoService(PhotoRepository photoRepository, ArtworkService artworkService,
-            StorageService storageService) {
+            StorageService storageService, ImageUploadValidator imageValidator) {
         this.photoRepository = photoRepository;
         this.artworkService = artworkService;
         this.storageService = storageService;
+        this.imageValidator = imageValidator;
     }
 
     @Transactional(readOnly = true)
@@ -65,6 +67,7 @@ public class PhotoService {
             throw new FeatureDisabledException(ErrorCode.STORAGE_DISABLED);
         }
         Artwork artwork = artworkService.getArtwork(artworkId);
+        imageValidator.validate(file);
         StoredImage image = storageService.upload(file, "artworks/" + artworkId);
         Photo photo = new Photo();
         photo.setArtwork(artwork);

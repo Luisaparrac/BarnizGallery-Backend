@@ -39,6 +39,8 @@ class PhotoServiceTest {
     private ArtworkService artworkService;
     @Mock
     private StorageService storageService;
+    @Mock
+    private ImageUploadValidator imageValidator;
     @InjectMocks
     private PhotoService photoService;
 

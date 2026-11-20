@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -14,6 +15,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.unit.DataSize;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
@@ -41,9 +44,12 @@ public class GlobalExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     private final MessageSource messageSource;
+    private final long maxUploadMegabytes;
 
-    public GlobalExceptionHandler(MessageSource messageSource) {
+    public GlobalExceptionHandler(MessageSource messageSource,
+            @Value("${app.storage.max-upload-size}") DataSize maxUploadSize) {
         this.messageSource = messageSource;
+        this.maxUploadMegabytes = maxUploadSize.toMegabytes();
     }
 
     @ExceptionHandler(ApiException.class)
@@ -105,6 +111,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleMissingPart(MissingServletRequestPartException ex,
             HttpServletRequest request) {
         return build(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_PARAMETER, request, null, ex.getRequestPartName());
+    }
+
+    /** The multipart request is bigger than the servlet limit (only possible for oversized images). */
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorResponse> handleUploadTooLarge(MaxUploadSizeExceededException ex,
+            HttpServletRequest request) {
+        return build(HttpStatus.CONTENT_TOO_LARGE, ErrorCode.IMAGE_TOO_LARGE, request, null, maxUploadMegabytes);
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)

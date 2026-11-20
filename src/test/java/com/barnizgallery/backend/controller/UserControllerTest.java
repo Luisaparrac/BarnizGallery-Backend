@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.util.unit.DataSize;
 
 import com.barnizgallery.backend.config.MessageConfig;
 import com.barnizgallery.backend.dto.IdentifyUserRequest;
@@ -39,7 +40,8 @@ class UserControllerTest {
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(new UserController(userService))
-                .setControllerAdvice(new GlobalExceptionHandler(new MessageConfig().messageSource()))
+                .setControllerAdvice(new GlobalExceptionHandler(new MessageConfig().messageSource(),
+                        DataSize.ofMegabytes(5)))
                 .build();
     }
 
