@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import com.barnizgallery.backend.TestEntities;
+import com.barnizgallery.backend.dto.AiCandidate;
 import com.barnizgallery.backend.dto.AiRecommendationItem;
 import com.barnizgallery.backend.dto.AiRecommendationReasons;
 import com.barnizgallery.backend.dto.AiRecommendationRequest;
@@ -30,6 +31,7 @@ import com.barnizgallery.backend.enums.InteractionAction;
 import com.barnizgallery.backend.enums.Language;
 import com.barnizgallery.backend.exception.AiServiceException;
 import com.barnizgallery.backend.patterns.adapter.AiServiceGateway;
+import com.barnizgallery.backend.repository.ArtworkCatalogViewRepository;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.InteractionRepository;
 import com.barnizgallery.backend.repository.TasteProfileRepository;
@@ -41,8 +43,9 @@ class AiServiceStrategyTest {
     private final ArtworkRepository artworkRepository = mock(ArtworkRepository.class);
     private final TasteProfileRepository tasteProfileRepository = mock(TasteProfileRepository.class);
     private final InteractionRepository interactionRepository = mock(InteractionRepository.class);
+    private final ArtworkCatalogViewRepository catalogRepository = mock(ArtworkCatalogViewRepository.class);
     private final AiServiceStrategy strategy = new AiServiceStrategy(aiService, fallback, artworkRepository,
-            tasteProfileRepository, interactionRepository);
+            tasteProfileRepository, interactionRepository, catalogRepository);
 
     private final User user = TestEntities.user(1, Language.ES);
     private final List<RecommendationResult> hybridResults = List.of(RecommendationResult.of(9L, 50, "hybrid"));
@@ -60,6 +63,7 @@ class AiServiceStrategyTest {
         when(aiService.isAvailable()).thenReturn(true);
         when(artworkRepository.findByDeletedAtIsNullAndStatusInOrderByArtworkIdAsc(anyCollection(), any()))
                 .thenReturn(List.of(first, second, third));
+        when(catalogRepository.findAllArtworkIds()).thenReturn(List.of(10L, 11L, 20L));
         when(tasteProfileRepository.findByUserUserId(1L)).thenReturn(Optional.empty());
         when(fallback.recommend(user)).thenReturn(hybridResults);
     }
@@ -123,12 +127,25 @@ class AiServiceStrategyTest {
     }
 
     @Test
-    void fallsBackToHybridWithoutAvailableArtworks() {
-        when(artworkRepository.findByDeletedAtIsNullAndStatusInOrderByArtworkIdAsc(anyCollection(), any()))
-                .thenReturn(List.of());
+    void onlyArtworksOfThePublicCatalogAreSentAsCandidates() {
+        when(catalogRepository.findAllArtworkIds()).thenReturn(List.of(10L, 11L));
+        when(aiService.recommend(any())).thenReturn(new AiRecommendationResponse("content", List.of()));
 
-        assertThat(strategy.recommend(user)).isEqualTo(hybridResults);
+        strategy.recommendArtworks(user);
+
+        ArgumentCaptor<AiRecommendationRequest> sent = ArgumentCaptor.forClass(AiRecommendationRequest.class);
+        verify(aiService).recommend(sent.capture());
+        assertThat(sent.getValue().candidates()).extracting(AiCandidate::artworkId).containsExactly(10L, 11L);
+    }
+
+    @Test
+    void withoutPublicArtworksTheAnswerIsEmptyAndTheServiceIsNotCalled() {
+        when(catalogRepository.findAllArtworkIds()).thenReturn(List.of());
+
+        assertThat(strategy.recommend(user)).isEmpty();
+        assertThat(strategy.recommendArtworks(user)).isEmpty();
         verify(aiService, never()).recommend(any());
+        verify(fallback, never()).recommend(any());
     }
 
     private static AiRecommendationItem item(long artworkId, double score, AiRecommendationReasons reasons) {

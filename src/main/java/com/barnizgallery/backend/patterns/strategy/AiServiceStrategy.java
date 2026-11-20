@@ -3,6 +3,7 @@ package com.barnizgallery.backend.patterns.strategy;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -27,6 +28,7 @@ import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.exception.AiServiceException;
 import com.barnizgallery.backend.mapper.AiRequestMapper;
 import com.barnizgallery.backend.patterns.adapter.AiServiceGateway;
+import com.barnizgallery.backend.repository.ArtworkCatalogViewRepository;
 import com.barnizgallery.backend.repository.ArtworkInteractionCount;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.InteractionRepository;
@@ -37,8 +39,9 @@ import com.barnizgallery.backend.repository.TasteProfileRepository;
  * <p>
  * Sends the available artworks (with their catalog codes), the taste profile and the interactions of the user to
  * the AI service, which scores artworks from 0 to 1. The scores of each store are added up (as 0-100) and
- * rescaled so the best store stays at 100 at most. When the service is not configured, fails or there are no
- * available artworks, it delegates to {@link HybridStrategy}: a failure of the AI never breaks the flow.
+ * rescaled so the best store stays at 100 at most. Only artworks of the public catalog are sent; without any the
+ * answer is empty and the service is not called. When the service is not configured or fails, it delegates to
+ * {@link HybridStrategy}: a failure of the AI never breaks the flow.
  */
 @Component
 public class AiServiceStrategy implements RecommendationStrategy {
@@ -56,9 +59,12 @@ public class AiServiceStrategy implements RecommendationStrategy {
     private final ArtworkRepository artworkRepository;
     private final TasteProfileRepository tasteProfileRepository;
     private final InteractionRepository interactionRepository;
+    private final ArtworkCatalogViewRepository catalogRepository;
 
     public AiServiceStrategy(AiServiceGateway aiService, HybridStrategy fallback, ArtworkRepository artworkRepository,
-            TasteProfileRepository tasteProfileRepository, InteractionRepository interactionRepository) {
+            TasteProfileRepository tasteProfileRepository, InteractionRepository interactionRepository,
+            ArtworkCatalogViewRepository catalogRepository) {
+        this.catalogRepository = catalogRepository;
         this.aiService = aiService;
         this.fallback = fallback;
         this.artworkRepository = artworkRepository;
@@ -76,10 +82,9 @@ public class AiServiceStrategy implements RecommendationStrategy {
         if (!aiService.isAvailable()) {
             return fallback.recommend(user);
         }
-        List<Artwork> available = artworkRepository.findByDeletedAtIsNullAndStatusInOrderByArtworkIdAsc(ArtworkStatus.PUBLIC,
-                CANDIDATES);
+        List<Artwork> available = publicCandidates();
         if (available.isEmpty()) {
-            return fallback.recommend(user);
+            return List.of();
         }
         try {
             List<AiRecommendationItem> items = aiService.recommend(request(user, available)).items();
@@ -96,10 +101,9 @@ public class AiServiceStrategy implements RecommendationStrategy {
         if (!aiService.isAvailable()) {
             return fallback.recommendArtworks(user);
         }
-        List<Artwork> available = artworkRepository.findByDeletedAtIsNullAndStatusInOrderByArtworkIdAsc(ArtworkStatus.PUBLIC,
-                CANDIDATES);
+        List<Artwork> available = publicCandidates();
         if (available.isEmpty()) {
-            return fallback.recommendArtworks(user);
+            return List.of();
         }
         try {
             List<AiRecommendationItem> items = aiService.recommend(request(user, available)).items();
@@ -112,6 +116,18 @@ public class AiServiceStrategy implements RecommendationStrategy {
             log.warn("Artwork recommendations for user {} without the AI service: {}", user.getUserId(), ex.getCode());
             return fallback.recommendArtworks(user);
         }
+    }
+
+    /**
+     * Candidates for the AI service: only artworks of the public catalog ({@code v_artwork_catalog}: exhibited or in
+     * auction, published store, approved and active master), as for similar artworks.
+     */
+    private List<Artwork> publicCandidates() {
+        Set<Long> publicIds = new HashSet<>(catalogRepository.findAllArtworkIds());
+        return artworkRepository.findByDeletedAtIsNullAndStatusInOrderByArtworkIdAsc(ArtworkStatus.PUBLIC, CANDIDATES)
+                .stream()
+                .filter(artwork -> publicIds.contains(artwork.getArtworkId()))
+                .toList();
     }
 
     private AiRecommendationRequest request(User user, List<Artwork> available) {
