@@ -38,6 +38,7 @@ public enum ErrorCode {
     AI_STRATEGY_DISABLED,
     PRICE_SUGGESTION_UNAVAILABLE,
     STORAGE_DISABLED,
+    STORAGE_UNAVAILABLE,
 
     // Image uploads
     IMAGE_REQUIRED,
