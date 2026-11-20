@@ -20,6 +20,7 @@ public class CheckoutSettings {
 
     static final String COMMISSION_RATE = "platform.commission_rate";
     static final String SHIPPING_FIXED_AMOUNT = "shipping.fixed_amount";
+    static final String RESERVATION_MINUTES = "cart.reservation_minutes";
 
     private final AppSettingsService settings;
 
@@ -29,6 +30,11 @@ public class CheckoutSettings {
 
     public BigDecimal commissionRate() {
         return settings.decimal(COMMISSION_RATE);
+    }
+
+    /** Minutes a checkout keeps the artworks reserved while the buyer pays. */
+    public int reservationMinutes() {
+        return settings.integer(RESERVATION_MINUTES);
     }
 
     public BigDecimal shipping(String currency) {
