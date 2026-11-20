@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.barnizgallery.backend.dto.ConversationResponse;
+import com.barnizgallery.backend.dto.MessageResponse;
 import com.barnizgallery.backend.dto.StartConversationRequest;
 import com.barnizgallery.backend.entity.Conversation;
 import com.barnizgallery.backend.entity.Master;
@@ -45,11 +46,15 @@ public class ConversationService {
     private final OrderRepository orderRepository;
     private final CurrentUser currentUser;
     private final Clock clock;
+    private final NotificationService notificationService;
+
+    static final String NEW_MESSAGE = "new_message";
 
     public ConversationService(ConversationRepository conversationRepository, MessageRepository messageRepository,
             MasterRepository masterRepository, UserRepository userRepository, ArtworkRepository artworkRepository,
             CustomRequestRepository customRequestRepository, OrderRepository orderRepository, CurrentUser currentUser,
-            Clock clock) {
+            Clock clock, NotificationService notificationService) {
+        this.notificationService = notificationService;
         this.conversationRepository = conversationRepository;
         this.messageRepository = messageRepository;
         this.masterRepository = masterRepository;
@@ -108,6 +113,29 @@ public class ConversationService {
                 .filter(c -> c.getCustomer().getUserId().equals(userId)
                         || (c.getMaster().getUser() != null && c.getMaster().getUser().getUserId().equals(userId)))
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.CONVERSATION_NOT_FOUND, conversationId));
+    }
+
+    @Transactional(readOnly = true)
+    public List<MessageResponse> messages(Long conversationId) {
+        mine(conversationId);
+        return messageRepository.findByConversationConversationIdOrderByMessageIdAsc(conversationId).stream()
+                .map(ConversationMapper::toResponse)
+                .toList();
+    }
+
+    /** Sends a message and tells the other participant. */
+    @Transactional
+    public MessageResponse send(Long conversationId, String content) {
+        Conversation conversation = mine(conversationId);
+        User sender = userRepository.getReferenceById(currentUser.requireId());
+        Message message = addMessage(conversation, sender, content);
+        User recipient = conversation.getCustomer().getUserId().equals(sender.getUserId())
+                ? conversation.getMaster().getUser() : conversation.getCustomer();
+        if (recipient != null) {
+            notificationService.notify(recipient, NEW_MESSAGE, "/messages/" + conversationId, null,
+                    userRepository.findById(sender.getUserId()).map(User::getName).orElse(""));
+        }
+        return ConversationMapper.toResponse(message);
     }
 
     Message addMessage(Conversation conversation, User sender, String content) {

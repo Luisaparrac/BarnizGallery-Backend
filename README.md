@@ -352,6 +352,8 @@ the database).
 |---|---|---|
 | GET | `/api/conversations` | Conversations where the user is the customer or the master: `{ id, customerId, customerName, masterId, masterName, artworkId, customRequestId, orderId, lastMessageAt, lastMessagePreview, unreadCount }` |
 | POST | `/api/conversations` | `{ masterId, content, subject?, artworkId? \| customRequestId? \| orderId? }` → 201 with the first message (`subject` is not stored: no column) |
+| GET | `/api/conversations/{id}/messages` | Messages `{ id, conversationId, senderId, senderName, content, readAt, createdAt }`, oldest first (404 if the user does not take part) |
+| POST | `/api/conversations/{id}/messages` | `{ content }` → 201; the other participant gets a `new_message` notification |
 
 ### Notifications (logged-in user)
 | GET | `/api/notifications/unread-count` | `{ count }` of unread notifications |
