@@ -7,8 +7,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.barnizgallery.backend.TestEntities;
+import com.barnizgallery.backend.TestFactories;
 import com.barnizgallery.backend.dto.InteractionRequest;
 import com.barnizgallery.backend.dto.InteractionResponse;
 import com.barnizgallery.backend.entity.Interaction;
@@ -23,10 +22,7 @@ import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.enums.InteractionAction;
 import com.barnizgallery.backend.enums.Language;
 import com.barnizgallery.backend.exception.BusinessRuleException;
-import com.barnizgallery.backend.patterns.factorymethod.BidInteractionFactory;
 import com.barnizgallery.backend.patterns.factorymethod.InteractionFactoryProvider;
-import com.barnizgallery.backend.patterns.factorymethod.ViewInteractionFactory;
-import com.barnizgallery.backend.patterns.factorymethod.ZoomInteractionFactory;
 import com.barnizgallery.backend.repository.InteractionRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -42,8 +38,7 @@ class InteractionServiceTest {
 
     @BeforeEach
     void setUp() {
-        InteractionFactoryProvider provider = new InteractionFactoryProvider(List.of(new ViewInteractionFactory(),
-                new ZoomInteractionFactory(), new BidInteractionFactory()));
+        InteractionFactoryProvider provider = TestFactories.provider();
         interactionService = new InteractionService(interactionRepository, provider, userService, artworkService);
     }
 

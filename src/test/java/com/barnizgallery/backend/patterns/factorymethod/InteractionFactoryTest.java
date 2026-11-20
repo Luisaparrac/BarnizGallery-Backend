@@ -12,6 +12,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import com.barnizgallery.backend.TestEntities;
+import com.barnizgallery.backend.TestFactories;
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Interaction;
 import com.barnizgallery.backend.entity.User;
@@ -67,8 +68,7 @@ class InteractionFactoryTest {
 
     @Test
     void providerReturnsTheCreatorOfEachAction() {
-        InteractionFactoryProvider provider = new InteractionFactoryProvider(List.of(new ViewInteractionFactory(),
-                new ZoomInteractionFactory(), new BidInteractionFactory()));
+        InteractionFactoryProvider provider = TestFactories.provider();
 
         assertThat(provider.forAction(InteractionAction.ZOOM)).isInstanceOf(ZoomInteractionFactory.class);
         assertThat(provider.weightOf(InteractionAction.BID)).isEqualTo(5);

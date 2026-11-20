@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.barnizgallery.backend.TestEntities;
+import com.barnizgallery.backend.TestFactories;
 import com.barnizgallery.backend.entity.Store;
 import com.barnizgallery.backend.entity.TasteProfile;
 import com.barnizgallery.backend.entity.User;
@@ -26,10 +27,7 @@ import com.barnizgallery.backend.exception.BusinessRuleException;
 import com.barnizgallery.backend.exception.FeatureDisabledException;
 import com.barnizgallery.backend.patterns.adapter.AiTextClient;
 import com.barnizgallery.backend.patterns.adapter.DisabledAiClient;
-import com.barnizgallery.backend.patterns.factorymethod.BidInteractionFactory;
 import com.barnizgallery.backend.patterns.factorymethod.InteractionFactoryProvider;
-import com.barnizgallery.backend.patterns.factorymethod.ViewInteractionFactory;
-import com.barnizgallery.backend.patterns.factorymethod.ZoomInteractionFactory;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.InteractionRepository;
 import com.barnizgallery.backend.repository.StoreInteraction;
@@ -44,9 +42,7 @@ class RecommendationStrategiesTest {
     private final TasteProfileRepository tasteProfileRepository = mock(TasteProfileRepository.class);
     private final ArtworkRepository artworkRepository = mock(ArtworkRepository.class);
     private final InteractionRepository interactionRepository = mock(InteractionRepository.class);
-    private final InteractionFactoryProvider factoryProvider = new InteractionFactoryProvider(List.of(
-            new ViewInteractionFactory(), new ZoomInteractionFactory(),
-            new BidInteractionFactory()));
+    private final InteractionFactoryProvider factoryProvider = TestFactories.provider();
 
     private ProfileBasedStrategy profileStrategy;
     private InteractionBasedStrategy interactionStrategy;
