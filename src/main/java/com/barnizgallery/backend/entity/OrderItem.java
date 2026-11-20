@@ -6,7 +6,11 @@ import java.time.Instant;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.barnizgallery.backend.converter.FulfillmentStatusConverter;
+import com.barnizgallery.backend.enums.FulfillmentStatus;
+
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -72,8 +76,9 @@ public class OrderItem {
     @Column(name = "artisan_net_amount", nullable = false, precision = 14, scale = 2)
     private BigDecimal artisanNetAmount;
 
+    @Convert(converter = FulfillmentStatusConverter.class)
     @Column(name = "fulfillment_status", nullable = false, length = 30)
-    private String fulfillmentStatus;
+    private FulfillmentStatus fulfillmentStatus;
 
     @Column(name = "carrier")
     private String carrier;
@@ -193,11 +198,11 @@ public class OrderItem {
         this.artisanNetAmount = artisanNetAmount;
     }
 
-    public String getFulfillmentStatus() {
+    public FulfillmentStatus getFulfillmentStatus() {
         return fulfillmentStatus;
     }
 
-    public void setFulfillmentStatus(String fulfillmentStatus) {
+    public void setFulfillmentStatus(FulfillmentStatus fulfillmentStatus) {
         this.fulfillmentStatus = fulfillmentStatus;
     }
 
