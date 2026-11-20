@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,11 +18,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.barnizgallery.backend.dto.ArtworkDetailResponse;
 import com.barnizgallery.backend.dto.ArtworkSummaryResponse;
+import com.barnizgallery.backend.dto.PhotoOrderRequest;
 import com.barnizgallery.backend.dto.PhotoRequest;
 import com.barnizgallery.backend.dto.PhotoResponse;
 import com.barnizgallery.backend.dto.SuggestedPriceResponse;
 import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.service.ArtworkService;
+import com.barnizgallery.backend.service.PhotoArrangementService;
 import com.barnizgallery.backend.service.PhotoService;
 import com.barnizgallery.backend.service.PricingService;
 
@@ -39,9 +42,11 @@ public class ArtworkController {
     private final ArtworkService artworkService;
     private final PhotoService photoService;
     private final PricingService pricingService;
+    private final PhotoArrangementService arrangementService;
 
     public ArtworkController(ArtworkService artworkService, PhotoService photoService,
-            PricingService pricingService) {
+            PricingService pricingService, PhotoArrangementService arrangementService) {
+        this.arrangementService = arrangementService;
         this.artworkService = artworkService;
         this.photoService = photoService;
         this.pricingService = pricingService;
@@ -68,6 +73,11 @@ public class ArtworkController {
             @Valid @RequestBody PhotoRequest request) {
         PhotoResponse created = photoService.addByUrl(id, request);
         return ResponseEntity.created(URI.create("/api/artworks/" + id + "/photos")).body(created);
+    }
+
+    @PutMapping("/{id}/photos/order")
+    public List<PhotoResponse> reorderPhotos(@PathVariable Long id, @Valid @RequestBody PhotoOrderRequest request) {
+        return arrangementService.reorder(id, request.photoIds());
     }
 
     /** Multipart upload. Returns 503 while no storage provider is configured. */

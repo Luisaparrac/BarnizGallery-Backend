@@ -46,7 +46,7 @@ class GalleryTreeBuilderTest {
         when(storeRepository.findByStatusWithMaster(StoreStatus.PUBLISHED,
                 MasterVerificationStatus.APPROVED)).thenReturn(List.of(store1, store2));
         when(artworkRepository.findByDeletedAtIsNullAndStatusInOrderByArtworkIdAsc(ArtworkStatus.PUBLIC, Pageable.unpaged())).thenReturn(List.of(a1, a2, a3));
-        when(photoRepository.findFirstPhotoOfEachArtwork()).thenReturn(List.of(TestEntities.photo(1, a2, "a2.jpg")));
+        when(photoRepository.findAllByOrderByPrimaryDescSortOrderAscPhotoIdAsc()).thenReturn(List.of(TestEntities.photo(1, a2, "a2.jpg")));
 
         GalleryComposite gallery = builder.build();
         GalleryNodeResponse root = gallery.toNode();
@@ -65,7 +65,7 @@ class GalleryTreeBuilderTest {
         when(storeRepository.findByStatusWithMaster(StoreStatus.PUBLISHED,
                 MasterVerificationStatus.APPROVED)).thenReturn(List.of());
         when(artworkRepository.findByDeletedAtIsNullAndStatusInOrderByArtworkIdAsc(ArtworkStatus.PUBLIC, Pageable.unpaged())).thenReturn(List.of());
-        when(photoRepository.findFirstPhotoOfEachArtwork()).thenReturn(List.of());
+        when(photoRepository.findAllByOrderByPrimaryDescSortOrderAscPhotoIdAsc()).thenReturn(List.of());
 
         GalleryNodeResponse root = builder.build().toNode();
 

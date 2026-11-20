@@ -24,7 +24,7 @@ import com.barnizgallery.backend.repository.StoreRepository;
  * Builds the Composite tree Gallery → Stores → Artworks from the database. Only what the public can see is
  * included: published stores of approved masters and their exhibited or auctioned artworks.
  * <p>
- * It always runs 3 queries (stores with masters, artworks and first photos),
+ * It always runs 3 queries (stores with masters, artworks and photos; the primary photo is the thumbnail),
  * whatever the number of stores or artworks, so there is no N+1 problem.
  * Must be called inside a transaction.
  */
@@ -43,8 +43,9 @@ public class GalleryTreeBuilder {
     }
 
     public GalleryComposite build() {
-        Map<Long, String> thumbnails = photoRepository.findFirstPhotoOfEachArtwork().stream()
-                .collect(Collectors.toMap(p -> p.getArtwork().getArtworkId(), Photo::getFileUrl));
+        Map<Long, String> thumbnails = photoRepository.findAllByOrderByPrimaryDescSortOrderAscPhotoIdAsc().stream()
+                .filter(p -> p.getFileUrl() != null)
+                .collect(Collectors.toMap(p -> p.getArtwork().getArtworkId(), Photo::getFileUrl, (first, next) -> first));
 
         GalleryComposite gallery = new GalleryComposite();
         Map<Long, StoreComposite> stores = new LinkedHashMap<>();
