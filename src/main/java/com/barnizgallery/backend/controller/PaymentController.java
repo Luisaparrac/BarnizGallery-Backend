@@ -11,14 +11,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.barnizgallery.backend.dto.PaymentResponse;
 import com.barnizgallery.backend.dto.PaymentStartResponse;
+import com.barnizgallery.backend.dto.SimulatedPaymentRequest;
 import com.barnizgallery.backend.dto.StartPaymentRequest;
 import com.barnizgallery.backend.patterns.adapter.WebhookCall;
+import com.barnizgallery.backend.service.PaymentSimulationService;
 import com.barnizgallery.backend.service.PaymentStartService;
 import com.barnizgallery.backend.service.PaymentWebhookService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 
 /**
  * Payments of orders and the webhooks of the payment gateways.
@@ -30,10 +34,20 @@ public class PaymentController {
 
     private final PaymentStartService startService;
     private final PaymentWebhookService webhookService;
+    private final PaymentSimulationService simulationService;
 
-    public PaymentController(PaymentStartService startService, PaymentWebhookService webhookService) {
+    public PaymentController(PaymentStartService startService, PaymentWebhookService webhookService,
+            PaymentSimulationService simulationService) {
         this.startService = startService;
         this.webhookService = webhookService;
+        this.simulationService = simulationService;
+    }
+
+    @PostMapping("/payments/{paymentId}/simulate")
+    @Operation(summary = "Demo: approve or decline an own payment of the simulated gateway (payments.test_mode)")
+    public PaymentResponse simulate(@PathVariable Long paymentId,
+            @Valid @RequestBody SimulatedPaymentRequest request) {
+        return simulationService.simulate(paymentId, request.outcome());
     }
 
     /** Public: the gateway signs the call and its adapter verifies it (400 when the signature is wrong). */
