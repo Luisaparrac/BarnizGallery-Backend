@@ -131,6 +131,7 @@ class AiServiceClientTest {
         server.expect(requestTo(BASE_URL + "/v1/recommendations"))
                 .andExpect(jsonPath("$.candidates[0].artwork_id").value(5))
                 .andExpect(jsonPath("$.candidates[0].store_id").value(2))
+                .andExpect(jsonPath("$.candidates[0].slug").value("bandeja-roja"))
                 .andExpect(jsonPath("$.limit").value(10))
                 .andRespond(withSuccess("""
                         {"strategy": "hybrid", "items": [
@@ -162,7 +163,7 @@ class AiServiceClientTest {
     }
 
     private static AiRecommendationRequest recommendationRequest() {
-        AiCandidate candidate = new AiCandidate(5L, 2L, List.of("rojo", "amarillo"), "bandeja", "tradicional",
+        AiCandidate candidate = new AiCandidate(5L, "bandeja-roja", 2L, List.of("rojo", "amarillo"), "bandeja", "tradicional",
                 List.of("colibri"), new BigDecimal("80"), "USD", 12);
         return new AiRecommendationRequest(null, List.of(), List.of(candidate), 10);
     }

@@ -8,14 +8,14 @@ import java.util.function.Predicate;
  * Turns a name into a URL slug: {@code "Taller de Barniz Ñañez"} → {@code "taller-de-barniz-nanez"}. When the slug
  * is taken, {@code -2}, {@code -3}... is added.
  */
-final class SlugGenerator {
+public final class SlugGenerator {
 
     static final int MAX_LENGTH = 80;
 
     private SlugGenerator() {
     }
 
-    static String slugOf(String text) {
+    public static String slugOf(String text) {
         String ascii = Normalizer.normalize(text, Normalizer.Form.NFD).replaceAll("\\p{M}", "");
         String slug = ascii.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]+", "-").replaceAll("(^-+|-+$)", "");
         if (slug.length() > MAX_LENGTH) {

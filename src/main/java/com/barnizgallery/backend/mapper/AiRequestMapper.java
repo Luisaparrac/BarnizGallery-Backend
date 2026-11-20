@@ -20,6 +20,7 @@ import com.barnizgallery.backend.entity.Style;
 import com.barnizgallery.backend.entity.TasteProfile;
 import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.enums.InteractionAction;
+import com.barnizgallery.backend.service.SlugGenerator;
 
 /**
  * Builds the requests of the AI service from the entities, with catalog codes. Values the service would reject
@@ -45,7 +46,7 @@ public final class AiRequestMapper {
 
     /** An available artwork the service can rank; {@code popularity} is its number of interactions. */
     public static AiCandidate toCandidate(Artwork artwork, long popularity) {
-        return new AiCandidate(artwork.getArtworkId(), artwork.getStore().getStoreId(),
+        return new AiCandidate(artwork.getArtworkId(), slugOf(artwork), artwork.getStore().getStoreId(),
                 ArtworkMapper.colorCodes(artwork), shapeCode(artwork), styleCode(artwork),
                 ArtworkMapper.motifCodes(artwork), artwork.getPrice(), artwork.getCurrency(), popularity);
     }
@@ -75,6 +76,14 @@ public final class AiRequestMapper {
                 ArtworkMapper.colorCodes(artwork), ArtworkMapper.motifCodes(artwork), measure(artwork.getWidthCm()),
                 measure(artwork.getHeightCm()), measure(artwork.getDepthCm()), artwork.getPrice(),
                 artwork.getCurrency(), artwork.getStatus() == ArtworkStatus.SOLD);
+    }
+
+    /**
+     * The artwork's slug; an artwork without one gets a slug made from its Spanish title, only for the request
+     * (it is not saved).
+     */
+    static String slugOf(Artwork artwork) {
+        return artwork.getSlug() != null ? artwork.getSlug() : SlugGenerator.slugOf(artwork.getTitleEs());
     }
 
     /** Code of the artwork's shape, or null. */
