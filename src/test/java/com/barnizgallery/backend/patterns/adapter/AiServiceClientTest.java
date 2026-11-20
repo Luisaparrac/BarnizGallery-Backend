@@ -137,7 +137,8 @@ class AiServiceClientTest {
                         {"strategy": "hybrid", "items": [
                           {"artwork_id": 5, "store_id": 2, "score": 0.9476,
                            "reasons": {"colors": ["rojo", "amarillo"], "shape": true, "style": true,
-                                       "motifs": ["colibri"], "budget": null}}]}""",
+                                       "motifs": ["colibri"], "budget": null},
+                           "explanation": "Coincide con lo que te gusta: rojo."}]}""",
                         MediaType.APPLICATION_JSON));
 
         AiRecommendationResponse response = client.recommend(recommendationRequest());
@@ -150,6 +151,7 @@ class AiServiceClientTest {
             assertThat(item.reasons().colors()).containsExactly("rojo", "amarillo");
             assertThat(item.reasons().shape()).isTrue();
             assertThat(item.reasons().budget()).isNull();
+            assertThat(item.explanation()).isEqualTo("Coincide con lo que te gusta: rojo.");
         });
     }
 

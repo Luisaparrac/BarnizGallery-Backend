@@ -7,8 +7,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
+import com.barnizgallery.backend.dto.AiRecommendationItem;
 import com.barnizgallery.backend.dto.AiRecommendationReasons;
 import com.barnizgallery.backend.entity.User;
+import com.barnizgallery.backend.enums.Language;
 
 /**
  * Writes the reason of a store recommended by the AI service from the reasons of its artworks, in the user's
@@ -19,6 +21,19 @@ final class AiReasonText {
     static final int MAX_CODES = 3;
 
     private AiReasonText() {
+    }
+
+    /**
+     * The reason saved for one recommended artwork: the explanation written by the AI service when there is one and
+     * the user reads Spanish (the service only writes Spanish); otherwise the text built from its reasons in the
+     * user's language.
+     */
+    static String forItem(User user, AiRecommendationItem item) {
+        String explanation = item.explanation();
+        if (explanation != null && !explanation.isBlank() && user.getPreferredLanguage() != Language.EN) {
+            return explanation.strip();
+        }
+        return describe(user, item.reasons() == null ? List.of() : List.of(item.reasons()));
     }
 
     static String describe(User user, List<AiRecommendationReasons> reasons) {

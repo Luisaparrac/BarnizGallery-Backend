@@ -132,7 +132,7 @@ class AiServiceStrategyTest {
     }
 
     private static AiRecommendationItem item(long artworkId, double score, AiRecommendationReasons reasons) {
-        return new AiRecommendationItem(artworkId, null, score, reasons);
+        return new AiRecommendationItem(artworkId, null, score, reasons, null);
     }
 
     private static AiRecommendationReasons reasons(List<String> colors, boolean shape) {

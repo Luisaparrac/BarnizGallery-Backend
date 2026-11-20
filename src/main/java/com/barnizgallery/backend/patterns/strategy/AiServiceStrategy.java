@@ -106,7 +106,7 @@ public class AiServiceStrategy implements RecommendationStrategy {
             return (items == null ? List.<AiRecommendationItem>of() : items).stream()
                     .filter(item -> item.score() > 0)
                     .map(item -> RecommendationResult.ofArtwork(item.artworkId(), item.score() * 100,
-                            AiReasonText.describe(user, item.reasons() == null ? List.of() : List.of(item.reasons()))))
+                            AiReasonText.forItem(user, item)))
                     .toList();
         } catch (AiServiceException ex) {
             log.warn("Artwork recommendations for user {} without the AI service: {}", user.getUserId(), ex.getCode());
