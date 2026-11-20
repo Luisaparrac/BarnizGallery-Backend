@@ -14,5 +14,7 @@ public record StoreTemplateResponse(
         String previewUrl,
         @JsonRawValue String defaultLayout,
         @JsonRawValue String defaultTheme,
-        boolean active) {
+        boolean active,
+        Long id,
+        boolean isActive) {
 }

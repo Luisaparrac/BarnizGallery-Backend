@@ -5,8 +5,10 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.barnizgallery.backend.dto.BudgetRangeResponse;
 import com.barnizgallery.backend.dto.CatalogEntryResponse;
 import com.barnizgallery.backend.dto.CatalogsResponse;
+import com.barnizgallery.backend.dto.StoreTemplateResponse;
 import com.barnizgallery.backend.entity.CatalogEntry;
 import com.barnizgallery.backend.mapper.CatalogMapper;
 import com.barnizgallery.backend.repository.AvatarRepository;
@@ -47,13 +49,12 @@ public class CatalogService {
 
     @Transactional(readOnly = true)
     public CatalogsResponse activeCatalogs() {
+        List<BudgetRangeResponse> budgets = budgetRangeRepository.findAllByOrderByMinAmountAscCodeAsc().stream()
+                .map(CatalogMapper::toResponse).toList();
+        List<StoreTemplateResponse> templates = templateRepository.findByActiveTrueOrderByCodeAsc().stream()
+                .map(CatalogMapper::toResponse).toList();
         return new CatalogsResponse(active(colorRepository), active(shapeRepository), active(motifRepository),
-                active(styleRepository),
-                budgetRangeRepository.findAllByOrderByMinAmountAscCodeAsc().stream()
-                        .map(CatalogMapper::toResponse).toList(),
-                active(avatarRepository),
-                templateRepository.findByActiveTrueOrderByCodeAsc().stream()
-                        .map(CatalogMapper::toResponse).toList());
+                active(styleRepository), budgets, active(avatarRepository), templates, budgets, templates);
     }
 
     private static <E extends CatalogEntry> List<CatalogEntryResponse> active(CatalogEntryRepository<E> repository) {

@@ -13,5 +13,7 @@ public record CatalogsResponse(
         List<CatalogEntryResponse> styles,
         List<BudgetRangeResponse> budgetRanges,
         List<CatalogEntryResponse> avatars,
-        List<StoreTemplateResponse> storeTemplates) {
+        List<StoreTemplateResponse> storeTemplates,
+        List<BudgetRangeResponse> budgets,
+        List<StoreTemplateResponse> templates) {
 }

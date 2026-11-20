@@ -51,7 +51,7 @@ class CatalogAdminServiceTest {
         CatalogEntryResponse created = service.create(CatalogKind.COLORS,
                 new CatalogEntryRequest("rojo", " Rojo ", "Red", 1, null, "#B3261E", null));
 
-        assertThat(created).isEqualTo(new CatalogEntryResponse("rojo", "Rojo", "Red", 1, true, "#B3261E", null));
+        assertThat(created).isEqualTo(new CatalogEntryResponse("rojo", "Rojo", "Red", 1, true, "#B3261E", null, null, true));
     }
 
     @Test

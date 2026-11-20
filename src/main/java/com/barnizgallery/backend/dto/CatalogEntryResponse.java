@@ -14,5 +14,7 @@ public record CatalogEntryResponse(
         Integer sortOrder,
         boolean active,
         String hex,
-        String imageUrl) {
+        String imageUrl,
+        Long id,
+        boolean isActive) {
 }

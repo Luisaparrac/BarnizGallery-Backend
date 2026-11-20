@@ -9,5 +9,7 @@ public record BudgetRangeResponse(
         String code,
         BigDecimal minAmount,
         BigDecimal maxAmount,
-        String currency) {
+        String currency,
+        Long id,
+        boolean isActive) {
 }
