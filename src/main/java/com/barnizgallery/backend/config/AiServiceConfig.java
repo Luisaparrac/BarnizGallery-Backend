@@ -38,13 +38,14 @@ public class AiServiceConfig {
             return new DisabledAiServiceGateway();
         }
         log.info("AI service enabled");
-        return new AiServiceProxy(new AiServiceClient(restClient(properties)), clock, CACHE_TTL, COOL_DOWN);
+        return new AiServiceProxy(new AiServiceClient(restClient(properties, properties.timeout()),
+                restClient(properties, properties.designTimeout())), clock, CACHE_TTL, COOL_DOWN);
     }
 
-    private static RestClient restClient(AiServiceProperties properties) {
+    private static RestClient restClient(AiServiceProperties properties, Duration readTimeout) {
         HttpClient httpClient = HttpClient.newBuilder().connectTimeout(properties.timeout()).build();
         JdkClientHttpRequestFactory requestFactory = new JdkClientHttpRequestFactory(httpClient);
-        requestFactory.setReadTimeout(properties.timeout());
+        requestFactory.setReadTimeout(readTimeout);
         return RestClient.builder()
                 .baseUrl(properties.url())
                 .defaultHeader(AiServiceClient.API_KEY_HEADER, properties.key())

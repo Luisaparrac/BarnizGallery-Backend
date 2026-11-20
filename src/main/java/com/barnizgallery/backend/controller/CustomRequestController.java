@@ -18,6 +18,7 @@ import com.barnizgallery.backend.dto.CustomRequestResponse;
 import com.barnizgallery.backend.dto.DeclineRequest;
 import com.barnizgallery.backend.dto.OfferInput;
 import com.barnizgallery.backend.service.ArtisanCustomRequestService;
+import com.barnizgallery.backend.service.CustomDesignService;
 import com.barnizgallery.backend.service.CustomOfferService;
 import com.barnizgallery.backend.service.CustomRequestService;
 
@@ -36,12 +37,26 @@ public class CustomRequestController {
     private final CustomRequestService requestService;
     private final CustomOfferService offerService;
     private final ArtisanCustomRequestService artisanService;
+    private final CustomDesignService designService;
 
     public CustomRequestController(CustomRequestService requestService, CustomOfferService offerService,
-            ArtisanCustomRequestService artisanService) {
+            ArtisanCustomRequestService artisanService, CustomDesignService designService) {
         this.requestService = requestService;
         this.offerService = offerService;
         this.artisanService = artisanService;
+        this.designService = designService;
+    }
+
+    @PostMapping("/{id}/designs")
+    @Operation(summary = "Customer: generate one AI design for an own draft (up to custom_orders.max_ai_designs)")
+    public CustomRequestResponse generateDesign(@PathVariable Long id) {
+        return designService.generate(id);
+    }
+
+    @PostMapping("/{id}/designs/{designId}/select")
+    @Operation(summary = "Customer: choose one completed design of an own draft")
+    public CustomRequestResponse selectDesign(@PathVariable Long id, @PathVariable Long designId) {
+        return designService.select(id, designId);
     }
 
     @PostMapping("/{id}/decline")

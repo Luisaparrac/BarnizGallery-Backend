@@ -1,5 +1,7 @@
 package com.barnizgallery.backend.patterns.adapter;
 
+import com.barnizgallery.backend.dto.AiDesignRequest;
+import com.barnizgallery.backend.dto.AiDesignResponse;
 import com.barnizgallery.backend.dto.AiPriceSuggestion;
 import com.barnizgallery.backend.dto.AiPricingRequest;
 import com.barnizgallery.backend.dto.AiRecommendationRequest;
@@ -31,4 +33,10 @@ public interface AiServiceGateway {
      * when the artwork is not in the service's index.
      */
     AiSimilarResponse similar(AiSimilarRequest request);
+
+    /**
+     * {@code POST /v1/designs}: images for a custom request. Every call can cost money, so it is never cached nor
+     * retried. Fails with {@code content_rejected} or {@code budget_exceeded}.
+     */
+    AiDesignResponse generateDesigns(AiDesignRequest request);
 }

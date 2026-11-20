@@ -12,4 +12,6 @@ import com.barnizgallery.backend.entity.CustomRequestDesign;
 public interface CustomRequestDesignRepository extends JpaRepository<CustomRequestDesign, Long> {
 
     List<CustomRequestDesign> findByCustomRequestCustomRequestIdOrderByDesignIdAsc(Long customRequestId);
+
+    long countByCustomRequestCustomRequestId(Long customRequestId);
 }

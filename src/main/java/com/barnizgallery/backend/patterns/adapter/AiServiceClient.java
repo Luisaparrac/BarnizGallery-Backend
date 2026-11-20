@@ -11,6 +11,8 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
+import com.barnizgallery.backend.dto.AiDesignRequest;
+import com.barnizgallery.backend.dto.AiDesignResponse;
 import com.barnizgallery.backend.dto.AiError;
 import com.barnizgallery.backend.dto.AiPriceSuggestion;
 import com.barnizgallery.backend.dto.AiPricingRequest;
@@ -44,9 +46,15 @@ public class AiServiceClient implements AiServiceGateway {
     private static final JsonMapper ERROR_READER = JsonMapper.builder().build();
 
     private final RestClient restClient;
+    private final RestClient designClient;
 
-    public AiServiceClient(RestClient restClient) {
+    /**
+     * @param restClient   client for the quick calls (prices, recommendations, similar artworks)
+     * @param designClient client with the long read timeout of the image calls
+     */
+    public AiServiceClient(RestClient restClient, RestClient designClient) {
         this.restClient = restClient;
+        this.designClient = designClient;
     }
 
     @Override
@@ -69,10 +77,19 @@ public class AiServiceClient implements AiServiceGateway {
         return post("/v1/similar", request, AiSimilarResponse.class);
     }
 
+    @Override
+    public AiDesignResponse generateDesigns(AiDesignRequest request) {
+        return post(designClient, "/v1/designs", request, AiDesignResponse.class);
+    }
+
     private <T> T post(String path, Object body, Class<T> type) {
+        return post(restClient, path, body, type);
+    }
+
+    private static <T> T post(RestClient client, String path, Object body, Class<T> type) {
         T answer;
         try {
-            answer = restClient.post().uri(path)
+            answer = client.post().uri(path)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(body)
                     .retrieve()

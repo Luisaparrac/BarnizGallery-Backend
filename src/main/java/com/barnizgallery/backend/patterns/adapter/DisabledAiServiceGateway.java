@@ -1,5 +1,7 @@
 package com.barnizgallery.backend.patterns.adapter;
 
+import com.barnizgallery.backend.dto.AiDesignRequest;
+import com.barnizgallery.backend.dto.AiDesignResponse;
 import com.barnizgallery.backend.dto.AiPriceSuggestion;
 import com.barnizgallery.backend.dto.AiPricingRequest;
 import com.barnizgallery.backend.dto.AiRecommendationRequest;
@@ -33,6 +35,11 @@ public class DisabledAiServiceGateway implements AiServiceGateway {
 
     @Override
     public AiSimilarResponse similar(AiSimilarRequest request) {
+        throw disabled();
+    }
+
+    @Override
+    public AiDesignResponse generateDesigns(AiDesignRequest request) {
         throw disabled();
     }
 

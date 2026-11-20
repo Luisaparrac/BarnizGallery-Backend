@@ -23,17 +23,17 @@ class AiServiceConfigTest {
 
     @Test
     void emptyUrlOrKeyDisablesTheService() {
-        assertThat(config.aiServiceGateway(new AiServiceProperties("", key, TIMEOUT), Clock.systemUTC()))
+        assertThat(config.aiServiceGateway(new AiServiceProperties("", key, TIMEOUT, TIMEOUT), Clock.systemUTC()))
                 .isInstanceOf(DisabledAiServiceGateway.class);
-        assertThat(config.aiServiceGateway(new AiServiceProperties("http://ai.test", " ", TIMEOUT), Clock.systemUTC()))
+        assertThat(config.aiServiceGateway(new AiServiceProperties("http://ai.test", " ", TIMEOUT, TIMEOUT), Clock.systemUTC()))
                 .isInstanceOf(DisabledAiServiceGateway.class);
-        assertThat(config.aiServiceGateway(new AiServiceProperties(null, null, TIMEOUT), Clock.systemUTC()))
+        assertThat(config.aiServiceGateway(new AiServiceProperties(null, null, TIMEOUT, TIMEOUT), Clock.systemUTC()))
                 .isInstanceOf(DisabledAiServiceGateway.class);
     }
 
     @Test
     void disabledGatewayIsNotAvailableAndNeverCallsTheNetwork() {
-        AiServiceGateway gateway = config.aiServiceGateway(new AiServiceProperties("", "", TIMEOUT), Clock.systemUTC());
+        AiServiceGateway gateway = config.aiServiceGateway(new AiServiceProperties("", "", TIMEOUT, TIMEOUT), Clock.systemUTC());
 
         assertThat(gateway.isAvailable()).isFalse();
         assertThatThrownBy(() -> gateway.suggestPrice(null))
@@ -44,7 +44,7 @@ class AiServiceConfigTest {
 
     @Test
     void urlAndKeyEnableTheHttpClientBehindTheProxy() {
-        AiServiceGateway gateway = config.aiServiceGateway(new AiServiceProperties("http://ai.test", key, TIMEOUT), Clock.systemUTC());
+        AiServiceGateway gateway = config.aiServiceGateway(new AiServiceProperties("http://ai.test", key, TIMEOUT, TIMEOUT), Clock.systemUTC());
 
         assertThat(gateway).isInstanceOf(AiServiceProxy.class);
         assertThat(gateway.isAvailable()).isTrue();

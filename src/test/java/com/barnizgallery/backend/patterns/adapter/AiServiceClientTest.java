@@ -26,6 +26,9 @@ import org.springframework.web.client.RestClient;
 import com.barnizgallery.backend.dto.AiArtworkRef;
 import com.barnizgallery.backend.dto.AiCandidate;
 import com.barnizgallery.backend.dto.AiComparable;
+import com.barnizgallery.backend.dto.AiDesignColor;
+import com.barnizgallery.backend.dto.AiDesignRequest;
+import com.barnizgallery.backend.dto.AiDesignResponse;
 import com.barnizgallery.backend.dto.AiPriceSuggestion;
 import com.barnizgallery.backend.dto.AiPricingPiece;
 import com.barnizgallery.backend.dto.AiPricingRequest;
@@ -49,7 +52,8 @@ class AiServiceClientTest {
         RestClient.Builder builder = RestClient.builder().baseUrl(BASE_URL)
                 .defaultHeader(AiServiceClient.API_KEY_HEADER, apiKey);
         server = MockRestServiceServer.bindTo(builder).build();
-        client = new AiServiceClient(builder.build());
+        RestClient restClient = builder.build();
+        client = new AiServiceClient(restClient, restClient);
     }
 
     @Test
@@ -73,6 +77,32 @@ class AiServiceClientTest {
         assertThat(suggestion.minPrice()).isEqualByComparingTo("90");
         assertThat(suggestion.maxPrice()).isEqualByComparingTo("115");
         assertThat(suggestion.method()).isEqualTo("comparables");
+        server.verify();
+    }
+
+    @Test
+    void generateDesignsSendsTheRequestAndReadsTheImages() {
+        server.expect(requestTo(BASE_URL + "/v1/designs"))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(header(AiServiceClient.API_KEY_HEADER, apiKey))
+                .andExpect(jsonPath("$.request_id").value(42))
+                .andExpect(jsonPath("$.size_notes").value("unos 30 cm"))
+                .andExpect(jsonPath("$.colors[0].hex").value("#B3261E"))
+                .andExpect(jsonPath("$.count").value(1))
+                .andRespond(withSuccess("""
+                        {"provider": "fake", "model": "fake-1", "prompt": "Bandeja",
+                         "images": [{"image_base64": "UklGRl", "mime_type": "image/webp", "composition": null,
+                                     "prompt": "Bandeja roja"}]}""", MediaType.APPLICATION_JSON));
+
+        AiDesignResponse answer = client.generateDesigns(new AiDesignRequest(42, "Bandeja para mi abuela", null,
+                "Bandeja", "Tradicional", List.of(new AiDesignColor("Rojo", "#B3261E")), List.of("Colibrí"),
+                "unos 30 cm", "es", 1));
+
+        assertThat(answer.provider()).isEqualTo("fake");
+        assertThat(answer.images()).singleElement().satisfies(image -> {
+            assertThat(image.imageBase64()).isEqualTo("UklGRl");
+            assertThat(image.mimeType()).isEqualTo("image/webp");
+        });
         server.verify();
     }
 
