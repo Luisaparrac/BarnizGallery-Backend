@@ -3,15 +3,16 @@ package com.barnizgallery.backend.config;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.time.Clock;
 import java.time.Duration;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
 import com.barnizgallery.backend.exception.AiServiceException;
-import com.barnizgallery.backend.patterns.adapter.AiServiceClient;
 import com.barnizgallery.backend.patterns.adapter.AiServiceGateway;
 import com.barnizgallery.backend.patterns.adapter.DisabledAiServiceGateway;
+import com.barnizgallery.backend.patterns.proxy.AiServiceProxy;
 
 class AiServiceConfigTest {
 
@@ -22,17 +23,17 @@ class AiServiceConfigTest {
 
     @Test
     void emptyUrlOrKeyDisablesTheService() {
-        assertThat(config.aiServiceGateway(new AiServiceProperties("", key, TIMEOUT)))
+        assertThat(config.aiServiceGateway(new AiServiceProperties("", key, TIMEOUT), Clock.systemUTC()))
                 .isInstanceOf(DisabledAiServiceGateway.class);
-        assertThat(config.aiServiceGateway(new AiServiceProperties("http://ai.test", " ", TIMEOUT)))
+        assertThat(config.aiServiceGateway(new AiServiceProperties("http://ai.test", " ", TIMEOUT), Clock.systemUTC()))
                 .isInstanceOf(DisabledAiServiceGateway.class);
-        assertThat(config.aiServiceGateway(new AiServiceProperties(null, null, TIMEOUT)))
+        assertThat(config.aiServiceGateway(new AiServiceProperties(null, null, TIMEOUT), Clock.systemUTC()))
                 .isInstanceOf(DisabledAiServiceGateway.class);
     }
 
     @Test
     void disabledGatewayIsNotAvailableAndNeverCallsTheNetwork() {
-        AiServiceGateway gateway = config.aiServiceGateway(new AiServiceProperties("", "", TIMEOUT));
+        AiServiceGateway gateway = config.aiServiceGateway(new AiServiceProperties("", "", TIMEOUT), Clock.systemUTC());
 
         assertThat(gateway.isAvailable()).isFalse();
         assertThatThrownBy(() -> gateway.suggestPrice(null))
@@ -42,10 +43,10 @@ class AiServiceConfigTest {
     }
 
     @Test
-    void urlAndKeyEnableTheHttpClient() {
-        AiServiceGateway gateway = config.aiServiceGateway(new AiServiceProperties("http://ai.test", key, TIMEOUT));
+    void urlAndKeyEnableTheHttpClientBehindTheProxy() {
+        AiServiceGateway gateway = config.aiServiceGateway(new AiServiceProperties("http://ai.test", key, TIMEOUT), Clock.systemUTC());
 
-        assertThat(gateway).isInstanceOf(AiServiceClient.class);
+        assertThat(gateway).isInstanceOf(AiServiceProxy.class);
         assertThat(gateway.isAvailable()).isTrue();
     }
 }
