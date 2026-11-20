@@ -20,6 +20,8 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     List<Notification> findByUserUserIdOrderByCreatedAtDescNotificationIdDesc(Long userId, Pageable page);
 
     /** Latest unread notifications of a user, newest first. */
+    long countByUserUserIdAndReadAtIsNull(Long userId);
+
     List<Notification> findByUserUserIdAndReadAtIsNullOrderByCreatedAtDescNotificationIdDesc(Long userId,
             Pageable page);
 

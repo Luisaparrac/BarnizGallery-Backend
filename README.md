@@ -340,6 +340,7 @@ the database).
 | PATCH | `/api/artisans/me/artworks/{artworkId}/status` | `{ status }`: `DRAFT` ↔ `EXHIBITED` ↔ `ARCHIVED`, and `SOLD` → `ARCHIVED`; artworks in auction or reserved change only through the auction or the order (409) |
 
 ### Notifications (logged-in user)
+| GET | `/api/notifications/unread-count` | `{ count }` of unread notifications |
 | Method | Path | Description |
 |---|---|---|
 | GET | `/api/notifications?unreadOnly=false` | Latest 100 notifications, newest first, in the user's language |

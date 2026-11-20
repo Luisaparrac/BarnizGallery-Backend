@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.barnizgallery.backend.dto.NotificationResponse;
+import com.barnizgallery.backend.dto.UnreadCountResponse;
 import com.barnizgallery.backend.entity.Notification;
 import com.barnizgallery.backend.entity.User;
 import com.barnizgallery.backend.enums.ErrorCode;
@@ -58,6 +59,12 @@ public class NotificationService {
                         page)
                 : notificationRepository.findByUserUserIdOrderByCreatedAtDescNotificationIdDesc(userId, page);
         return notifications.stream().map(NotificationMapper::toResponse).toList();
+    }
+
+    /** Number of unread notifications of the logged-in user. */
+    @Transactional(readOnly = true)
+    public UnreadCountResponse unreadCount() {
+        return new UnreadCountResponse(notificationRepository.countByUserUserIdAndReadAtIsNull(currentUser.requireId()));
     }
 
     /** Marks one notification of the logged-in user as read; another user's notification is 404. */

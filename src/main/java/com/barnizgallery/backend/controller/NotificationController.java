@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.barnizgallery.backend.dto.NotificationResponse;
+import com.barnizgallery.backend.dto.UnreadCountResponse;
 import com.barnizgallery.backend.service.NotificationService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,6 +35,12 @@ public class NotificationController {
     @Operation(summary = "Latest notifications of the logged-in user, newest first")
     public List<NotificationResponse> mine(@RequestParam(defaultValue = "false") boolean unreadOnly) {
         return notificationService.mine(unreadOnly);
+    }
+
+    @GetMapping("/unread-count")
+    @Operation(summary = "{ count } of unread notifications of the logged-in user")
+    public UnreadCountResponse unreadCount() {
+        return notificationService.unreadCount();
     }
 
     @PostMapping("/{id}/read")
