@@ -23,4 +23,6 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
     Optional<Store> findFirstByMasterMasterIdOrderByStoreIdAsc(Long masterId);
 
     boolean existsByMasterMasterId(Long masterId);
+
+    boolean existsBySlug(String slug);
 }

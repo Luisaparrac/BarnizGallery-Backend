@@ -92,6 +92,7 @@ public enum ErrorCode {
 
     // Stores and interactions
     MASTER_ALREADY_HAS_STORE,
+    ARTISAN_STORE_NOT_FOUND,
     DURATION_NEGATIVE,
     DURATION_REQUIRED,
     INTERACTION_RECORDED_BY_SERVER,

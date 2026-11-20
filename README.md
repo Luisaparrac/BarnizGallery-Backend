@@ -225,6 +225,12 @@ the artisan) and `ADMIN_APPROVAL` (the administrator's final decision).
 | PUT | `/api/artisans/me/verification/{step}` | `{ evidenceUrl }` (https) for `IDENTITY`, `WORKSHOP` or `SAMPLES` → step `SUBMITTED` |
 | POST | `/api/artisans/me/verification/{step}/evidence` | Multipart `file` (JPEG/PNG/WebP) uploaded to the photo storage (503 while disabled) |
 
+### Store editor (artisans)
+| Method | Path | Description |
+|---|---|---|
+| POST | `/api/artisans/me/store` | `{ templateCode, nameEs, nameEn, descriptionEs?, descriptionEn?, slug?, acceptsCustomOrders? }` → 201 draft store with the template theme and sections |
+| GET | `/api/artisans/me/store` | The artisan's store with every section |
+
 ### Artisan verification (administrators)
 | Method | Path | Description |
 |---|---|---|
