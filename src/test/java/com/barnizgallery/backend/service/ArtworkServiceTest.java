@@ -68,7 +68,7 @@ class ArtworkServiceTest {
     void detailIncludesPhotosAndNoAuctionWhenAbsent() {
         Artwork artwork = TestEntities.artwork(3, store, ArtworkStatus.EXHIBITED);
         when(artworkRepository.findById(3L)).thenReturn(Optional.of(artwork));
-        when(photoRepository.findByArtworkArtworkIdOrderByPhotoIdAsc(3L))
+        when(photoRepository.findByArtworkArtworkIdOrderBySortOrderAscPhotoIdAsc(3L))
                 .thenReturn(List.of(TestEntities.photo(1, artwork, "https://img/1.jpg")));
         when(auctionRepository.findFirstByArtworkArtworkIdAndStatusInOrderByStartDateDesc(eq(3L), anyCollection()))
                 .thenReturn(Optional.empty());

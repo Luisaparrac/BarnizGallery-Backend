@@ -48,7 +48,7 @@ public class PhotoService {
     @Transactional(readOnly = true)
     public List<PhotoResponse> findByArtwork(Long artworkId) {
         artworkService.getArtwork(artworkId);
-        return photoRepository.findByArtworkArtworkIdOrderByPhotoIdAsc(artworkId).stream()
+        return photoRepository.findByArtworkArtworkIdOrderBySortOrderAscPhotoIdAsc(artworkId).stream()
                 .map(ArtworkMapper::toPhotoResponse)
                 .toList();
     }
@@ -57,16 +57,17 @@ public class PhotoService {
     public PhotoResponse addByUrl(Long artworkId, PhotoRequest request) {
         Artwork artwork = artworkService.getArtwork(artworkId);
         ownershipGuard.requireStore(artwork.getStore());
-        Photo photo = new Photo();
-        photo.setArtwork(artwork);
+        Photo photo = newPhoto(artwork, request.angle(), request.altEs(), request.altEn());
         photo.setFileUrl(request.fileUrl());
-        photo.setAngle(request.angle());
         return ArtworkMapper.toPhotoResponse(photoRepository.save(photo));
     }
 
-    /** Uploads the file through the {@link StorageService} adapter and registers its URL, key and size. */
+    /**
+     * Uploads the file through the {@link StorageService} adapter and registers its URL, key and size. The photo
+     * goes after the existing ones; the first photo of an artwork is its primary photo.
+     */
     @Transactional
-    public PhotoResponse upload(Long artworkId, MultipartFile file, String angle) {
+    public PhotoResponse upload(Long artworkId, MultipartFile file, String angle, String altEs, String altEn) {
         if (!storageService.isEnabled()) {
             throw new FeatureDisabledException(ErrorCode.STORAGE_DISABLED);
         }
@@ -74,13 +75,11 @@ public class PhotoService {
         ownershipGuard.requireStore(artwork.getStore());
         imageValidator.validate(file);
         StoredImage image = storageService.upload(file, "artworks/" + artworkId);
-        Photo photo = new Photo();
-        photo.setArtwork(artwork);
+        Photo photo = newPhoto(artwork, angle, altEs, altEn);
         photo.setStorageKey(image.storageKey());
         photo.setFileUrl(image.url());
         photo.setWidthPx(image.width());
         photo.setHeightPx(image.height());
-        photo.setAngle(angle);
         return ArtworkMapper.toPhotoResponse(photoRepository.save(photo));
     }
 
@@ -103,5 +102,19 @@ public class PhotoService {
             log.warn("Photo {} deleted but its file {} stays in the storage: storage is disabled", photoId,
                     photo.getStorageKey());
         }
+    }
+
+    /** A new photo placed after the existing ones; the first photo of an artwork is its primary photo. */
+    private Photo newPhoto(Artwork artwork, String angle, String altEs, String altEn) {
+        List<Photo> existing = photoRepository
+                .findByArtworkArtworkIdOrderBySortOrderAscPhotoIdAsc(artwork.getArtworkId());
+        Photo photo = new Photo();
+        photo.setArtwork(artwork);
+        photo.setAngle(angle);
+        photo.setAltEs(altEs);
+        photo.setAltEn(altEn);
+        photo.setSortOrder(existing.isEmpty() ? 0 : existing.get(existing.size() - 1).getSortOrder() + 1);
+        photo.setPrimary(existing.isEmpty());
+        return photo;
     }
 }

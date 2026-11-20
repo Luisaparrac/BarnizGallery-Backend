@@ -74,8 +74,10 @@ public class ArtworkController {
     @PostMapping(path = "/{id}/photos/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PhotoResponse> uploadPhoto(@PathVariable Long id,
             @RequestPart("file") MultipartFile file,
-            @RequestParam(required = false) String angle) {
-        PhotoResponse created = photoService.upload(id, file, angle);
+            @RequestParam(required = false) String angle,
+            @RequestParam(required = false) String altEs,
+            @RequestParam(required = false) String altEn) {
+        PhotoResponse created = photoService.upload(id, file, angle, altEs, altEn);
         return ResponseEntity.created(URI.create("/api/artworks/" + id + "/photos")).body(created);
     }
 

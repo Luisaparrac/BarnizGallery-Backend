@@ -59,7 +59,7 @@ public class ArtworkService {
     @Transactional(readOnly = true)
     public ArtworkDetailResponse findById(Long artworkId) {
         Artwork artwork = getArtwork(artworkId);
-        List<PhotoResponse> photos = photoRepository.findByArtworkArtworkIdOrderByPhotoIdAsc(artworkId).stream()
+        List<PhotoResponse> photos = photoRepository.findByArtworkArtworkIdOrderBySortOrderAscPhotoIdAsc(artworkId).stream()
                 .map(ArtworkMapper::toPhotoResponse)
                 .toList();
         AuctionResponse currentAuction = auctionRepository

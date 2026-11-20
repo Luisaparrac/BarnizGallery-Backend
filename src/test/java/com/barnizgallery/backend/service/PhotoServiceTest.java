@@ -54,18 +54,20 @@ class PhotoServiceTest {
         when(artworkService.getArtwork(3L)).thenReturn(artwork);
         when(photoRepository.save(any(Photo.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        PhotoResponse photo = photoService.addByUrl(3L, new PhotoRequest("https://img/front.jpg", "front"));
+        PhotoResponse photo = photoService.addByUrl(3L, new PhotoRequest("https://img/front.jpg", "front", "Frente", "Front"));
 
         assertThat(photo.artworkId()).isEqualTo(3);
         assertThat(photo.fileUrl()).isEqualTo("https://img/front.jpg");
         assertThat(photo.angle()).isEqualTo("front");
+        assertThat(photo.altEn()).isEqualTo("Front");
+        assertThat(photo.primary()).isTrue();
     }
 
     @Test
     void uploadIsDisabledWithoutStorage() {
         when(storageService.isEnabled()).thenReturn(false);
 
-        assertThatThrownBy(() -> photoService.upload(3L, null, null))
+        assertThatThrownBy(() -> photoService.upload(3L, null, null, null, null))
                 .isInstanceOf(FeatureDisabledException.class);
     }
 
@@ -99,7 +101,7 @@ class PhotoServiceTest {
                 .thenReturn(new StoredImage("museo/artworks/3/abc", "https://res.test/abc.jpg", 800, 600));
         when(photoRepository.save(any(Photo.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        photoService.upload(3L, file, "front");
+        photoService.upload(3L, file, "front", null, null);
 
         ArgumentCaptor<Photo> saved = ArgumentCaptor.forClass(Photo.class);
         verify(photoRepository).save(saved.capture());

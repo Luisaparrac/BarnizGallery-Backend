@@ -121,8 +121,8 @@ Dates are ISO-8601 (UTC). Enum values are in English (`EXHIBITED`, `ACTIVE`, `PE
 | GET | `/api/artworks?storeId=&status=` | Filterable list |
 | GET | `/api/artworks/{id}` | Artwork + photos + current auction |
 | GET | `/api/artworks/{id}/photos` | Photos |
-| POST | `/api/artworks/{id}/photos` | Register photo by URL `{ fileUrl, angle }` |
-| POST | `/api/artworks/{id}/photos/upload` | Multipart upload (503 while storage is disabled) |
+| POST | `/api/artworks/{id}/photos` | Register photo by URL `{ fileUrl, angle?, altEs?, altEn? }` (owner artisan) |
+| POST | `/api/artworks/{id}/photos/upload` | Multipart `file` (+ `angle`, `altEs`, `altEn`) uploaded to the storage (503 while disabled); goes last, the first photo is the primary one |
 | DELETE | `/api/photos/{id}` | Delete a photo |
 
 ### Users
