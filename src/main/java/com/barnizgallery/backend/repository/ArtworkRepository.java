@@ -41,8 +41,4 @@ public interface ArtworkRepository extends JpaRepository<Artwork, Long> {
     @Query("select a.store.storeId as storeId, count(a) as artworkCount from Artwork a "
             + "where a.deletedAt is null and a.status in :statuses group by a.store.storeId")
     List<StoreArtworkCount> countGroupedByStore(Collection<ArtworkStatus> statuses);
-
-    /** Artwork count of every store in a single query. */
-    @Query("select a.store.storeId as storeId, count(a) as artworkCount from Artwork a group by a.store.storeId")
-    List<StoreArtworkCount> countGroupedByStore();
 }

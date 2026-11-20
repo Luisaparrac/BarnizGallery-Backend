@@ -3,9 +3,7 @@ package com.barnizgallery.backend.mapper;
 import java.util.List;
 
 import com.barnizgallery.backend.dto.ArtworkSummaryResponse;
-import com.barnizgallery.backend.dto.StoreDetailResponse;
 import com.barnizgallery.backend.dto.StorePageResponse;
-import com.barnizgallery.backend.dto.StoreRequest;
 import com.barnizgallery.backend.dto.StoreSectionResponse;
 import com.barnizgallery.backend.dto.StoreSummaryResponse;
 import com.barnizgallery.backend.entity.Master;
@@ -26,24 +24,11 @@ public final class StoreMapper {
                 store.getLogoUrl(), store.getBannerUrl(), store.getStatus(), artworkCount);
     }
 
-    public static StoreDetailResponse toDetail(Store store, List<ArtworkSummaryResponse> artworks) {
-        return new StoreDetailResponse(store.getStoreId(), MasterMapper.toResponse(store.getMaster()), store.getNameEs(),
-                store.getNameEn(), store.getDescriptionEs(), store.getDescriptionEn(), store.getStatus(), artworks);
-    }
-
     public static StorePageResponse toPage(Store store, List<StoreSectionResponse> sections,
             List<ArtworkSummaryResponse> artworks) {
         return new StorePageResponse(store.getStoreId(), store.getSlug(), store.getNameEs(), store.getNameEn(),
                 store.getDescriptionEs(), store.getDescriptionEn(), store.getLogoUrl(), store.getBannerUrl(),
                 store.getTheme(), store.isAcceptsCustomOrders(), store.getPublishedAt(),
                 MasterMapper.toResponse(store.getMaster()), sections, artworks);
-    }
-
-    /** Copies the request fields into the entity. The master and template are set by the service. */
-    public static void apply(StoreRequest request, Store store) {
-        store.setNameEs(request.nameEs());
-        store.setNameEn(request.nameEn());
-        store.setDescriptionEs(request.descriptionEs());
-        store.setDescriptionEn(request.descriptionEn());
     }
 }

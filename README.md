@@ -49,7 +49,7 @@ Important rules:
 - Business rules that live in the database (stock reservations, payment triggers, audit, currency
   checks) are called from the backend, not re-implemented in Java.
 - There is **no seed data**: an empty table returns an empty list.
-- Masters and rooms **cannot be deleted** through the API (the database cascades deletes).
+- Masters and stores **cannot be deleted** through the API (the database cascades deletes).
 - All times are **UTC**.
 
 ## Running locally
@@ -118,9 +118,6 @@ Dates are ISO-8601 (UTC). Enum values are in English (`EXHIBITED`, `ACTIVE`, `PE
 | POST / PUT | `/api/masters`, `/api/masters/{id}` | Create / update master |
 | GET | `/api/stores` | Published stores of approved masters, newest first, with slug, logo, banner and count of public artworks |
 | GET | `/api/stores/{slug}` | Public page of a published store (approved master): visible sections in order and exhibited or auctioned artworks; 404 otherwise |
-| GET | `/api/rooms` | Stores with master and artwork count (legacy path) |
-| GET | `/api/rooms/{id}` | Store + artworks (legacy path) |
-| POST / PUT | `/api/rooms`, `/api/rooms/{id}` | Create / update store `{ masterId, templateId, nameEs, nameEn, … }` (one store per master) |
 | GET | `/api/artworks?storeId=&status=` | Filterable list |
 | GET | `/api/artworks/{id}` | Artwork + photos + current auction |
 | POST / PUT | `/api/artworks`, `/api/artworks/{id}` | Create / update artwork (status is managed by auctions) |
@@ -210,7 +207,7 @@ Public endpoints; every other call sends `Authorization: Bearer <accessToken>`. 
 ### Access by role
 | Who | What |
 |---|---|
-| Anyone | `/api/auth/**`; `GET` of health, gallery, stores (`/api/stores`, `/api/rooms`), masters, artworks, auctions and catalogs |
+| Anyone | `/api/auth/**`; `GET` of health, gallery, stores (`/api/stores`), masters, artworks, auctions and catalogs |
 | Logged-in user | Their own account (`/api/users/{id}/**` with their id), notifications, interactions and bids in their own name |
 | Artisan or administrator | Create and edit stores, artworks and photos (an artisan only their own store); suggested prices |
 | Administrator | `/api/admin/**`, masters, creating and closing auctions, any user's data |
