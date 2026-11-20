@@ -102,8 +102,8 @@ public class ArtisanArtworkService {
             return ArtworkMapper.toSummary(artwork);
         }
         ArtworkStatusRules.requireChange(artwork.getStatus(), status);
+        ArtworkSaleRules.validate(artwork, status);
         artwork.setStatus(status);
-        ArtworkSaleRules.validate(artwork);
         if (status == ArtworkStatus.EXHIBITED && artwork.getPublishedAt() == null) {
             artwork.setPublishedAt(clock.instant());
         }

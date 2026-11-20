@@ -18,10 +18,15 @@ final class ArtworkSaleRules {
     }
 
     static void validate(Artwork artwork) {
+        validate(artwork, artwork.getStatus());
+    }
+
+    /** Checks the artwork as if it had the given status, before the status is changed. */
+    static void validate(Artwork artwork, ArtworkStatus status) {
         if (artwork.getPrice() != null && artwork.getCurrency() == null) {
             throw BusinessRuleException.unprocessable(ErrorCode.ARTWORK_CURRENCY_REQUIRED);
         }
-        if (artwork.getStatus() == ArtworkStatus.DRAFT || artwork.getStatus() == ArtworkStatus.ARCHIVED) {
+        if (status == ArtworkStatus.DRAFT || status == ArtworkStatus.ARCHIVED) {
             return;
         }
         if (artwork.getSaleMode() == null) {
