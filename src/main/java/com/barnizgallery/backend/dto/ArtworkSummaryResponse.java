@@ -17,6 +17,8 @@ public record ArtworkSummaryResponse(
         String technique,
         List<String> colorCodes,
         List<String> motifCodes,
+        String shapeCode,
+        String styleCode,
         ArtworkStatus status,
         SaleMode saleMode,
         BigDecimal price,

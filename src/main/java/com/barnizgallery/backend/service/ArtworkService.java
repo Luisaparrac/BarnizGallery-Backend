@@ -110,6 +110,8 @@ public class ArtworkService {
     private void applyCatalogs(ArtworkRequest request, Artwork artwork) {
         artwork.setColors(catalogResolver.colors(request.colorCodes()));
         artwork.setMotifs(catalogResolver.motifs(request.motifCodes()));
+        artwork.setShape(catalogResolver.shape(request.shapeCode()));
+        artwork.setStyle(catalogResolver.style(request.styleCode()));
     }
 
     /** Loads an artwork or throws 404. Used by other services too. */

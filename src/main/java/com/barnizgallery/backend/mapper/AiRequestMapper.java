@@ -77,11 +77,13 @@ public final class AiRequestMapper {
                 artwork.getCurrency(), artwork.getStatus() == ArtworkStatus.SOLD);
     }
 
-    private static String shapeCode(Artwork artwork) {
+    /** Code of the artwork's shape, or null. */
+    public static String shapeCode(Artwork artwork) {
         return artwork.getShape() == null ? null : artwork.getShape().getCode();
     }
 
-    private static String styleCode(Artwork artwork) {
+    /** Code of the artwork's style, or null. */
+    public static String styleCode(Artwork artwork) {
         return artwork.getStyle() == null ? null : artwork.getStyle().getCode();
     }
 

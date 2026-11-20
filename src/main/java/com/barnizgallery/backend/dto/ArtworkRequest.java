@@ -17,6 +17,8 @@ import jakarta.validation.constraints.Size;
  * @param currency   ISO 4217 code of the price (for example USD)
  * @param colorCodes codes of the color catalog
  * @param motifCodes codes of the motif catalog
+ * @param shapeCode  code of the shape catalog, or null
+ * @param styleCode  code of the style catalog, or null
  */
 public record ArtworkRequest(
         @NotNull Long storeId,
@@ -34,5 +36,7 @@ public record ArtworkRequest(
         @Pattern(regexp = "[A-Z]{3}") String currency,
         @PositiveOrZero Integer stock,
         List<String> colorCodes,
-        List<String> motifCodes) {
+        List<String> motifCodes,
+        @Size(max = 60) String shapeCode,
+        @Size(max = 60) String styleCode) {
 }

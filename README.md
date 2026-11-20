@@ -166,7 +166,7 @@ The v1 contact messages were migrated by the database to conversations and messa
 ### Catalogs
 `GET /api/catalogs` (public) returns the active colors, shapes, motifs, styles, budget ranges, avatars and
 store templates, each with its `code` and its names in Spanish and English. Requests always use these
-**codes** (for example `colorCodes: ["rojo"]`), never database ids.
+**codes** (for example `colorCodes: ["rojo"]`, `shapeCode`, `styleCode`), never database ids.
 
 ### Catalog administration (administrators)
 | Method | Path | Description |

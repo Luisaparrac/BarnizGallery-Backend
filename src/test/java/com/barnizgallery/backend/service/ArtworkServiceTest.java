@@ -101,7 +101,7 @@ class ArtworkServiceTest {
 
         ArtworkSummaryResponse created = artworkService.create(
                 new ArtworkRequest(1L, "Obra", "Artwork", null, null, null, null, null, null, null,
-                        null, null, null, null, List.of("rojo"), List.of()));
+                        null, null, null, null, List.of("rojo"), List.of(), null, null));
 
         assertThat(created.status()).isEqualTo(ArtworkStatus.EXHIBITED);
         assertThat(created.colorCodes()).containsExactly("rojo");
@@ -114,7 +114,7 @@ class ArtworkServiceTest {
 
         ArtworkSummaryResponse updated = artworkService.update(3L,
                 new ArtworkRequest(1L, "Nuevo", "New", null, null, null, null, null, null, null,
-                        null, null, null, null, null, null));
+                        null, null, null, null, null, null, null, null));
 
         assertThat(updated.titleEn()).isEqualTo("New");
         assertThat(updated.status()).isEqualTo(ArtworkStatus.IN_AUCTION);

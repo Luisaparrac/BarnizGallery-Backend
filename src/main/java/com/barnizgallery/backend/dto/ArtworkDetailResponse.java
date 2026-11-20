@@ -26,6 +26,8 @@ public record ArtworkDetailResponse(
         BigDecimal weightG,
         List<String> colorCodes,
         List<String> motifCodes,
+        String shapeCode,
+        String styleCode,
         ArtworkStatus status,
         SaleMode saleMode,
         BigDecimal price,
