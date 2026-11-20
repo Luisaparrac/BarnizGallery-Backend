@@ -212,6 +212,7 @@ action changes their status.
 |---|---|---|
 | AI service (price suggestions, recommendation strategy `ai-service`) | Enabled when configured | Set `AI_SERVICE_URL` and `AI_SERVICE_KEY` |
 | AI text model (recommendation strategy `ai`, AI bid review) | Disabled – provider not chosen | When the provider is chosen: add an adapter implementing `AiTextClient`, add the `AI_API_KEY` property, and set `AI_PROVIDER` |
+| Payments (by currency: COP → Wompi, USD → PayPal; simulated gateway for demos) | Each gateway enabled when its keys are set | Set the `WOMPI_*` and `PAYPAL_*` variables; any other currency answers 409 |
 | Photo storage (Cloudinary, JPEG/PNG/WebP up to 5 MB) | Enabled when configured | Set `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY` and `CLOUDINARY_API_SECRET` |
 
 While an integration is disabled its endpoints answer **503** and nothing is invented: recommendations
