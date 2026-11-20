@@ -6,16 +6,14 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.MediaType;
-import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestClientResponseException;
 
 import com.barnizgallery.backend.config.PayPalProperties;
 import com.barnizgallery.backend.enums.ErrorCode;
+import com.barnizgallery.backend.enums.PaymentStatus;
 import com.barnizgallery.backend.exception.BusinessRuleException;
 import com.barnizgallery.backend.exception.FeatureDisabledException;
 
+import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.node.ObjectNode;
@@ -23,29 +21,34 @@ import tools.jackson.databind.node.ObjectNode;
 /**
  * <b>Adapter pattern – Adapter</b> for PayPal (REST API, Orders v2, without the SDK).
  * <p>
- * PayPal charges the USD obligations. A checkout creates an order with {@code intent=CAPTURE}; the payment
- * reference travels as {@code reference_id} and {@code custom_id}, and the buyer is sent to the
- * {@code payer-action} (or {@code approve}) link to pay.
+ * PayPal charges the USD obligations:
+ * <ol>
+ * <li>a checkout creates an order with {@code intent=CAPTURE}; the payment reference travels as
+ * {@code reference_id} and {@code custom_id}, and the buyer pays in the {@code payer-action} (or {@code approve})
+ * link;</li>
+ * <li>when the buyer approves, PayPal sends {@code CHECKOUT.ORDER.APPROVED} and the order is captured here;</li>
+ * <li>{@code PAYMENT.CAPTURE.*} events then report the final result.</li>
+ * </ol>
+ * Every webhook is verified by PayPal before it is used.
  */
 public class PayPalGateway implements PaymentGateway {
 
     public static final String CODE = "paypal";
     public static final String CURRENCY = "USD";
 
-    static final String REQUEST_ID_HEADER = "PayPal-Request-Id";
     static final String BRAND_NAME = "MUSEO Barniz de Pasto";
     static final int MAX_DESCRIPTION = 127;
 
     private static final Logger log = LoggerFactory.getLogger(PayPalGateway.class);
     private static final JsonMapper JSON = JsonMapper.builder().build();
 
-    private final RestClient restClient;
-    private final PayPalTokenClient tokenClient;
+    private final PayPalApiClient api;
+    private final PayPalWebhookVerifier verifier;
     private final PayPalProperties properties;
 
-    public PayPalGateway(RestClient restClient, PayPalTokenClient tokenClient, PayPalProperties properties) {
-        this.restClient = restClient;
-        this.tokenClient = tokenClient;
+    public PayPalGateway(PayPalApiClient api, PayPalWebhookVerifier verifier, PayPalProperties properties) {
+        this.api = api;
+        this.verifier = verifier;
         this.properties = properties;
     }
 
@@ -69,10 +72,8 @@ public class PayPalGateway implements PaymentGateway {
         if (!CURRENCY.equals(request.currency())) {
             throw new BusinessRuleException(ErrorCode.PAYMENT_CURRENCY_NOT_SUPPORTED, request.currency());
         }
-        if (!isEnabled()) {
-            throw new FeatureDisabledException(ErrorCode.PAYMENT_GATEWAY_DISABLED, CURRENCY);
-        }
-        JsonNode order = post("/v2/checkout/orders", "create-" + request.reference(), orderBody(request));
+        requireEnabled();
+        JsonNode order = api.post("/v2/checkout/orders", "create-" + request.reference(), orderBody(request));
         String orderId = order.path("id").asString();
         String payUrl = null;
         for (JsonNode link : order.path("links").values()) {
@@ -88,9 +89,44 @@ public class PayPalGateway implements PaymentGateway {
         return new CheckoutSession(CODE, orderId, payUrl);
     }
 
+    /**
+     * Verifies the webhook with PayPal, then reads it. An approved order is captured (the capture uses the
+     * order id as {@code PayPal-Request-Id}, so a repeated event does not capture twice). Other event types
+     * are ignored.
+     */
     @Override
     public Optional<GatewayEvent> readEvent(WebhookCall call) {
-        throw BusinessRuleException.badRequest(ErrorCode.WEBHOOK_NOT_SUPPORTED, CODE);
+        requireEnabled();
+        JsonNode event = parse(call.body());
+        if (!verifier.isValid(call, event)) {
+            throw BusinessRuleException.badRequest(ErrorCode.INVALID_WEBHOOK_SIGNATURE);
+        }
+        String eventId = event.path("id").asString();
+        String type = event.path("event_type").asString();
+        JsonNode resource = event.path("resource");
+        if ("CHECKOUT.ORDER.APPROVED".equals(type)) {
+            String orderId = resource.path("id").asString();
+            String reference = resource.path("purchase_units").path(0).path("custom_id").asString();
+            JsonNode capture = api.post("/v2/checkout/orders/" + orderId + "/capture", "capture-" + orderId,
+                    JSON.createObjectNode()).path("purchase_units").path(0).path("payments").path("captures").path(0);
+            return Optional.of(new GatewayEvent(CODE, eventId, reference, capture.path("id").asString(),
+                    captureStatus(capture.path("status").asString()), call.body()));
+        }
+        if (type.startsWith("PAYMENT.CAPTURE.")) {
+            return Optional.of(new GatewayEvent(CODE, eventId, resource.path("custom_id").asString(),
+                    resource.path("id").asString(), captureStatus(resource.path("status").asString()), call.body()));
+        }
+        return Optional.empty();
+    }
+
+    /** COMPLETED → approved; DECLINED and FAILED → declined; REFUNDED → refunded; anything else → pending. */
+    static PaymentStatus captureStatus(String paypalStatus) {
+        return switch (paypalStatus) {
+            case "COMPLETED" -> PaymentStatus.APPROVED;
+            case "DECLINED", "FAILED" -> PaymentStatus.DECLINED;
+            case "REFUNDED", "PARTIALLY_REFUNDED" -> PaymentStatus.REFUNDED;
+            default -> PaymentStatus.PENDING;
+        };
     }
 
     static ObjectNode orderBody(CheckoutRequest request) {
@@ -120,27 +156,17 @@ public class PayPalGateway implements PaymentGateway {
         return body;
     }
 
-    /** Authenticated JSON POST; the request id makes PayPal ignore a repeated call. */
-    JsonNode post(String path, String requestId, Object body) {
+    private void requireEnabled() {
+        if (!isEnabled()) {
+            throw new FeatureDisabledException(ErrorCode.PAYMENT_GATEWAY_DISABLED, CURRENCY);
+        }
+    }
+
+    private static JsonNode parse(String body) {
         try {
-            JsonNode answer = restClient.post().uri(path)
-                    .headers(headers -> headers.setBearerAuth(tokenClient.accessToken()))
-                    .header(REQUEST_ID_HEADER, requestId)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .body(body)
-                    .retrieve()
-                    .body(JsonNode.class);
-            if (answer == null) {
-                throw new FeatureDisabledException(ErrorCode.PAYMENT_GATEWAY_UNAVAILABLE);
-            }
-            return answer;
-        } catch (RestClientResponseException ex) {
-            log.warn("PayPal answered HTTP {} on {}", ex.getStatusCode().value(), path);
-            throw new FeatureDisabledException(ErrorCode.PAYMENT_GATEWAY_UNAVAILABLE);
-        } catch (RestClientException ex) {
-            log.warn("PayPal did not answer on {}: {}", path, ex.getClass().getSimpleName());
-            throw new FeatureDisabledException(ErrorCode.PAYMENT_GATEWAY_UNAVAILABLE);
+            return JSON.readTree(body);
+        } catch (JacksonException ex) {
+            throw BusinessRuleException.badRequest(ErrorCode.INVALID_WEBHOOK_SIGNATURE);
         }
     }
 }
