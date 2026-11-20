@@ -251,6 +251,11 @@ the artisan) and `ADMIN_APPROVAL` (the administrator's final decision).
 | GET | `/api/cart` | `{ items: [{ artworkId, storeId, titleEs, titleEn, unitPrice, currency, quantity, lineTotal, stock, available }], subtotals: { USD: … } }`; adding to the cart reserves nothing |
 | PUT | `/api/cart/items/{artworkId}` | `{ quantity }` (1–99) sets the quantity; 409 when the artwork is not for sale or has less stock |
 | DELETE | `/api/cart/items/{artworkId}` | Remove a line |
+| POST | `/api/orders/checkout` | `{ addressId }` → 201 order `PENDING_PAYMENT` (type `PURCHASE`) with its lines and one `SINGLE_PAYMENT` obligation; the cart is emptied. 409 when the cart is empty, mixes currencies, a line is not for sale or a setting is missing |
+
+Checkout amounts (`OrderBuilder`, Builder pattern): fee per line = line total × `platform.commission_rate`,
+rounded half up to cents; artisan net = line total − fee; total = subtotal + shipping. Shipping comes from
+`shipping.fixed_amount.<CURRENCY>` or, for orders in `currency.default`, from `shipping.fixed_amount`.
 
 Artwork rules (422): a price needs its currency; an exhibited artwork needs `saleMode`; `SALE` needs
 `price` > 0 and `stock`. The currency cannot change once the artwork has orders or auctions (409, enforced by
