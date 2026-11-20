@@ -163,6 +163,11 @@ them is `null` the operation answers 409 `setting_not_configured` naming it.
 The v1 contact messages were migrated by the database to conversations and messages. The old
 `/api/contact-messages` endpoints were removed; the conversation endpoints replace them.
 
+### Catalogs
+`GET /api/catalogs` (public) returns the active colors, shapes, motifs, styles, budget ranges, avatars and
+store templates, each with its `code` and its names in Spanish and English. Requests always use these
+**codes** (for example `colorCodes: ["rojo"]`), never database ids.
+
 ### Authentication
 Public endpoints; every other call sends `Authorization: Bearer <accessToken>`. The access token lasts
 `JWT_ACCESS_MINUTES` (15); the refresh token lasts `JWT_REFRESH_DAYS` (7) and works only once.
