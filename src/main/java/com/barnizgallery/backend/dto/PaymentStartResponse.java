@@ -16,5 +16,8 @@ public record PaymentStartResponse(
         String redirectUrl,
         BigDecimal amount,
         String currency,
-        PaymentStatus status) {
+        PaymentStatus status,
+        Long id,
+        Long orderId,
+        String checkoutUrl) {
 }
