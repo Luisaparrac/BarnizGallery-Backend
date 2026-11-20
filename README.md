@@ -184,7 +184,7 @@ of the `Accept-Language` header (`es` or `en`; Spanish by default). The texts li
 | Topic | Payload |
 |---|---|
 | `/topic/auctions/{auctionId}` | `AuctionEvent { type: BID_PLACED \| AUCTION_STARTED \| AUCTION_FINISHED \| AUCTION_CANCELLED, auctionId, artworkId, bid?, previousTopBidderId?, timestamp }` |
-| `/topic/users/{userId}/notifications` | `{ type: "OUTBID" \| "MATCHING_AUCTION", auctionId, artworkId, message }` |
+| `/topic/users/{userId}/notifications` | Stored notifications `{ notificationId, type, title, body, link, payload, readAt, createdAt }` (title and body in the user's language); the auction observers still send `{ type: "OUTBID" \| "MATCHING_AUCTION", auctionId, artworkId, message }` |
 | `/topic/admin/anomalies` | `{ auctionId, bidId, userId, amount, reason, timestamp }` |
 
 Bids are placed through REST (`POST /api/auctions/{id}/bids`); WebSocket is used to receive updates.

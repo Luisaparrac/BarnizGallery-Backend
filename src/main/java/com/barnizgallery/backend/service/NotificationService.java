@@ -2,6 +2,7 @@ package com.barnizgallery.backend.service;
 
 import java.util.Locale;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +17,8 @@ import com.barnizgallery.backend.repository.NotificationRepository;
 /**
  * Stores notifications for users. The title and the body are written once, in the recipient's preferred
  * language, from the message bundles: {@code notification.<type>.title} and {@code notification.<type>.body}
- * (both receive the same arguments).
+ * (both receive the same arguments). After the commit, {@link NotificationPusher} also sends it through
+ * WebSocket.
  */
 @Service
 public class NotificationService {
@@ -25,10 +27,13 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final MessageSource messageSource;
+    private final ApplicationEventPublisher events;
 
-    public NotificationService(NotificationRepository notificationRepository, MessageSource messageSource) {
+    public NotificationService(NotificationRepository notificationRepository, MessageSource messageSource,
+            ApplicationEventPublisher events) {
         this.notificationRepository = notificationRepository;
         this.messageSource = messageSource;
+        this.events = events;
     }
 
     /**
@@ -47,6 +52,8 @@ public class NotificationService {
         notification.setBody(messageSource.getMessage("notification." + type + ".body", args, locale));
         notification.setLink(link);
         notification.setPayload(payload);
-        return NotificationMapper.toResponse(notificationRepository.save(notification));
+        NotificationResponse saved = NotificationMapper.toResponse(notificationRepository.save(notification));
+        events.publishEvent(new NotificationCreated(user.getUserId(), saved));
+        return saved;
     }
 }
