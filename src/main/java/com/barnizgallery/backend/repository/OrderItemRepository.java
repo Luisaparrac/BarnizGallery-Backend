@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.barnizgallery.backend.entity.OrderItem;
+import com.barnizgallery.backend.enums.FulfillmentStatus;
 import com.barnizgallery.backend.enums.OrderStatus;
 
 /**
@@ -16,6 +17,11 @@ import com.barnizgallery.backend.enums.OrderStatus;
 public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
 
     List<OrderItem> findByOrderOrderIdOrderByOrderItemIdAsc(Long orderId);
+
+    /** Delivered lines not included in any payout yet. */
+    @Query("select i from OrderItem i where i.fulfillmentStatus = :delivered "
+            + "and not exists (select 1 from PayoutItem p where p.orderItem = i) order by i.orderItemId")
+    List<OrderItem> findDeliveredWithoutPayout(FulfillmentStatus delivered);
 
     /** Lines of a store whose order has one of the statuses, newest order first. */
     @Query("select i from OrderItem i join fetch i.order o where i.store.storeId = :storeId and o.status in :statuses "

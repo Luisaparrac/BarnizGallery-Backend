@@ -6,7 +6,11 @@ import java.time.Instant;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.barnizgallery.backend.converter.PayoutStatusConverter;
+import com.barnizgallery.backend.enums.PayoutStatus;
+
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -40,8 +44,9 @@ public class Payout {
     @Column(name = "amount", nullable = false, precision = 14, scale = 2)
     private BigDecimal amount = BigDecimal.ZERO;
 
+    @Convert(converter = PayoutStatusConverter.class)
     @Column(name = "status", nullable = false, length = 30)
-    private String status;
+    private PayoutStatus status;
 
     @Column(name = "reference")
     private String reference;
@@ -89,11 +94,11 @@ public class Payout {
         this.amount = amount;
     }
 
-    public String getStatus() {
+    public PayoutStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(PayoutStatus status) {
         this.status = status;
     }
 

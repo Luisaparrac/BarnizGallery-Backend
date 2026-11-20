@@ -26,6 +26,7 @@ import com.barnizgallery.backend.enums.OrderType;
 import com.barnizgallery.backend.enums.PaymentObligationStage;
 import com.barnizgallery.backend.enums.PaymentObligationStatus;
 import com.barnizgallery.backend.enums.PaymentStatus;
+import com.barnizgallery.backend.enums.PayoutStatus;
 import com.barnizgallery.backend.enums.SaleMode;
 import com.barnizgallery.backend.enums.StoreStatus;
 import com.barnizgallery.backend.enums.UserRole;
@@ -37,6 +38,8 @@ class EnumConvertersTest {
 
     static Stream<Arguments> mappings() {
         return Stream.of(
+                Arguments.of(new PayoutStatusConverter(), PayoutStatus.PENDING, "pendiente"),
+                Arguments.of(new PayoutStatusConverter(), PayoutStatus.PAID, "pagado"),
                 Arguments.of(new FulfillmentStatusConverter(), FulfillmentStatus.PENDING, "pendiente"),
                 Arguments.of(new FulfillmentStatusConverter(), FulfillmentStatus.SHIPPED, "enviado"),
                 Arguments.of(new FulfillmentStatusConverter(), FulfillmentStatus.DELIVERED, "entregado"),

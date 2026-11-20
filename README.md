@@ -250,6 +250,12 @@ the artisan) and `ADMIN_APPROVAL` (the administrator's final decision).
 | POST | `/api/artisans/me/orders/items/{orderItemId}/ship` | `{ carrier, trackingNumber }`: line `PENDING` → `SHIPPED`; the order goes to `IN_PREPARATION`, and to `SHIPPED` when every line is shipped; the buyer is notified |
 | POST | `/api/artisans/me/orders/items/{orderItemId}/deliver` | Line `SHIPPED` → `DELIVERED`; when every line is delivered the order becomes `DELIVERED` |
 
+### Payouts (administrators)
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/admin/payouts` | Every payout, newest first |
+| POST | `/api/admin/payouts` | Create `PENDING` payouts from delivered lines not paid out yet, one per master and currency (amount = sum of the artisan net amounts) |
+
 ### Cart and orders
 | Method | Path | Description |
 |---|---|---|
