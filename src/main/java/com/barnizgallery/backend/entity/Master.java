@@ -68,6 +68,10 @@ public class Master {
     @Column(name = "verification_status", nullable = false, length = 30)
     private MasterVerificationStatus verificationStatus = MasterVerificationStatus.PENDING;
 
+    /** False for archived masters: their history stays, but they take no new operations (V4). */
+    @Column(name = "is_active", nullable = false)
+    private boolean active = true;
+
     @Column(name = "verified_at")
     private Instant verifiedAt;
 
@@ -169,6 +173,14 @@ public class Master {
 
     public void setProfilePhotoUrl(String profilePhotoUrl) {
         this.profilePhotoUrl = profilePhotoUrl;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     public MasterVerificationStatus getVerificationStatus() {

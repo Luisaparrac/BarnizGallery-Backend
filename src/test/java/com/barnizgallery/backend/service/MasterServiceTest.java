@@ -2,7 +2,6 @@ package com.barnizgallery.backend.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -13,7 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Sort;
 
 import com.barnizgallery.backend.TestEntities;
 import com.barnizgallery.backend.dto.MasterDetailResponse;
@@ -21,10 +19,12 @@ import com.barnizgallery.backend.dto.MasterRequest;
 import com.barnizgallery.backend.dto.MasterResponse;
 import com.barnizgallery.backend.entity.Master;
 import com.barnizgallery.backend.entity.Store;
+import com.barnizgallery.backend.enums.UserRole;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.MasterRepository;
 import com.barnizgallery.backend.repository.StoreRepository;
+import com.barnizgallery.backend.security.CurrentUser;
 
 @ExtendWith(MockitoExtension.class)
 class MasterServiceTest {
@@ -35,12 +35,14 @@ class MasterServiceTest {
     private StoreRepository storeRepository;
     @Mock
     private ArtworkRepository artworkRepository;
+    @Mock
+    private CurrentUser currentUser;
     @InjectMocks
     private MasterService masterService;
 
     @Test
     void findAllReturnsEmptyListWhenTableIsEmpty() {
-        when(masterRepository.findAll(any(Sort.class))).thenReturn(List.of());
+        when(masterRepository.findByActiveTrueOrderByMasterIdAsc()).thenReturn(List.of());
 
         assertThat(masterService.findAll()).isEmpty();
     }
@@ -66,6 +68,17 @@ class MasterServiceTest {
         when(storeRepository.findFirstByMasterMasterIdOrderByStoreIdAsc(1L)).thenReturn(Optional.empty());
 
         assertThat(masterService.findById(1L).store()).isNull();
+    }
+
+    @Test
+    void archivedMastersAreHiddenFromThePublicButNotFromAdministrators() {
+        Master archived = TestEntities.master(2);
+        archived.setActive(false);
+        when(masterRepository.findById(2L)).thenReturn(Optional.of(archived));
+
+        assertThatThrownBy(() -> masterService.findById(2L)).isInstanceOf(ResourceNotFoundException.class);
+        when(currentUser.hasRole(UserRole.ADMIN)).thenReturn(true);
+        assertThat(masterService.findById(2L).active()).isFalse();
     }
 
     @Test

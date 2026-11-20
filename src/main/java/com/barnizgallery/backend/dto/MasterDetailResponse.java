@@ -13,5 +13,6 @@ public record MasterDetailResponse(
         String workshop,
         String contactInfo,
         MasterVerificationStatus verificationStatus,
+        boolean active,
         StoreSummaryResponse store) {
 }

@@ -113,8 +113,8 @@ Dates are ISO-8601 (UTC). Enum values are in English (`EXHIBITED`, `ACTIVE`, `PE
 | Method | Path | Description |
 |---|---|---|
 | GET | `/api/gallery` | Full tree Gallery → Stores → Artworks (Composite): published stores of approved masters and their exhibited or auctioned artworks |
-| GET | `/api/masters` | Masters |
-| GET | `/api/masters/{id}` | Master + its store |
+| GET | `/api/masters` | Active masters (archived ones keep their history but are not listed) |
+| GET | `/api/masters/{id}` | Master + its store (an archived master is 404 except for administrators) |
 | POST / PUT | `/api/masters`, `/api/masters/{id}` | Create / update master |
 | GET | `/api/stores` | Published stores of approved masters, newest first, with slug, logo, banner and count of public artworks |
 | GET | `/api/stores/{slug}` | Public page of a published store (approved master): visible sections in order and exhibited or auctioned artworks; 404 otherwise |
@@ -255,6 +255,7 @@ the artisan) and `ADMIN_APPROVAL` (the administrator's final decision).
 |---|---|---|
 | GET | `/api/admin/payouts` | Every payout, newest first |
 | POST | `/api/admin/payouts` | Create `PENDING` payouts from delivered lines not paid out yet, one per master and currency (amount = sum of the artisan net amounts) |
+| GET | `/api/admin/masters` | Every master with `verificationStatus` and `active` |
 | POST | `/api/admin/payouts/{payoutId}/paid` | `{ reference }`: `PENDING` → `PAID` with `paidAt`; the artisan is notified |
 
 ### Cart and orders

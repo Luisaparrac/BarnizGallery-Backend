@@ -17,13 +17,13 @@ public final class MasterMapper {
     public static MasterResponse toResponse(Master master) {
         return new MasterResponse(master.getMasterId(), master.getName(), master.getBiographyEs(),
                 master.getBiographyEn(), master.getWorkshop(), master.getContactInfo(),
-                master.getVerificationStatus());
+                master.getVerificationStatus(), master.isActive());
     }
 
     public static MasterDetailResponse toDetail(Master master, StoreSummaryResponse store) {
         return new MasterDetailResponse(master.getMasterId(), master.getName(), master.getBiographyEs(),
                 master.getBiographyEn(), master.getWorkshop(), master.getContactInfo(),
-                master.getVerificationStatus(), store);
+                master.getVerificationStatus(), master.isActive(), store);
     }
 
     /** Copies the request fields into the entity (used for create and update). */

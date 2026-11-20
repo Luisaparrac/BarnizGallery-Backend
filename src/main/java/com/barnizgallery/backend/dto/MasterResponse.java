@@ -12,5 +12,6 @@ public record MasterResponse(
         String biographyEn,
         String workshop,
         String contactInfo,
-        MasterVerificationStatus verificationStatus) {
+        MasterVerificationStatus verificationStatus,
+        boolean active) {
 }
