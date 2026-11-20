@@ -20,7 +20,7 @@ import com.barnizgallery.backend.config.BrevoProperties;
  */
 public class BrevoEmailSender implements EmailSender {
 
-    static final String API_KEY_HEADER = "api-key";
+    public static final String API_KEY_HEADER = "api-key";
 
     private static final Logger log = LoggerFactory.getLogger(BrevoEmailSender.class);
 
