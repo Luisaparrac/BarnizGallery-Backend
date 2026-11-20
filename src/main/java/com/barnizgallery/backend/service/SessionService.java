@@ -54,4 +54,15 @@ public class SessionService {
         }
         return sessionIssuer.open(user);
     }
+
+    /**
+     * Closes the session of this refresh token. Unknown or already used tokens are ignored, so logging out twice
+     * is harmless. The short access token simply expires.
+     */
+    @Transactional
+    public void logout(String refreshToken) {
+        authTokenService.find(refreshToken, AuthTokenPurpose.REFRESH)
+                .filter(token -> token.getUsedAt() == null)
+                .ifPresent(authTokenService::markUsed);
+    }
 }
