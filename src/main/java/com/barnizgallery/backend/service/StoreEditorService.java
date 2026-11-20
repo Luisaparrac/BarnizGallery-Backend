@@ -1,8 +1,10 @@
 package com.barnizgallery.backend.service;
 
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +18,7 @@ import com.barnizgallery.backend.entity.StoreTemplate;
 import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.enums.StoreStatus;
 import com.barnizgallery.backend.exception.BusinessRuleException;
+import com.barnizgallery.backend.exception.DatabaseErrors;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.mapper.StoreEditorMapper;
 import com.barnizgallery.backend.repository.MasterRepository;
@@ -43,9 +46,12 @@ public class StoreEditorService {
     private final StoreSectionRepository sectionRepository;
     private final MasterRepository masterRepository;
     private final CurrentUser currentUser;
+    private final Clock clock;
 
     public StoreEditorService(StoreRepository storeRepository, StoreTemplateRepository templateRepository,
-            StoreSectionRepository sectionRepository, MasterRepository masterRepository, CurrentUser currentUser) {
+            StoreSectionRepository sectionRepository, MasterRepository masterRepository, CurrentUser currentUser,
+            Clock clock) {
+        this.clock = clock;
         this.storeRepository = storeRepository;
         this.templateRepository = templateRepository;
         this.sectionRepository = sectionRepository;
@@ -113,6 +119,31 @@ public class StoreEditorService {
         }
         if (request.acceptsCustomOrders() != null) {
             store.setAcceptsCustomOrders(request.acceptsCustomOrders());
+        }
+        return mine();
+    }
+
+    /**
+     * Publishes the store. The database only lets a store be published when its master is {@code aprobado}; that
+     * rejection is answered with 409. A suspended store cannot be published again by its artisan.
+     */
+    @Transactional
+    public StoreEditorResponse publish() {
+        Store store = myStore();
+        if (store.getStatus() == StoreStatus.SUSPENDED) {
+            throw new BusinessRuleException(ErrorCode.STORE_SUSPENDED, store.getStoreId());
+        }
+        if (store.getStatus() != StoreStatus.PUBLISHED) {
+            store.setStatus(StoreStatus.PUBLISHED);
+            store.setPublishedAt(clock.instant());
+            try {
+                storeRepository.saveAndFlush(store);
+            } catch (DataAccessException ex) {
+                if (DatabaseErrors.isRuleViolation(ex)) {
+                    throw new BusinessRuleException(ErrorCode.STORE_MASTER_NOT_APPROVED);
+                }
+                throw ex;
+            }
         }
         return mine();
     }

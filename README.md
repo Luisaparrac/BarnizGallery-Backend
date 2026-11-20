@@ -234,6 +234,7 @@ the artisan) and `ADMIN_APPROVAL` (the administrator's final decision).
 | POST | `/api/artisans/me/store/sections` | `{ sectionType, titleEs?, titleEn?, contentEs?, contentEn?, imageUrl?, config? }` → 201, added at the end |
 | PUT | `/api/artisans/me/store/sections/{sectionId}` | Replace the content of a section |
 | PATCH | `/api/artisans/me/store/sections/{sectionId}/visibility` | `{ visible }` hides or shows it on the public page |
+| POST | `/api/artisans/me/store/publish` | Publish the store; the database rejects it while the master is not approved (409) |
 | PUT | `/api/artisans/me/store/sections/order` | `{ sectionIds: [...] }` every section once, top to bottom (422 otherwise) |
 
 ### Artisan verification (administrators)

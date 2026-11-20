@@ -83,6 +83,12 @@ public class ArtisanStoreController {
         return editorService.update(request);
     }
 
+    @PostMapping("/publish")
+    @Operation(summary = "Publish the store (409 while the artisan is not approved or the store is suspended)")
+    public StoreEditorResponse publish() {
+        return editorService.publish();
+    }
+
     @GetMapping
     @Operation(summary = "The artisan's store with every section, visible or hidden")
     public StoreEditorResponse mine() {
