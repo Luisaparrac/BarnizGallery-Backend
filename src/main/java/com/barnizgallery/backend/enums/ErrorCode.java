@@ -21,6 +21,7 @@ public enum ErrorCode {
     // Authentication and authorization
     UNAUTHORIZED,
     ACCESS_DENIED,
+    TOO_MANY_LOGIN_ATTEMPTS,
 
     // Missing resources
     ARTWORK_NOT_FOUND,
