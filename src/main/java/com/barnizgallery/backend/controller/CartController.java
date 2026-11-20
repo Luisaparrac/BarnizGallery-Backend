@@ -3,11 +3,13 @@ package com.barnizgallery.backend.controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.barnizgallery.backend.dto.CartAddRequest;
 import com.barnizgallery.backend.dto.CartItemRequest;
 import com.barnizgallery.backend.dto.CartResponse;
 import com.barnizgallery.backend.service.CartService;
@@ -34,6 +36,12 @@ public class CartController {
     @Operation(summary = "Cart lines with current prices, availability and subtotals per currency")
     public CartResponse view() {
         return cartService.view();
+    }
+
+    @PostMapping("/items")
+    @Operation(summary = "Add units of an artwork to the cart ({ artworkId, quantity = 1 })")
+    public CartResponse add(@Valid @RequestBody CartAddRequest request) {
+        return cartService.add(request.artworkId(), request.quantity() == null ? 1 : request.quantity());
     }
 
     @PutMapping("/items/{artworkId}")

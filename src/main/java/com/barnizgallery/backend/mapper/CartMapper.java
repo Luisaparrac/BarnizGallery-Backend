@@ -22,6 +22,7 @@ public final class CartMapper {
         Artwork artwork = item.getArtwork();
         BigDecimal price = artwork.getPrice();
         return new CartItemResponse(artwork.getArtworkId(), artwork.getStore().getStoreId(), artwork.getTitleEs(),
+                artwork.getTitleEs(),
                 artwork.getTitleEn(), price, artwork.getCurrency(), item.getQuantity(),
                 price == null ? null : price.multiply(BigDecimal.valueOf(item.getQuantity())), artwork.getStock(),
                 available);
@@ -32,6 +33,8 @@ public final class CartMapper {
         Map<String, BigDecimal> subtotals = new LinkedHashMap<>();
         items.stream().filter(CartItemResponse::available)
                 .forEach(item -> subtotals.merge(item.currency(), item.lineTotal(), BigDecimal::add));
-        return new CartResponse(items, subtotals);
+        boolean single = subtotals.size() == 1;
+        return new CartResponse(items, subtotals, single ? subtotals.values().iterator().next() : null,
+                single ? subtotals.keySet().iterator().next() : null);
     }
 }

@@ -65,6 +65,16 @@ public class CartService {
         return view();
     }
 
+    /** Adds units to the line of the artwork (creating it when missing); same rules as {@link #put}. */
+    @Transactional
+    public CartResponse add(Long artworkId, int quantity) {
+        int current = cartRepository.findByUserUserId(currentUser.requireId())
+                .flatMap(cart -> itemRepository.findByCartCartIdAndArtworkArtworkId(cart.getCartId(), artworkId))
+                .map(CartItem::getQuantity)
+                .orElse(0);
+        return put(artworkId, current + quantity);
+    }
+
     /** Removes an artwork from the cart (nothing happens when it is not there). */
     @Transactional
     public CartResponse remove(Long artworkId) {

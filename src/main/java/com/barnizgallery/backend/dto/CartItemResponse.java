@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 public record CartItemResponse(
         Long artworkId,
         Long storeId,
+        String title,
         String titleEs,
         String titleEn,
         BigDecimal unitPrice,

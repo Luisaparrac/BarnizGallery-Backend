@@ -306,6 +306,7 @@ the artisan) and `ADMIN_APPROVAL` (the administrator's final decision).
 | GET / POST | `/api/users/me/addresses` | Shipping addresses; POST `{ recipientName, countryCode, city, addressLine1, contactPhone, administrativeArea?, locality?, addressLine2?, postalCode?, deliveryInstructions? }` |
 | PUT / DELETE | `/api/users/me/addresses/{addressId}` | Replace or delete an own address (orders keep their copy) |
 | GET | `/api/cart` | `{ items: [{ artworkId, storeId, titleEs, titleEn, unitPrice, currency, quantity, lineTotal, stock, available }], subtotals: { USD: … } }`; adding to the cart reserves nothing |
+| POST | `/api/cart/items` | `{ artworkId, quantity? }` adds units (1 by default) to the line → cart; same rules as `PUT` |
 | PUT | `/api/cart/items/{artworkId}` | `{ quantity }` (1–99) sets the quantity; 409 when the artwork is not for sale or has less stock |
 | DELETE | `/api/cart/items/{artworkId}` | Remove a line |
 | POST | `/api/orders/checkout` | `{ addressId }` → 201 order `PENDING_PAYMENT` (type `PURCHASE`) with its lines and one `SINGLE_PAYMENT` obligation; each line is reserved by `museo.reserve_order_item` until `paymentDueAt` (now + `cart.reservation_minutes`) and the cart is emptied. 409 when the cart is empty, mixes currencies, a line is not for sale, the database refuses the reservation or a setting is missing |
