@@ -267,6 +267,7 @@ the artisan) and `ADMIN_APPROVAL` (the administrator's final decision).
 |---|---|---|
 | GET | `/api/admin/settings` | Every `app_settings` row with its JSON value |
 | PUT | `/api/admin/settings/{key}` | `{ value: <JSON> }` e.g. `{ "value": 15 }` for `cart.reservation_minutes`; audited, the cache is cleared at once |
+| POST | `/api/admin/masters/{masterId}/approve` | Approve an active master (roster masters directly; signed-up artisans only when their steps pass); archived → 409 `master_archived` |
 
 ### Cart and orders
 | Method | Path | Description |
