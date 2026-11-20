@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import com.barnizgallery.backend.config.LocaleConfig;
 import com.barnizgallery.backend.config.MessageConfig;
 
 /**
@@ -24,12 +25,13 @@ class GlobalExceptionHandlerTest {
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(new ErrorTestController())
                 .setControllerAdvice(new GlobalExceptionHandler(new MessageConfig().messageSource()))
+                .setLocaleResolver(new LocaleConfig().localeResolver())
                 .build();
     }
 
     @Test
     void notFoundIs404WithCodeMessageAndPath() throws Exception {
-        mockMvc.perform(get("/not-found"))
+        mockMvc.perform(get("/not-found").header("Accept-Language", "en"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404))
                 .andExpect(jsonPath("$.error").value("Not Found"))
@@ -41,7 +43,7 @@ class GlobalExceptionHandlerTest {
 
     @Test
     void businessRuleIs409ByDefault() throws Exception {
-        mockMvc.perform(get("/conflict"))
+        mockMvc.perform(get("/conflict").header("Accept-Language", "en"))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.code").value("master_already_has_store"))
                 .andExpect(jsonPath("$.message").value("Master 7 already has a store"));
@@ -49,9 +51,20 @@ class GlobalExceptionHandlerTest {
 
     @Test
     void businessRuleCanBe422WithArguments() throws Exception {
-        mockMvc.perform(get("/too-low"))
+        mockMvc.perform(get("/too-low").header("Accept-Language", "en"))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(jsonPath("$.code").value("bid_too_low"))
+                .andExpect(jsonPath("$.message").value("The bid must be at least 2,500,000.5 COP"));
+    }
+
+    @Test
+    void messagesFollowTheRequestLanguage() throws Exception {
+        mockMvc.perform(get("/not-found").header("Accept-Language", "es-CO"))
+                .andExpect(jsonPath("$.code").value("artwork_not_found"))
+                .andExpect(jsonPath("$.message").value("No se encontró la obra 1234"));
+        mockMvc.perform(get("/too-low"))
+                .andExpect(jsonPath("$.message").value("La puja debe ser de al menos 2.500.000,5 COP"));
+        mockMvc.perform(get("/too-low").header("Accept-Language", "en"))
                 .andExpect(jsonPath("$.message").value("The bid must be at least 2,500,000.5 COP"));
     }
 

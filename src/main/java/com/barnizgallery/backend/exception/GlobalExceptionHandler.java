@@ -1,11 +1,11 @@
 package com.barnizgallery.backend.exception;
 
 import java.util.List;
-import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +29,7 @@ import jakarta.servlet.http.HttpServletRequest;
 /**
  * Translates exceptions into the common JSON error format:
  * {@code { timestamp, status, error, code, message, path }}. The {@code code} is stable; the {@code message}
- * comes from the message bundles.
+ * comes from the message bundles in the language of the request (Spanish or English). Logs stay in English.
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -114,7 +114,8 @@ public class GlobalExceptionHandler {
 
     private ResponseEntity<ErrorResponse> build(HttpStatus status, ErrorCode code, HttpServletRequest request,
             List<FieldErrorResponse> fieldErrors, Object... args) {
-        String message = messageSource.getMessage(code.messageKey(), args, code.code(), Locale.ENGLISH);
+        String message = messageSource.getMessage(code.messageKey(), args, code.code(),
+                LocaleContextHolder.getLocale());
         ErrorResponse body = ErrorResponse.of(status.value(), status.getReasonPhrase(), code.code(), message,
                 request.getRequestURI(), fieldErrors);
         return ResponseEntity.status(status).body(body);

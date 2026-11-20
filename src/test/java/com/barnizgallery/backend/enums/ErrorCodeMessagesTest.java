@@ -18,7 +18,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 class ErrorCodeMessagesTest {
 
     @ParameterizedTest
-    @ValueSource(strings = { "messages_en.properties" })
+    @ValueSource(strings = { "messages_en.properties", "messages_es.properties" })
     void everyErrorCodeHasAText(String bundle) throws IOException {
         Properties texts = load(bundle);
 
