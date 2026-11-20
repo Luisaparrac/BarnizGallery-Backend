@@ -354,6 +354,7 @@ the database).
 | POST | `/api/conversations` | `{ masterId, content, subject?, artworkId? \| customRequestId? \| orderId? }` → 201 with the first message (`subject` is not stored: no column) |
 | GET | `/api/conversations/{id}/messages` | Messages `{ id, conversationId, senderId, senderName, content, readAt, createdAt }`, oldest first (404 if the user does not take part) |
 | POST | `/api/conversations/{id}/messages` | `{ content }` → 201; the other participant gets a `new_message` notification |
+| POST | `/api/reports` | `{ entityType: ARTWORK \| STORE \| MESSAGE \| CUSTOM_REQUEST \| USER, entityId, reason }` → 201 `{ reportId, status: PENDING }` |
 
 ### Notifications (logged-in user)
 | GET | `/api/notifications/unread-count` | `{ count }` of unread notifications |

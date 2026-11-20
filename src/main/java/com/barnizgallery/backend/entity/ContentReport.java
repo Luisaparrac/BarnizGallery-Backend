@@ -4,7 +4,11 @@ import java.time.Instant;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.barnizgallery.backend.converter.ReportStatusConverter;
+import com.barnizgallery.backend.enums.ReportStatus;
+
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -43,8 +47,9 @@ public class ContentReport {
     @Column(name = "details")
     private String details;
 
+    @Convert(converter = ReportStatusConverter.class)
     @Column(name = "status", nullable = false)
-    private String status;
+    private ReportStatus status;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -101,11 +106,11 @@ public class ContentReport {
         this.details = details;
     }
 
-    public String getStatus() {
+    public ReportStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(ReportStatus status) {
         this.status = status;
     }
 
