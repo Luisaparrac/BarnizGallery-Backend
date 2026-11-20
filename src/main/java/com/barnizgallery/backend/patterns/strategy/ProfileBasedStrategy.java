@@ -59,15 +59,27 @@ public class ProfileBasedStrategy implements RecommendationStrategy {
                 .toList();
     }
 
+    /**
+     * Artworks of the public catalog that match a profile that is not saved (the visitor's kiosk); the reason is
+     * written in the reader's language.
+     */
+    public List<RecommendationResult> recommendArtworksFor(TasteProfile profile, User reader) {
+        return matches(profile).stream()
+                .map(match -> RecommendationResult.ofArtwork(match.artwork().getArtworkId(), match.score(),
+                        ProfileMatcher.reason(reader, match)))
+                .toList();
+    }
+
     /** Artworks of the public catalog that match some part of the profile, best first. */
     List<ProfileMatch> matches(User user) {
         Optional<TasteProfile> profile = tasteProfileRepository.findByUserUserId(user.getUserId());
-        if (profile.isEmpty()) {
-            return List.of();
-        }
+        return profile.map(this::matches).orElse(List.of());
+    }
+
+    private List<ProfileMatch> matches(TasteProfile profile) {
         List<ProfileMatch> matches = new ArrayList<>();
         for (Artwork artwork : publicCatalog.artworks()) {
-            ProfileMatch match = ProfileMatcher.match(profile.get(), artwork);
+            ProfileMatch match = ProfileMatcher.match(profile, artwork);
             if (match.matchesSomething()) {
                 matches.add(match);
             }

@@ -69,7 +69,7 @@ public class SecurityConfig {
         auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/change-password").authenticated()
                 .requestMatchers("/api/auth/**", "/ws/**", "/error").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/payments/webhooks/*").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/payments/webhooks/*", "/api/recommendations/preview").permitAll()
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .requestMatchers("/api/admin/**").hasRole(ADMIN)
                 .requestMatchers("/api/artisans/**").hasRole(ARTISAN)

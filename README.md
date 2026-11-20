@@ -174,6 +174,7 @@ Dates are ISO-8601 (UTC). Enum values are in English (`EXHIBITED`, `ACTIVE`, `PE
 | GET | `/api/users/{id}/interactions` | History |
 | POST | `/api/users/{id}/recommendations?strategy=hybrid` | Compute recommendations of `target=stores` (default) or `target=artworks` with a strategy (`profile`, `interactions`, `hybrid`, `ai`, `ai-service`) and replace the previous ones of that target. `ai-service` asks the AI service and falls back to `hybrid` if it is disabled or fails |
 | POST | `/api/users/me/recommendations?strategy=&target=` | Same as above for the logged-in user |
+| POST | `/api/recommendations/preview` | Public taste kiosk: `{ colorIds, shapeIds, styleIds, motifIds, budgetRangeId }` → artworks of the public catalog matched by the profile strategy (not saved; 422 for unknown ids) |
 | GET | `/api/users/{id}/recommendations` | Last saved recommendations |
 
 ### Auctions and bids
