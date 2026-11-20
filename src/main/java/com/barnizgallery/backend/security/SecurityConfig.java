@@ -72,7 +72,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/payments/webhooks/*", "/api/recommendations/preview").permitAll()
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .requestMatchers("/api/admin/**").hasRole(ADMIN)
-                .requestMatchers("/api/artisans/**").hasRole(ARTISAN)
+                .requestMatchers("/api/artisans/**", "/api/artisan/**").hasRole(ARTISAN)
                 .requestMatchers(HttpMethod.GET, "/api/artworks/*/suggested-price").hasAnyRole(ADMIN, ARTISAN)
                 .requestMatchers(HttpMethod.GET, "/api/health", "/api/gallery/**", "/api/stores/**", "/api/masters/**",
                         "/api/artworks/**", "/api/auctions/**", "/api/catalogs/**").permitAll()

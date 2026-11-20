@@ -4,9 +4,9 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,7 +25,7 @@ import jakarta.validation.Valid;
  * The logged-in master artisan's own verification. Only for artisans.
  */
 @RestController
-@RequestMapping("/api/artisans/me/verification")
+@RequestMapping({"/api/artisans/me/verification", "/api/artisan/verification"})
 @Tag(name = "Artisans")
 public class ArtisanController {
 
@@ -41,7 +41,7 @@ public class ArtisanController {
         return verificationService.myVerification();
     }
 
-    @PutMapping("/{step}")
+    @RequestMapping(value = "/{step}", method = { RequestMethod.PUT, RequestMethod.POST })
     @Operation(summary = "Send the evidence link of IDENTITY, WORKSHOP or SAMPLES; the step becomes SUBMITTED")
     public VerificationStepResponse submitEvidence(@PathVariable VerificationStep step,
             @Valid @RequestBody EvidenceRequest request) {

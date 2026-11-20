@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,7 +32,7 @@ import jakarta.validation.Valid;
  * Store editor of the logged-in artisan. Only for artisans.
  */
 @RestController
-@RequestMapping("/api/artisans/me/store")
+@RequestMapping({"/api/artisans/me/store", "/api/artisan/store"})
 @Tag(name = "Artisans")
 public class ArtisanStoreController {
 
@@ -77,7 +78,7 @@ public class ArtisanStoreController {
         return editorService.create(request);
     }
 
-    @PatchMapping
+    @RequestMapping(method = { RequestMethod.PATCH, RequestMethod.PUT })
     @Operation(summary = "Change names, descriptions, slug, logo, banner, theme or custom orders (409 if the slug is taken)")
     public StoreEditorResponse update(@Valid @RequestBody UpdateStoreRequest request) {
         return editorService.update(request);

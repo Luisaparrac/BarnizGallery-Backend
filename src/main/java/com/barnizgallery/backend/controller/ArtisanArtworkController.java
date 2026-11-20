@@ -28,7 +28,7 @@ import jakarta.validation.Valid;
  * Artworks of the logged-in artisan's store. Only for artisans.
  */
 @RestController
-@RequestMapping("/api/artisans/me/artworks")
+@RequestMapping({"/api/artisans/me/artworks", "/api/artisan/artworks"})
 @Tag(name = "Artisans")
 public class ArtisanArtworkController {
 

@@ -21,7 +21,7 @@ import jakarta.validation.Valid;
  * Paid order lines of the logged-in artisan's store and their shipping. Only for artisans.
  */
 @RestController
-@RequestMapping("/api/artisans/me/orders")
+@RequestMapping("/api")
 @Tag(name = "Artisans")
 public class ArtisanOrderController {
 
@@ -31,19 +31,19 @@ public class ArtisanOrderController {
         this.fulfillmentService = fulfillmentService;
     }
 
-    @GetMapping
+    @GetMapping({"/artisans/me/orders", "/artisan/order-items"})
     @Operation(summary = "Paid lines of the store with the shipping address, newest order first")
     public List<ArtisanOrderLineResponse> lines() {
         return fulfillmentService.lines();
     }
 
-    @PostMapping("/items/{orderItemId}/deliver")
+    @PostMapping({"/artisans/me/orders/items/{orderItemId}/deliver", "/artisan/order-items/{orderItemId}/delivered"})
     @Operation(summary = "Mark a shipped line as delivered; the order is delivered when all its lines are")
     public ArtisanOrderLineResponse deliver(@PathVariable Long orderItemId) {
         return fulfillmentService.deliver(orderItemId);
     }
 
-    @PostMapping("/items/{orderItemId}/ship")
+    @PostMapping({"/artisans/me/orders/items/{orderItemId}/ship", "/artisan/order-items/{orderItemId}/shipped"})
     @Operation(summary = "Mark a paid line as shipped with carrier and tracking number; the buyer is notified")
     public ArtisanOrderLineResponse ship(@PathVariable Long orderItemId, @Valid @RequestBody ShipmentRequest request) {
         return fulfillmentService.ship(orderItemId, request);

@@ -262,6 +262,11 @@ the artisan) and `ADMIN_APPROVAL` (the administrator's final decision).
 | PUT | `/api/artisans/me/verification/{step}` | `{ evidenceUrl }` (https) for `IDENTITY`, `WORKSHOP` or `SAMPLES` → step `SUBMITTED` |
 | POST | `/api/artisans/me/verification/{step}/evidence` | Multipart `file` (JPEG/PNG/WebP) uploaded to the photo storage (503 while disabled) |
 
+### Frontend route aliases (artisans)
+The frontend paths under `/api/artisan/...` answer the same as the `/api/artisans/me/...` ones: `verification`
+(`GET`, `POST|PUT /{step}`), `store` (`GET`, `PUT|PATCH`, `POST /publish`), `artworks` (`GET`, `POST`,
+`GET|PUT|DELETE /{id}`) and `order-items` (`GET`, `POST /{id}/shipped`, `POST /{id}/delivered`).
+
 ### Store editor (artisans)
 | Method | Path | Description |
 |---|---|---|
