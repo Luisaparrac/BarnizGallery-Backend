@@ -18,7 +18,7 @@ import com.barnizgallery.backend.repository.StoreInteraction;
 /**
  * <b>Strategy pattern – ConcreteStrategy "interactions".</b>
  * <p>
- * Adds, per store, the points of the user's interactions:
+ * Adds, per store, the points of the user's interactions with the store itself or with its artworks:
  * weight of the action (from the Factory Method creators) × duration factor.
  * The duration factor goes from 1 (no duration) to 2 (5 minutes or more).
  * The store with most points gets 100 and the others are proportional.
@@ -64,8 +64,8 @@ public class InteractionBasedStrategy implements RecommendationStrategy {
         pointsByStore.forEach((storeId, points) -> {
             int count = countByStore.get(storeId);
             String reason = LocalizedText.pick(user,
-                    "Interactuaste " + count + " veces con obras de esta tienda",
-                    "You interacted " + count + " times with artworks in this store");
+                    "Interactuaste " + count + " veces con esta tienda o sus obras",
+                    "You interacted " + count + " times with this store or its artworks");
             results.add(RecommendationResult.of(storeId, 100.0 * points / max, reason));
         });
         results.sort(Comparator.comparing(RecommendationResult::score).reversed());

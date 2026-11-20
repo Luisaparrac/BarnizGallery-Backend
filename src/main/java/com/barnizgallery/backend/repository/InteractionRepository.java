@@ -17,9 +17,13 @@ public interface InteractionRepository extends JpaRepository<Interaction, Long> 
             + "order by i.interactionDate desc, i.interactionId desc")
     List<Interaction> findHistory(Long userId);
 
-    /** Interactions of a user with the store of each artwork, in a single query. */
-    @Query("select i.artwork.store.storeId as storeId, i.action as action, i.durationSeconds as durationSeconds "
-            + "from Interaction i where i.user.userId = :userId")
+    /**
+     * Interactions of a user reduced to their store, in a single query: the store itself for store-level
+     * interactions (a store visit) or the store of the artwork otherwise.
+     */
+    @Query("select coalesce(st.storeId, artworkStore.storeId) as storeId, i.action as action, "
+            + "i.durationSeconds as durationSeconds from Interaction i left join i.store st "
+            + "left join i.artwork a left join a.store artworkStore where i.user.userId = :userId")
     List<StoreInteraction> findStoreInteractions(Long userId);
 
     long countByUserUserId(Long userId);
