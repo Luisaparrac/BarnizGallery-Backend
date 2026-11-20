@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import com.barnizgallery.backend.entity.Color;
 import com.barnizgallery.backend.exception.BusinessRuleException;
+import com.barnizgallery.backend.repository.AvatarRepository;
 import com.barnizgallery.backend.repository.BudgetRangeRepository;
 import com.barnizgallery.backend.repository.ColorRepository;
 import com.barnizgallery.backend.repository.MotifRepository;
@@ -25,7 +26,8 @@ class CatalogCodeResolverTest {
     private final ColorRepository colorRepository = mock(ColorRepository.class);
     private final BudgetRangeRepository budgetRangeRepository = mock(BudgetRangeRepository.class);
     private final CatalogCodeResolver resolver = new CatalogCodeResolver(colorRepository, mock(MotifRepository.class),
-            mock(ShapeRepository.class), mock(StyleRepository.class), budgetRangeRepository);
+            mock(ShapeRepository.class), mock(StyleRepository.class), budgetRangeRepository,
+            mock(AvatarRepository.class));
 
     private static Color color(String code) {
         Color color = new Color();

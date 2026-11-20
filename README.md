@@ -132,6 +132,7 @@ Dates are ISO-8601 (UTC). Enum values are in English (`EXHIBITED`, `ACTIVE`, `PE
 |---|---|---|
 | GET | `/api/users/{id}` | User |
 | PATCH | `/api/users/{id}/preferences` | Change the preferred language |
+| GET / PATCH | `/api/users/me` | Profile of the logged-in user; PATCH `{ name?, phone?, countryCode?, preferredLanguage?, avatarCode? }` |
 | GET / PUT | `/api/users/{id}/taste-profile` | Read / save the initial questionnaire as catalog codes `{ colorCodes, shapeCodes, styleCodes, motifCodes, budgetRangeCode }` |
 
 ### Interactions and recommendations

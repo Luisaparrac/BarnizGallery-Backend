@@ -11,10 +11,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.barnizgallery.backend.dto.TasteProfileRequest;
 import com.barnizgallery.backend.dto.TasteProfileResponse;
+import com.barnizgallery.backend.dto.UpdateProfileRequest;
 import com.barnizgallery.backend.dto.UserPreferencesRequest;
 import com.barnizgallery.backend.dto.UserResponse;
 import com.barnizgallery.backend.service.UserService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
@@ -30,6 +32,18 @@ public class UserController {
 
     public UserController(UserService userService) {
         this.userService = userService;
+    }
+
+    @GetMapping("/me")
+    @Operation(summary = "Profile of the logged-in user")
+    public UserResponse me() {
+        return userService.me();
+    }
+
+    @PatchMapping("/me")
+    @Operation(summary = "Change name, phone, country, language or avatar (by catalog code) of the logged-in user")
+    public UserResponse updateMe(@Valid @RequestBody UpdateProfileRequest request) {
+        return userService.updateMe(request);
     }
 
     @GetMapping("/{id}")

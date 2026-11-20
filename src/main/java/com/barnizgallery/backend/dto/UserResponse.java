@@ -14,5 +14,6 @@ public record UserResponse(
         UserRole role,
         UserStatus status,
         String countryCode,
-        Language preferredLanguage) {
+        Language preferredLanguage,
+        String avatarCode) {
 }

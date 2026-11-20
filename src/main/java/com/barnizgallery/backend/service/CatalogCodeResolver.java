@@ -8,6 +8,7 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.barnizgallery.backend.entity.Avatar;
 import com.barnizgallery.backend.entity.BudgetRange;
 import com.barnizgallery.backend.entity.CatalogEntry;
 import com.barnizgallery.backend.entity.Color;
@@ -16,6 +17,7 @@ import com.barnizgallery.backend.entity.Shape;
 import com.barnizgallery.backend.entity.Style;
 import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.exception.BusinessRuleException;
+import com.barnizgallery.backend.repository.AvatarRepository;
 import com.barnizgallery.backend.repository.BudgetRangeRepository;
 import com.barnizgallery.backend.repository.CatalogEntryRepository;
 import com.barnizgallery.backend.repository.ColorRepository;
@@ -35,15 +37,17 @@ public class CatalogCodeResolver {
     private final ShapeRepository shapeRepository;
     private final StyleRepository styleRepository;
     private final BudgetRangeRepository budgetRangeRepository;
+    private final AvatarRepository avatarRepository;
 
     public CatalogCodeResolver(ColorRepository colorRepository, MotifRepository motifRepository,
             ShapeRepository shapeRepository, StyleRepository styleRepository,
-            BudgetRangeRepository budgetRangeRepository) {
+            BudgetRangeRepository budgetRangeRepository, AvatarRepository avatarRepository) {
         this.colorRepository = colorRepository;
         this.motifRepository = motifRepository;
         this.shapeRepository = shapeRepository;
         this.styleRepository = styleRepository;
         this.budgetRangeRepository = budgetRangeRepository;
+        this.avatarRepository = avatarRepository;
     }
 
     @Transactional(readOnly = true)
@@ -74,6 +78,15 @@ public class CatalogCodeResolver {
         }
         return budgetRangeRepository.findByCode(code)
                 .orElseThrow(() -> BusinessRuleException.unprocessable(ErrorCode.UNKNOWN_BUDGET_RANGE, code));
+    }
+
+    /** The active avatar with this code, or null when no code is given. */
+    @Transactional(readOnly = true)
+    public Avatar avatar(String code) {
+        if (code == null || code.isBlank()) {
+            return null;
+        }
+        return single(code, resolve(ErrorCode.UNKNOWN_AVATAR_CODE, List.of(code), avatarRepository));
     }
 
     /** The shape with this code, or null when no code is given. */

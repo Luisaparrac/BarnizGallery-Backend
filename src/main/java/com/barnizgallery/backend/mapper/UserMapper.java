@@ -21,7 +21,8 @@ public final class UserMapper {
 
     public static UserResponse toResponse(User user) {
         return new UserResponse(user.getUserId(), user.getName(), user.getEmail(), user.getRole(), user.getStatus(),
-                user.getCountryCode(), user.getPreferredLanguage());
+                user.getCountryCode(), user.getPreferredLanguage(),
+                user.getAvatar() == null ? null : user.getAvatar().getCode());
     }
 
     public static TasteProfileResponse toResponse(TasteProfile profile) {

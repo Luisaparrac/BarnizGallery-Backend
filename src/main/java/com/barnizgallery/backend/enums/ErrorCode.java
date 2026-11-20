@@ -78,6 +78,7 @@ public enum ErrorCode {
     UNKNOWN_STYLE_CODES,
     UNKNOWN_MOTIF_CODES,
     UNKNOWN_BUDGET_RANGE,
+    UNKNOWN_AVATAR_CODE,
     UNKNOWN_STRATEGY,
 
     // Stores and interactions

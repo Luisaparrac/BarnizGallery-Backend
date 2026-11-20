@@ -26,6 +26,7 @@ import com.barnizgallery.backend.enums.Language;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.repository.TasteProfileRepository;
 import com.barnizgallery.backend.repository.UserRepository;
+import com.barnizgallery.backend.security.CurrentUser;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -36,6 +37,8 @@ class UserServiceTest {
     private TasteProfileRepository tasteProfileRepository;
     @Mock
     private CatalogCodeResolver catalogResolver;
+    @Mock
+    private CurrentUser currentUser;
     @InjectMocks
     private UserService userService;
 
