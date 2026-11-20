@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.barnizgallery.backend.dto.AuthResponse;
+import com.barnizgallery.backend.dto.ChangePasswordRequest;
 import com.barnizgallery.backend.dto.EmailTokenRequest;
 import com.barnizgallery.backend.dto.ForgotPasswordRequest;
 import com.barnizgallery.backend.dto.LoginRequest;
@@ -20,6 +21,7 @@ import com.barnizgallery.backend.dto.UserResponse;
 import com.barnizgallery.backend.security.ClientIpResolver;
 import com.barnizgallery.backend.service.ArtisanRegistrationService;
 import com.barnizgallery.backend.service.LoginService;
+import com.barnizgallery.backend.service.PasswordChangeService;
 import com.barnizgallery.backend.service.PasswordResetService;
 import com.barnizgallery.backend.service.RegistrationService;
 import com.barnizgallery.backend.service.SessionService;
@@ -44,10 +46,13 @@ public class AuthController {
     private final PasswordResetService passwordResetService;
     private final ClientIpResolver clientIpResolver;
     private final ArtisanRegistrationService artisanRegistrationService;
+    private final PasswordChangeService passwordChangeService;
 
     public AuthController(RegistrationService registrationService, LoginService loginService,
             SessionService sessionService, PasswordResetService passwordResetService,
-            ClientIpResolver clientIpResolver, ArtisanRegistrationService artisanRegistrationService) {
+            ClientIpResolver clientIpResolver, ArtisanRegistrationService artisanRegistrationService,
+            PasswordChangeService passwordChangeService) {
+        this.passwordChangeService = passwordChangeService;
         this.registrationService = registrationService;
         this.loginService = loginService;
         this.sessionService = sessionService;
@@ -98,6 +103,13 @@ public class AuthController {
     @Operation(summary = "Send the link to choose a new password (same answer whether the email exists or not)")
     public void forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         passwordResetService.requestReset(request.email());
+    }
+
+    @PostMapping("/change-password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Change the password of the logged-in user (422 if the current one is wrong)")
+    public void changePassword(@Valid @RequestBody ChangePasswordRequest request) {
+        passwordChangeService.change(request.currentPassword(), request.newPassword());
     }
 
     @PostMapping("/reset-password")

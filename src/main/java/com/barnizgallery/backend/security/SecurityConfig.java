@@ -67,6 +67,7 @@ public class SecurityConfig {
     static void authorizeRequests(
             AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth) {
         auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/auth/change-password").authenticated()
                 .requestMatchers("/api/auth/**", "/ws/**", "/error").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/payments/webhooks/*").permitAll()
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()

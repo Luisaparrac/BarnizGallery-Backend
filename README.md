@@ -226,6 +226,7 @@ Public endpoints; every other call sends `Authorization: Bearer <accessToken>`. 
 
 | Method | Path | Body → answer |
 |---|---|---|
+| POST | `/api/auth/change-password` | Logged-in user: `{ currentPassword, newPassword }` → 204 (422 `wrong_password`); other sessions must log in again |
 | POST | `/api/auth/register` | `{ name, email, password (8-72), countryCode?, preferredLanguage? }` → 201 `AuthResponse`; sends the verification email |
 | POST | `/api/auth/register-artisan` | `{ account: { name, email, password, countryCode?, preferredLanguage? }, workshop?, city?, phone?, biographyEs?, biographyEn? }` → 201 `AuthResponse`; creates the master profile and its 5 verification steps |
 | POST | `/api/auth/login` | `{ email, password }` → `AuthResponse` (401 wrong credentials, 403 suspended, 429 too many failures) |
