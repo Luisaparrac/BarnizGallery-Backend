@@ -44,8 +44,9 @@ class AiServiceStrategyTest {
     private final TasteProfileRepository tasteProfileRepository = mock(TasteProfileRepository.class);
     private final InteractionRepository interactionRepository = mock(InteractionRepository.class);
     private final ArtworkCatalogViewRepository catalogRepository = mock(ArtworkCatalogViewRepository.class);
-    private final AiServiceStrategy strategy = new AiServiceStrategy(aiService, fallback, artworkRepository,
-            tasteProfileRepository, interactionRepository, catalogRepository);
+    private final AiServiceStrategy strategy = new AiServiceStrategy(aiService, fallback,
+            new PublicArtworkCatalog(artworkRepository, catalogRepository), tasteProfileRepository,
+            interactionRepository);
 
     private final User user = TestEntities.user(1, Language.ES);
     private final List<RecommendationResult> hybridResults = List.of(RecommendationResult.of(9L, 50, "hybrid"));

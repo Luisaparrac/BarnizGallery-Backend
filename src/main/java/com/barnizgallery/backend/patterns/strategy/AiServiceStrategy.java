@@ -3,7 +3,6 @@ package com.barnizgallery.backend.patterns.strategy;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,13 +23,10 @@ import com.barnizgallery.backend.dto.AiRecommendationRequest;
 import com.barnizgallery.backend.dto.AiTasteProfile;
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.User;
-import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.exception.AiServiceException;
 import com.barnizgallery.backend.mapper.AiRequestMapper;
 import com.barnizgallery.backend.patterns.adapter.AiServiceGateway;
-import com.barnizgallery.backend.repository.ArtworkCatalogViewRepository;
 import com.barnizgallery.backend.repository.ArtworkInteractionCount;
-import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.InteractionRepository;
 import com.barnizgallery.backend.repository.TasteProfileRepository;
 
@@ -56,18 +52,15 @@ public class AiServiceStrategy implements RecommendationStrategy {
 
     private final AiServiceGateway aiService;
     private final HybridStrategy fallback;
-    private final ArtworkRepository artworkRepository;
+    private final PublicArtworkCatalog publicCatalog;
     private final TasteProfileRepository tasteProfileRepository;
     private final InteractionRepository interactionRepository;
-    private final ArtworkCatalogViewRepository catalogRepository;
 
-    public AiServiceStrategy(AiServiceGateway aiService, HybridStrategy fallback, ArtworkRepository artworkRepository,
-            TasteProfileRepository tasteProfileRepository, InteractionRepository interactionRepository,
-            ArtworkCatalogViewRepository catalogRepository) {
-        this.catalogRepository = catalogRepository;
+    public AiServiceStrategy(AiServiceGateway aiService, HybridStrategy fallback, PublicArtworkCatalog publicCatalog,
+            TasteProfileRepository tasteProfileRepository, InteractionRepository interactionRepository) {
         this.aiService = aiService;
         this.fallback = fallback;
-        this.artworkRepository = artworkRepository;
+        this.publicCatalog = publicCatalog;
         this.tasteProfileRepository = tasteProfileRepository;
         this.interactionRepository = interactionRepository;
     }
@@ -82,7 +75,7 @@ public class AiServiceStrategy implements RecommendationStrategy {
         if (!aiService.isAvailable()) {
             return fallback.recommend(user);
         }
-        List<Artwork> available = publicCandidates();
+        List<Artwork> available = publicCatalog.artworks();
         if (available.isEmpty()) {
             return List.of();
         }
@@ -101,7 +94,7 @@ public class AiServiceStrategy implements RecommendationStrategy {
         if (!aiService.isAvailable()) {
             return fallback.recommendArtworks(user);
         }
-        List<Artwork> available = publicCandidates();
+        List<Artwork> available = publicCatalog.artworks();
         if (available.isEmpty()) {
             return List.of();
         }
@@ -116,18 +109,6 @@ public class AiServiceStrategy implements RecommendationStrategy {
             log.warn("Artwork recommendations for user {} without the AI service: {}", user.getUserId(), ex.getCode());
             return fallback.recommendArtworks(user);
         }
-    }
-
-    /**
-     * Candidates for the AI service: only artworks of the public catalog ({@code v_artwork_catalog}: exhibited or in
-     * auction, published store, approved and active master), as for similar artworks.
-     */
-    private List<Artwork> publicCandidates() {
-        Set<Long> publicIds = new HashSet<>(catalogRepository.findAllArtworkIds());
-        return artworkRepository.findByDeletedAtIsNullAndStatusInOrderByArtworkIdAsc(ArtworkStatus.PUBLIC, CANDIDATES)
-                .stream()
-                .filter(artwork -> publicIds.contains(artwork.getArtworkId()))
-                .toList();
     }
 
     private AiRecommendationRequest request(User user, List<Artwork> available) {

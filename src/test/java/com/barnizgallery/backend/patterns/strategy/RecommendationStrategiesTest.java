@@ -28,6 +28,7 @@ import com.barnizgallery.backend.exception.FeatureDisabledException;
 import com.barnizgallery.backend.patterns.adapter.AiTextClient;
 import com.barnizgallery.backend.patterns.adapter.DisabledAiClient;
 import com.barnizgallery.backend.patterns.factorymethod.InteractionFactoryProvider;
+import com.barnizgallery.backend.repository.ArtworkCatalogViewRepository;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.InteractionRepository;
 import com.barnizgallery.backend.repository.StoreInteraction;
@@ -43,6 +44,8 @@ class RecommendationStrategiesTest {
     private final ArtworkRepository artworkRepository = mock(ArtworkRepository.class);
     private final InteractionRepository interactionRepository = mock(InteractionRepository.class);
     private final InteractionFactoryProvider factoryProvider = TestFactories.provider();
+    private final ArtworkCatalogViewRepository catalogRepository = mock(ArtworkCatalogViewRepository.class);
+    private final PublicArtworkCatalog publicCatalog = new PublicArtworkCatalog(artworkRepository, catalogRepository);
 
     private ProfileBasedStrategy profileStrategy;
     private InteractionBasedStrategy interactionStrategy;
@@ -55,8 +58,9 @@ class RecommendationStrategiesTest {
 
     @BeforeEach
     void setUp() {
-        profileStrategy = new ProfileBasedStrategy(tasteProfileRepository, artworkRepository);
-        interactionStrategy = new InteractionBasedStrategy(interactionRepository, factoryProvider, artworkRepository);
+        profileStrategy = new ProfileBasedStrategy(tasteProfileRepository, publicCatalog);
+        interactionStrategy = new InteractionBasedStrategy(interactionRepository, factoryProvider, publicCatalog);
+        when(catalogRepository.findAllArtworkIds()).thenReturn(List.of(10L, 11L, 20L));
         hybridStrategy = new HybridStrategy(profileStrategy, interactionStrategy, interactionRepository);
         when(artworkRepository.findByDeletedAtIsNullAndStatusInOrderByArtworkIdAsc(anyCollection(), any()))
                 .thenReturn(List.of(
@@ -121,6 +125,36 @@ class RecommendationStrategiesTest {
         assertThat(results).extracting(RecommendationResult::storeId).containsExactly(1L, 2L);
         assertThat(results.get(0).score()).isEqualByComparingTo("100");
         assertThat(results.get(1).score()).isEqualByComparingTo("16.67");
+    }
+
+    @Test
+    void fallbackStrategiesOnlySuggestThePublicCatalog() {
+        givenPreferredColors("rojo");
+        StoreInteraction visit = mock(StoreInteraction.class);
+        when(visit.getStoreId()).thenReturn(2L);
+        when(visit.getAction()).thenReturn(InteractionAction.STORE_VISIT);
+        givenInteractions(visit);
+        when(catalogRepository.findAllArtworkIds()).thenReturn(List.of(10L, 11L));
+
+        assertThat(profileStrategy.recommendArtworks(userEs)).extracting(RecommendationResult::artworkId)
+                .containsExactly(10L);
+        assertThat(interactionStrategy.recommend(userEs)).isEmpty();
+        assertThat(interactionStrategy.recommendArtworks(userEs)).isEmpty();
+    }
+
+    @Test
+    void withoutPublicArtworksEveryFallbackStrategyIsEmpty() {
+        givenPreferredColors("rojo");
+        StoreInteraction visit = mock(StoreInteraction.class);
+        when(visit.getStoreId()).thenReturn(1L);
+        when(visit.getAction()).thenReturn(InteractionAction.STORE_VISIT);
+        givenInteractions(visit);
+        when(catalogRepository.findAllArtworkIds()).thenReturn(List.of());
+
+        assertThat(profileStrategy.recommend(userEs)).isEmpty();
+        assertThat(interactionStrategy.recommend(userEs)).isEmpty();
+        assertThat(hybridStrategy.recommend(userEs)).isEmpty();
+        assertThat(hybridStrategy.recommendArtworks(userEs)).isEmpty();
     }
 
     @Test

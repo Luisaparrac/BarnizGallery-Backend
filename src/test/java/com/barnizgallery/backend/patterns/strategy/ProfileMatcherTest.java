@@ -25,6 +25,7 @@ import com.barnizgallery.backend.entity.User;
 import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.enums.InteractionAction;
 import com.barnizgallery.backend.enums.Language;
+import com.barnizgallery.backend.repository.ArtworkCatalogViewRepository;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.InteractionRepository;
 import com.barnizgallery.backend.repository.StoreInteraction;
@@ -76,7 +77,8 @@ class ProfileMatcherTest {
         when(artworks.findByDeletedAtIsNullAndStatusInOrderByArtworkIdAsc(anyCollection(), any()))
                 .thenReturn(List.of(artwork(10, "rojo"), artwork(11, "rojo", "verde"), artwork(12, "azul")));
 
-        List<RecommendationResult> results = new ProfileBasedStrategy(profiles, artworks).recommendArtworks(user);
+        List<RecommendationResult> results = new ProfileBasedStrategy(profiles, catalog(artworks, 10L, 11L, 12L))
+                .recommendArtworks(user);
 
         assertThat(results).extracting(RecommendationResult::artworkId).containsExactly(11L, 10L);
         assertThat(results).allSatisfy(r -> assertThat(r.storeId()).isNull());
@@ -96,13 +98,19 @@ class ProfileMatcherTest {
                 .thenReturn(List.of(artwork(10), elsewhere));
 
         List<RecommendationResult> results = new InteractionBasedStrategy(interactions, TestFactories.provider(),
-                artworks).recommendArtworks(user);
+                catalog(artworks, 10L, 20L)).recommendArtworks(user);
 
         assertThat(results).singleElement().satisfies(r -> {
             assertThat(r.artworkId()).isEqualTo(10L);
             assertThat(r.score()).isEqualByComparingTo("100");
             assertThat(r.reason()).isEqualTo("Interactuaste 1 veces con esta tienda o sus obras");
         });
+    }
+
+    private static PublicArtworkCatalog catalog(ArtworkRepository artworks, Long... publicIds) {
+        ArtworkCatalogViewRepository view = mock(ArtworkCatalogViewRepository.class);
+        when(view.findAllArtworkIds()).thenReturn(List.of(publicIds));
+        return new PublicArtworkCatalog(artworks, view);
     }
 
     private TasteProfile profile() {

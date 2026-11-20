@@ -12,28 +12,24 @@ import org.springframework.stereotype.Component;
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.TasteProfile;
 import com.barnizgallery.backend.entity.User;
-import com.barnizgallery.backend.enums.ArtworkStatus;
-import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.TasteProfileRepository;
 
 /**
  * <b>Strategy pattern – ConcreteStrategy "profile".</b>
  * <p>
- * Compares the user's taste profile (colors, shape, style, motifs and budget) with each available artwork
+ * Compares the user's taste profile (colors, shape, style, motifs and budget) with each artwork of the public catalog
  * ({@link ProfileMatcher}). A store gets the score of its best matching artwork, and the reason says what
  * matched.
  */
 @Component
 public class ProfileBasedStrategy implements RecommendationStrategy {
 
-
     private final TasteProfileRepository tasteProfileRepository;
-    private final ArtworkRepository artworkRepository;
+    private final PublicArtworkCatalog publicCatalog;
 
-    public ProfileBasedStrategy(TasteProfileRepository tasteProfileRepository,
-            ArtworkRepository artworkRepository) {
+    public ProfileBasedStrategy(TasteProfileRepository tasteProfileRepository, PublicArtworkCatalog publicCatalog) {
         this.tasteProfileRepository = tasteProfileRepository;
-        this.artworkRepository = artworkRepository;
+        this.publicCatalog = publicCatalog;
     }
 
     @Override
@@ -63,15 +59,14 @@ public class ProfileBasedStrategy implements RecommendationStrategy {
                 .toList();
     }
 
-    /** Available artworks that match some part of the profile, best first. */
+    /** Artworks of the public catalog that match some part of the profile, best first. */
     List<ProfileMatch> matches(User user) {
         Optional<TasteProfile> profile = tasteProfileRepository.findByUserUserId(user.getUserId());
         if (profile.isEmpty()) {
             return List.of();
         }
         List<ProfileMatch> matches = new ArrayList<>();
-        for (Artwork artwork : artworkRepository.findByDeletedAtIsNullAndStatusInOrderByArtworkIdAsc(ArtworkStatus.PUBLIC,
-                AiServiceStrategy.CANDIDATES)) {
+        for (Artwork artwork : publicCatalog.artworks()) {
             ProfileMatch match = ProfileMatcher.match(profile.get(), artwork);
             if (match.matchesSomething()) {
                 matches.add(match);
