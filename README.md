@@ -262,6 +262,12 @@ the artisan) and `ADMIN_APPROVAL` (the administrator's final decision).
 | GET | `/api/admin/masters` | Every master with `verificationStatus` and `active` |
 | POST | `/api/admin/payouts/{payoutId}/paid` | `{ reference }`: `PENDING` → `PAID` with `paidAt`; the artisan is notified |
 
+### Demo administration
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/admin/settings` | Every `app_settings` row with its JSON value |
+| PUT | `/api/admin/settings/{key}` | `{ value: <JSON> }` e.g. `{ "value": 15 }` for `cart.reservation_minutes`; audited, the cache is cleared at once |
+
 ### Cart and orders
 | Method | Path | Description |
 |---|---|---|
