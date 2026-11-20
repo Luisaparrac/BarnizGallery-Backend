@@ -41,7 +41,7 @@ class UserControllerTest {
     @Test
     void findByIdReturnsTheUser() throws Exception {
         when(userService.findById(1L)).thenReturn(new UserResponse(1L, "Ana", "ana@mail.com", UserRole.CUSTOMER,
-                UserStatus.ACTIVE, "CO", Language.ES, null));
+                UserStatus.ACTIVE, "CO", Language.ES, null, 1L, "Ana", null, null, false, null, null));
 
         mockMvc.perform(get("/api/users/1"))
                 .andExpect(status().isOk())

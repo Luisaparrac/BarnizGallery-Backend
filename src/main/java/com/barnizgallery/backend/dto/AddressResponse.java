@@ -14,5 +14,11 @@ public record AddressResponse(
         String addressLine2,
         String postalCode,
         String deliveryInstructions,
-        String contactPhone) {
+        String contactPhone,
+        Long id,
+        String line1,
+        String line2,
+        String region,
+        String phone,
+        boolean isDefault) {
 }

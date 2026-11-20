@@ -22,7 +22,9 @@ public final class UserMapper {
     public static UserResponse toResponse(User user) {
         return new UserResponse(user.getUserId(), user.getName(), user.getEmail(), user.getRole(), user.getStatus(),
                 user.getCountryCode(), user.getPreferredLanguage(),
-                user.getAvatar() == null ? null : user.getAvatar().getCode());
+                user.getAvatar() == null ? null : user.getAvatar().getCode(), user.getUserId(), user.getName(),
+                user.getAvatar() == null ? null : user.getAvatar().getAvatarId(), user.getPhone(),
+                user.getEmailVerifiedAt() != null, user.getCreatedAt(), user.getLastLoginAt());
     }
 
     public static TasteProfileResponse toResponse(TasteProfile profile) {

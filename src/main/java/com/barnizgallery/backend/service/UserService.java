@@ -60,8 +60,9 @@ public class UserService {
     @Transactional
     public UserResponse updateMe(UpdateProfileRequest request) {
         User user = getUser(currentUser.requireId());
-        if (request.name() != null) {
-            user.setName(request.name().trim());
+        String name = request.name() != null ? request.name() : request.fullName();
+        if (name != null) {
+            user.setName(name.trim());
         }
         if (request.phone() != null) {
             user.setPhone(request.phone().isBlank() ? null : request.phone().trim());
@@ -74,6 +75,9 @@ public class UserService {
         }
         if (request.avatarCode() != null) {
             user.setAvatar(catalogResolver.avatar(request.avatarCode()));
+        } else if (request.avatarId() != null) {
+            user.setAvatar(catalogResolver.avatar(
+                    catalogResolver.codesOf(CatalogKind.AVATARS, List.of(request.avatarId())).get(0)));
         }
         return UserMapper.toResponse(user);
     }

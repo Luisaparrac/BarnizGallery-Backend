@@ -14,5 +14,7 @@ public record UpdateProfileRequest(
         @Size(max = 40) String phone,
         @Pattern(regexp = "[A-Z]{2}") String countryCode,
         Language preferredLanguage,
-        @Size(max = 60) String avatarCode) {
+        @Size(max = 60) String avatarCode,
+        @Size(min = 1, max = 100) String fullName,
+        Long avatarId) {
 }
