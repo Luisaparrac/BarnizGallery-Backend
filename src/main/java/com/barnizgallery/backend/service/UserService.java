@@ -74,6 +74,18 @@ public class UserService {
         return UserMapper.toResponse(user);
     }
 
+    /** Taste profile of the logged-in user. */
+    @Transactional(readOnly = true)
+    public TasteProfileResponse myTasteProfile() {
+        return getTasteProfile(currentUser.requireId());
+    }
+
+    /** Creates or replaces the taste profile of the logged-in user (active catalog codes). */
+    @Transactional
+    public TasteProfileResponse saveMyTasteProfile(TasteProfileRequest request) {
+        return saveTasteProfile(currentUser.requireId(), request);
+    }
+
     /** Changes the preferred language. A null value is left as it is. */
     @Transactional
     public UserResponse updatePreferences(Long userId, UserPreferencesRequest request) {

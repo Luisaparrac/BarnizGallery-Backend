@@ -46,6 +46,18 @@ public class UserController {
         return userService.updateMe(request);
     }
 
+    @GetMapping("/me/taste-profile")
+    @Operation(summary = "Taste profile of the logged-in user")
+    public TasteProfileResponse myTasteProfile() {
+        return userService.myTasteProfile();
+    }
+
+    @PutMapping("/me/taste-profile")
+    @Operation(summary = "Save the questionnaire of the logged-in user with catalog codes (unknown or inactive → 422)")
+    public TasteProfileResponse saveMyTasteProfile(@Valid @RequestBody TasteProfileRequest request) {
+        return userService.saveMyTasteProfile(request);
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("@access.isSelfOrAdmin(#id)")
     public UserResponse findById(@PathVariable Long id) {
