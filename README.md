@@ -203,7 +203,7 @@ Every error has the same shape:
   "message": "Artwork 99 not found", "path": "/api/artworks/99" }
 ```
 `code` is stable (see `ErrorCode`): the frontend decides by it. `message` is text for people, in the language
-of the `Accept-Language` header (`es` or `en`; Spanish by default). The texts live in
+of the logged-in user, or else of the `Accept-Language` header (`es` or `en`; Spanish by default). The texts live in
 `messages_es.properties` and `messages_en.properties`.
 400 invalid input (with `fieldErrors`), 404 not found, 409 business rule or database constraint,
 422 invalid bid / business validation, 429 too many bids, 503 integration disabled.

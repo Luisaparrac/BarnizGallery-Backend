@@ -16,6 +16,7 @@ import org.springframework.util.unit.DataSize;
 
 import com.barnizgallery.backend.config.LocaleConfig;
 import com.barnizgallery.backend.config.MessageConfig;
+import com.barnizgallery.backend.security.CurrentUser;
 
 /**
  * Checks the JSON error format with a small controller (no Spring context, no database).
@@ -29,7 +30,7 @@ class GlobalExceptionHandlerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(new ErrorTestController())
                 .setControllerAdvice(new GlobalExceptionHandler(new MessageConfig().messageSource(),
                         DataSize.ofMegabytes(5)))
-                .setLocaleResolver(new LocaleConfig().localeResolver())
+                .setLocaleResolver(new LocaleConfig().localeResolver(new CurrentUser()))
                 .build();
     }
 
