@@ -62,7 +62,7 @@ class AuctionBuilderTest {
         assertThatThrownBy(() -> builder().forArtwork(artwork).basePrice(BigDecimal.TEN)
                 .startsAt(NOW).endsAt(NOW.plusDays(1)).build())
                 .isInstanceOf(BusinessRuleException.class)
-                .hasMessageContaining("must be exhibited");
+                .hasMessageContaining("artwork_not_exhibited");
     }
 
     @Test
@@ -71,21 +71,21 @@ class AuctionBuilderTest {
 
         assertThatThrownBy(() -> builder().forArtwork(artwork).basePrice(BigDecimal.TEN)
                 .startsAt(NOW).endsAt(NOW.plusDays(1)).build())
-                .hasMessageContaining("already has a scheduled or active auction");
+                .hasMessageContaining("artwork_already_in_auction");
     }
 
     @Test
     void endMustBeAfterStart() {
         assertThatThrownBy(() -> builder().forArtwork(artwork).basePrice(BigDecimal.TEN)
                 .startsAt(NOW.plusDays(2)).endsAt(NOW.plusDays(1)).build())
-                .hasMessageContaining("endDate must be after startDate");
+                .hasMessageContaining("auction_end_before_start");
     }
 
     @Test
     void basePriceCannotBeNegative() {
         assertThatThrownBy(() -> builder().forArtwork(artwork).basePrice(new BigDecimal("-1"))
                 .startsAt(NOW).endsAt(NOW.plusDays(1)).build())
-                .hasMessageContaining("basePrice must be >= 0");
+                .hasMessageContaining("base_price_negative");
     }
 
     @Test
@@ -96,7 +96,7 @@ class AuctionBuilderTest {
         assertThatThrownBy(() -> builder().forArtwork(artwork).useSuggestedBasePrice(ai)
                 .startsAt(NOW).endsAt(NOW.plusDays(1)).build())
                 .isInstanceOf(BusinessRuleException.class)
-                .hasMessage("basePrice is required while AI is disabled");
+                .hasMessage("base_price_required");
     }
 
     @Test
@@ -120,6 +120,6 @@ class AuctionBuilderTest {
         assertThatThrownBy(() -> builder().currency(null).forArtwork(artwork).basePrice(BigDecimal.TEN)
                 .startsAt(NOW.plusDays(1)).endsAt(NOW.plusDays(3)).build())
                 .isInstanceOf(BusinessRuleException.class)
-                .hasMessageContaining("currency");
+                .hasMessageContaining("currency_required");
     }
 }

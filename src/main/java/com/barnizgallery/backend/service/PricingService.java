@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.barnizgallery.backend.config.AuctionProperties;
 import com.barnizgallery.backend.dto.SuggestedPriceResponse;
 import com.barnizgallery.backend.entity.Artwork;
+import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.exception.FeatureDisabledException;
 import com.barnizgallery.backend.patterns.facade.AiFacade;
 
@@ -32,10 +33,10 @@ public class PricingService {
     public SuggestedPriceResponse suggestedPrice(Long artworkId) {
         Artwork artwork = artworkService.getArtwork(artworkId);
         if (!aiFacade.isAiEnabled()) {
-            throw new FeatureDisabledException("AI is disabled: no price suggestion available");
+            throw new FeatureDisabledException(ErrorCode.AI_DISABLED);
         }
         BigDecimal price = aiFacade.suggestBasePrice(artwork)
-                .orElseThrow(() -> new FeatureDisabledException("AI could not suggest a price for this artwork"));
+                .orElseThrow(() -> new FeatureDisabledException(ErrorCode.PRICE_SUGGESTION_UNAVAILABLE));
         return new SuggestedPriceResponse(artworkId, price, auctionProperties.currency());
     }
 }

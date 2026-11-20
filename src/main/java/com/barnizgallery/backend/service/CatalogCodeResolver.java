@@ -14,6 +14,7 @@ import com.barnizgallery.backend.entity.Color;
 import com.barnizgallery.backend.entity.Motif;
 import com.barnizgallery.backend.entity.Shape;
 import com.barnizgallery.backend.entity.Style;
+import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.exception.BusinessRuleException;
 import com.barnizgallery.backend.repository.BudgetRangeRepository;
 import com.barnizgallery.backend.repository.ColorRepository;
@@ -46,22 +47,22 @@ public class CatalogCodeResolver {
 
     @Transactional(readOnly = true)
     public Set<Color> colors(Collection<String> codes) {
-        return resolve("color", codes, colorRepository::findByCodeIn, Color::getCode);
+        return resolve(ErrorCode.UNKNOWN_COLOR_CODES, codes, colorRepository::findByCodeIn, Color::getCode);
     }
 
     @Transactional(readOnly = true)
     public Set<Motif> motifs(Collection<String> codes) {
-        return resolve("motif", codes, motifRepository::findByCodeIn, Motif::getCode);
+        return resolve(ErrorCode.UNKNOWN_MOTIF_CODES, codes, motifRepository::findByCodeIn, Motif::getCode);
     }
 
     @Transactional(readOnly = true)
     public Set<Shape> shapes(Collection<String> codes) {
-        return resolve("shape", codes, shapeRepository::findByCodeIn, Shape::getCode);
+        return resolve(ErrorCode.UNKNOWN_SHAPE_CODES, codes, shapeRepository::findByCodeIn, Shape::getCode);
     }
 
     @Transactional(readOnly = true)
     public Set<Style> styles(Collection<String> codes) {
-        return resolve("style", codes, styleRepository::findByCodeIn, Style::getCode);
+        return resolve(ErrorCode.UNKNOWN_STYLE_CODES, codes, styleRepository::findByCodeIn, Style::getCode);
     }
 
     /** Budget range with this code, or null when no code is given. */
@@ -71,10 +72,10 @@ public class CatalogCodeResolver {
             return null;
         }
         return budgetRangeRepository.findByCode(code)
-                .orElseThrow(() -> BusinessRuleException.unprocessable("Unknown budget range code: " + code));
+                .orElseThrow(() -> BusinessRuleException.unprocessable(ErrorCode.UNKNOWN_BUDGET_RANGE, code));
     }
 
-    private static <T> Set<T> resolve(String kind, Collection<String> codes,
+    private static <T> Set<T> resolve(ErrorCode unknownCodes, Collection<String> codes,
             Function<Collection<String>, List<T>> finder, Function<T, String> codeOf) {
         if (codes == null || codes.isEmpty()) {
             return new LinkedHashSet<>();
@@ -84,7 +85,7 @@ public class CatalogCodeResolver {
         Set<String> missing = new LinkedHashSet<>(wanted);
         found.forEach(item -> missing.remove(codeOf.apply(item)));
         if (!missing.isEmpty()) {
-            throw BusinessRuleException.unprocessable("Unknown " + kind + " codes: " + missing);
+            throw BusinessRuleException.unprocessable(unknownCodes, String.join(", ", missing));
         }
         return new LinkedHashSet<>(found);
     }

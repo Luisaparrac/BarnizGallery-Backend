@@ -120,6 +120,6 @@ class UserServiceTest {
     void unknownUserIs404() {
         when(userRepository.findById(77L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> userService.findById(77L)).hasMessage("User 77 not found");
+        assertThatThrownBy(() -> userService.findById(77L)).hasMessage("user_not_found [77]");
     }
 }

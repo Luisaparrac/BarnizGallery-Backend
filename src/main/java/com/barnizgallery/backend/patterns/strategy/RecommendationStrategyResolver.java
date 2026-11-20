@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.exception.BusinessRuleException;
 import com.barnizgallery.backend.exception.FeatureDisabledException;
 import com.barnizgallery.backend.patterns.adapter.AiTextClient;
@@ -36,11 +36,10 @@ public class RecommendationStrategyResolver {
         String key = (name == null || name.isBlank()) ? DEFAULT_STRATEGY : name.trim().toLowerCase(Locale.ROOT);
         RecommendationStrategy strategy = strategies.get(key);
         if (strategy == null) {
-            throw new BusinessRuleException("Unknown strategy '" + name + "'. Use one of " + strategies.keySet(),
-                    HttpStatus.BAD_REQUEST);
+            throw BusinessRuleException.badRequest(ErrorCode.UNKNOWN_STRATEGY, name, strategies.keySet());
         }
         if ("ai".equals(key) && !aiClient.isEnabled()) {
-            throw new FeatureDisabledException("The 'ai' recommendation strategy needs an AI provider");
+            throw new FeatureDisabledException(ErrorCode.AI_STRATEGY_DISABLED);
         }
         return strategy;
     }

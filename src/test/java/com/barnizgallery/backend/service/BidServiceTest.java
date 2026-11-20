@@ -116,7 +116,7 @@ class BidServiceTest {
         assertThatThrownBy(() -> bidService.placeBid(1L, bid("100.50", "USD")))
                 .isInstanceOfSatisfying(BusinessRuleException.class,
                         ex -> assertThat(ex.getStatus()).isEqualTo(HttpStatus.UNPROCESSABLE_CONTENT))
-                .hasMessageContaining("at least 101");
+                .hasMessage("bid_too_low [101, USD]");
         assertThat(bidService.placeBid(1L, bid("101", "USD")).amount()).isEqualByComparingTo("101");
     }
 
@@ -125,7 +125,7 @@ class BidServiceTest {
         givenTopBid("300", 8);
 
         assertThatThrownBy(() -> bidService.placeBid(1L, bid("300.99", "USD")))
-                .hasMessageContaining("at least 301");
+                .hasMessage("bid_too_low [301, USD]");
         verify(bidRepository, never()).save(any());
     }
 
@@ -133,7 +133,7 @@ class BidServiceTest {
     void otherCurrencyIsRejected() {
         assertThatThrownBy(() -> bidService.placeBid(1L, bid("500", "COP")))
                 .isInstanceOf(BusinessRuleException.class)
-                .hasMessage("Currency must be USD");
+                .hasMessage("bid_currency_mismatch [USD]");
     }
 
     @Test
@@ -143,7 +143,7 @@ class BidServiceTest {
         assertThatThrownBy(() -> bidService.placeBid(1L, bid("500", "COP")))
                 .isInstanceOfSatisfying(BusinessRuleException.class,
                         ex -> assertThat(ex.getStatus()).isEqualTo(HttpStatus.CONFLICT))
-                .hasMessageContaining("no currency");
+                .hasMessageContaining("auction_without_currency");
         verify(bidRepository, never()).save(any());
     }
 
@@ -173,7 +173,7 @@ class BidServiceTest {
 
         assertThatThrownBy(() -> bidService.placeBid(1L, bid("500", "USD")))
                 .isInstanceOf(BusinessRuleException.class)
-                .hasMessage("The auction has not started yet");
+                .hasMessage("auction_not_started");
         verify(messaging, never()).convertAndSend(anyString(), any(Object.class));
         verify(publisher, never()).publish(any());
     }

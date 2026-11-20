@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import com.barnizgallery.backend.config.MessageConfig;
 import com.barnizgallery.backend.dto.IdentifyUserRequest;
 import com.barnizgallery.backend.dto.IdentifyUserResponse;
 import com.barnizgallery.backend.dto.UserResponse;
@@ -38,7 +39,7 @@ class UserControllerTest {
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(new UserController(userService))
-                .setControllerAdvice(new GlobalExceptionHandler())
+                .setControllerAdvice(new GlobalExceptionHandler(new MessageConfig().messageSource()))
                 .build();
     }
 

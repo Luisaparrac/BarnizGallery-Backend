@@ -11,6 +11,7 @@ import com.barnizgallery.backend.dto.MasterRequest;
 import com.barnizgallery.backend.dto.MasterResponse;
 import com.barnizgallery.backend.dto.StoreSummaryResponse;
 import com.barnizgallery.backend.entity.Master;
+import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.mapper.MasterMapper;
 import com.barnizgallery.backend.mapper.StoreMapper;
@@ -70,6 +71,6 @@ public class MasterService {
     @Transactional(readOnly = true)
     public Master getMaster(Long masterId) {
         return masterRepository.findById(masterId)
-                .orElseThrow(() -> new ResourceNotFoundException("Master", masterId));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.MASTER_NOT_FOUND, masterId));
     }
 }

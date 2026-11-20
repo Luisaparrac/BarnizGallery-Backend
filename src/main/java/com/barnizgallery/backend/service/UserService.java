@@ -15,6 +15,7 @@ import com.barnizgallery.backend.dto.UserPreferencesRequest;
 import com.barnizgallery.backend.dto.UserResponse;
 import com.barnizgallery.backend.entity.TasteProfile;
 import com.barnizgallery.backend.entity.User;
+import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.mapper.UserMapper;
 import com.barnizgallery.backend.repository.TasteProfileRepository;
@@ -69,8 +70,7 @@ public class UserService {
         getUser(userId);
         return tasteProfileRepository.findByUserUserId(userId)
                 .map(UserMapper::toResponse)
-                .orElseThrow(() -> new ResourceNotFoundException("Taste profile of user " + userId
-                        + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.TASTE_PROFILE_NOT_FOUND, userId));
     }
 
     /** Creates the taste profile or replaces its answers (catalog codes), and refreshes updated_at. */
@@ -95,6 +95,6 @@ public class UserService {
     @Transactional(readOnly = true)
     public User getUser(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", userId));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND, userId));
     }
 }

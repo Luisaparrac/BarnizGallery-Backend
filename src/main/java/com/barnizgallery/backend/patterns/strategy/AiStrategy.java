@@ -16,6 +16,7 @@ import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Store;
 import com.barnizgallery.backend.entity.TasteProfile;
 import com.barnizgallery.backend.entity.User;
+import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.enums.Language;
 import com.barnizgallery.backend.exception.FeatureDisabledException;
 import com.barnizgallery.backend.mapper.ArtworkMapper;
@@ -64,7 +65,7 @@ public class AiStrategy implements RecommendationStrategy {
     @Override
     public List<RecommendationResult> recommend(User user) {
         if (!aiClient.isEnabled()) {
-            throw new FeatureDisabledException("The 'ai' recommendation strategy needs an AI provider");
+            throw new FeatureDisabledException(ErrorCode.AI_STRATEGY_DISABLED);
         }
         String answer = aiClient.complete(SYSTEM_PROMPT, buildUserPrompt(user));
         Set<Long> validStores = new LinkedHashSet<>();

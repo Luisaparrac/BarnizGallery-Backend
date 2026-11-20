@@ -3,6 +3,7 @@ package com.barnizgallery.backend.patterns.state;
 import com.barnizgallery.backend.dto.BidRequest;
 import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.enums.AuctionStatus;
+import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.exception.BusinessRuleException;
 
 /**
@@ -15,7 +16,7 @@ public class ActiveState implements AuctionState {
 
     @Override
     public void start(AuctionContext context) {
-        throw new BusinessRuleException("The auction is already active");
+        throw new BusinessRuleException(ErrorCode.AUCTION_ALREADY_ACTIVE);
     }
 
     @Override

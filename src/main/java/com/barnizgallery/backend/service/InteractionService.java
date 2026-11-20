@@ -10,6 +10,7 @@ import com.barnizgallery.backend.dto.InteractionResponse;
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Interaction;
 import com.barnizgallery.backend.entity.User;
+import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.enums.InteractionAction;
 import com.barnizgallery.backend.exception.BusinessRuleException;
 import com.barnizgallery.backend.mapper.InteractionMapper;
@@ -44,8 +45,7 @@ public class InteractionService {
     @Transactional
     public InteractionResponse record(InteractionRequest request) {
         if (request.action() == InteractionAction.BID) {
-            throw BusinessRuleException.unprocessable(
-                    "BID interactions are recorded automatically when a bid is placed");
+            throw BusinessRuleException.unprocessable(ErrorCode.BID_INTERACTION_NOT_ALLOWED);
         }
         User user = userService.getUser(request.userId());
         Artwork artwork = artworkService.getArtwork(request.artworkId());

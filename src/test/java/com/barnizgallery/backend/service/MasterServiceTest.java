@@ -74,7 +74,7 @@ class MasterServiceTest {
 
         assertThatThrownBy(() -> masterService.findById(99L))
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessage("Master 99 not found");
+                .hasMessage("master_not_found [99]");
     }
 
     @Test

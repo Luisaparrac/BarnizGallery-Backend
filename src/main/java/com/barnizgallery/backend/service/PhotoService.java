@@ -10,6 +10,7 @@ import com.barnizgallery.backend.dto.PhotoRequest;
 import com.barnizgallery.backend.dto.PhotoResponse;
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Photo;
+import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.exception.FeatureDisabledException;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.mapper.ArtworkMapper;
@@ -56,7 +57,7 @@ public class PhotoService {
     @Transactional
     public PhotoResponse upload(Long artworkId, MultipartFile file, String angle) {
         if (!storageService.isEnabled()) {
-            throw new FeatureDisabledException("Photo storage is not configured; register photos by URL instead");
+            throw new FeatureDisabledException(ErrorCode.STORAGE_DISABLED);
         }
         Artwork artwork = artworkService.getArtwork(artworkId);
         String url = storageService.upload(file, "artworks/" + artworkId);
@@ -70,7 +71,7 @@ public class PhotoService {
     @Transactional
     public void delete(Long photoId) {
         Photo photo = photoRepository.findById(photoId)
-                .orElseThrow(() -> new ResourceNotFoundException("Photo", photoId));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.PHOTO_NOT_FOUND, photoId));
         photoRepository.delete(photo);
     }
 }

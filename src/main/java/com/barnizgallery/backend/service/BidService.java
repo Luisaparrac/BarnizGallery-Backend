@@ -19,6 +19,7 @@ import com.barnizgallery.backend.dto.BidResponse;
 import com.barnizgallery.backend.entity.Auction;
 import com.barnizgallery.backend.entity.Bid;
 import com.barnizgallery.backend.entity.User;
+import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.exception.BusinessRuleException;
 import com.barnizgallery.backend.mapper.AuctionMapper;
 import com.barnizgallery.backend.patterns.facade.AiFacade;
@@ -81,11 +82,10 @@ public class BidService {
 
         String currency = auction.getCurrency();
         if (currency == null) {
-            throw new BusinessRuleException("Auction " + auctionId
-                    + " has no currency configured yet, so it does not accept bids");
+            throw new BusinessRuleException(ErrorCode.AUCTION_WITHOUT_CURRENCY, auctionId);
         }
         if (!currency.equals(request.currency().trim().toUpperCase(Locale.ROOT))) {
-            throw BusinessRuleException.unprocessable("Currency must be " + currency);
+            throw BusinessRuleException.unprocessable(ErrorCode.BID_CURRENCY_MISMATCH, currency);
         }
 
         Bid currentTop = bidRepository.findFirstByAuctionAuctionIdOrderByAmountDescBidDateAsc(auctionId)
@@ -94,12 +94,13 @@ public class BidService {
                 : currentTop.getAmount().max(auction.getBasePrice());
         BigDecimal minimum = reference.add(auctionProperties.minIncrement());
         if (request.amount().compareTo(minimum) < 0) {
-            throw BusinessRuleException.unprocessable("The bid must be at least " + minimum + " " + currency);
+            throw BusinessRuleException.unprocessable(ErrorCode.BID_TOO_LOW, minimum, currency);
         }
 
         BidAssessment assessment = aiFacade.assessBid(auction, request.amount(), user.getUserId());
         if (assessment.verdict() == BidVerdict.REJECTED) {
-            throw BusinessRuleException.tooManyRequests(assessment.reason());
+            throw BusinessRuleException.tooManyRequests(ErrorCode.BID_RATE_LIMITED,
+                    auctionProperties.maxBidsPerMinute());
         }
 
         Bid bid = new Bid();

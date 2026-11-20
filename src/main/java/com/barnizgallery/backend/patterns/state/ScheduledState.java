@@ -3,6 +3,7 @@ package com.barnizgallery.backend.patterns.state;
 import com.barnizgallery.backend.dto.BidRequest;
 import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.enums.AuctionStatus;
+import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.exception.BusinessRuleException;
 
 /**
@@ -21,12 +22,12 @@ public class ScheduledState implements AuctionState {
 
     @Override
     public void placeBid(AuctionContext context, BidRequest request) {
-        throw new BusinessRuleException("The auction has not started yet");
+        throw new BusinessRuleException(ErrorCode.AUCTION_NOT_STARTED);
     }
 
     @Override
     public void finish(AuctionContext context) {
-        throw new BusinessRuleException("A scheduled auction cannot be finished; cancel it instead");
+        throw new BusinessRuleException(ErrorCode.SCHEDULED_AUCTION_CANNOT_FINISH);
     }
 
     @Override

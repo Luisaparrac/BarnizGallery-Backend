@@ -14,6 +14,7 @@ import com.barnizgallery.backend.dto.StoreSummaryResponse;
 import com.barnizgallery.backend.entity.Master;
 import com.barnizgallery.backend.entity.Store;
 import com.barnizgallery.backend.entity.StoreTemplate;
+import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.exception.BusinessRuleException;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.mapper.ArtworkMapper;
@@ -55,7 +56,7 @@ public class StoreService {
     @Transactional(readOnly = true)
     public StoreDetailResponse findById(Long storeId) {
         Store store = storeRepository.findByIdWithMaster(storeId)
-                .orElseThrow(() -> new ResourceNotFoundException("Store", storeId));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.STORE_NOT_FOUND, storeId));
         List<ArtworkSummaryResponse> artworks = artworkRepository.findByStoreStoreIdOrderByArtworkIdAsc(storeId)
                 .stream()
                 .map(ArtworkMapper::toSummary)
@@ -67,7 +68,7 @@ public class StoreService {
     public StoreSummaryResponse create(StoreRequest request) {
         Master master = masterService.getMaster(request.masterId());
         if (storeRepository.existsByMasterMasterId(master.getMasterId())) {
-            throw new BusinessRuleException("Master " + master.getMasterId() + " already has a store");
+            throw new BusinessRuleException(ErrorCode.MASTER_ALREADY_HAS_STORE, master.getMasterId());
         }
         Store store = new Store();
         store.setMaster(master);
@@ -82,7 +83,7 @@ public class StoreService {
         if (!store.getMaster().getMasterId().equals(request.masterId())) {
             Master newMaster = masterService.getMaster(request.masterId());
             if (storeRepository.existsByMasterMasterId(newMaster.getMasterId())) {
-                throw new BusinessRuleException("Master " + newMaster.getMasterId() + " already has a store");
+                throw new BusinessRuleException(ErrorCode.MASTER_ALREADY_HAS_STORE, newMaster.getMasterId());
             }
             store.setMaster(newMaster);
         }
@@ -95,13 +96,13 @@ public class StoreService {
 
     private StoreTemplate getTemplate(Long templateId) {
         return templateRepository.findById(templateId)
-                .orElseThrow(() -> new ResourceNotFoundException("Store template", templateId));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.STORE_TEMPLATE_NOT_FOUND, templateId));
     }
 
     /** Loads a store or throws 404. Used by other services too. */
     @Transactional(readOnly = true)
     public Store getStore(Long storeId) {
         return storeRepository.findById(storeId)
-                .orElseThrow(() -> new ResourceNotFoundException("Store", storeId));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.STORE_NOT_FOUND, storeId));
     }
 }

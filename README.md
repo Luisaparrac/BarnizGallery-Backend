@@ -159,8 +159,10 @@ The v1 contact messages were migrated by the database to conversations and messa
 ### Errors
 Every error has the same shape:
 ```json
-{ "timestamp": "...", "status": 404, "error": "Not Found", "message": "Artwork 99 not found", "path": "/api/artworks/99" }
+{ "timestamp": "...", "status": 404, "error": "Not Found", "code": "artwork_not_found",
+  "message": "Artwork 99 not found", "path": "/api/artworks/99" }
 ```
+`code` is stable (see `ErrorCode`): the frontend decides by it. `message` is text for people.
 400 invalid input (with `fieldErrors`), 404 not found, 409 business rule or database constraint,
 422 invalid bid / business validation, 429 too many bids, 503 integration disabled.
 

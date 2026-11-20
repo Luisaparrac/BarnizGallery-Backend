@@ -1,0 +1,81 @@
+package com.barnizgallery.backend.enums;
+
+import java.util.Locale;
+
+/**
+ * Stable codes of the API errors. The frontend decides by the {@code code} of the error body (for example
+ * {@code artwork_not_found}); the {@code message} is only text for people. Each code has its text in the
+ * {@code messages_*.properties} bundles under the key {@code error.<code>}.
+ */
+public enum ErrorCode {
+
+    // Generic request errors
+    RESOURCE_NOT_FOUND,
+    VALIDATION_FAILED,
+    MALFORMED_REQUEST,
+    INVALID_PARAMETER,
+    METHOD_NOT_ALLOWED,
+    DATA_CONFLICT,
+    INTERNAL_ERROR,
+
+    // Missing resources
+    ARTWORK_NOT_FOUND,
+    AUCTION_NOT_FOUND,
+    MASTER_NOT_FOUND,
+    PHOTO_NOT_FOUND,
+    STORE_NOT_FOUND,
+    STORE_TEMPLATE_NOT_FOUND,
+    TASTE_PROFILE_NOT_FOUND,
+    USER_NOT_FOUND,
+
+    // Optional integrations
+    AI_DISABLED,
+    AI_STRATEGY_DISABLED,
+    PRICE_SUGGESTION_UNAVAILABLE,
+    STORAGE_DISABLED,
+
+    // Catalogs and recommendations
+    UNKNOWN_COLOR_CODES,
+    UNKNOWN_SHAPE_CODES,
+    UNKNOWN_STYLE_CODES,
+    UNKNOWN_MOTIF_CODES,
+    UNKNOWN_BUDGET_RANGE,
+    UNKNOWN_STRATEGY,
+
+    // Stores and interactions
+    MASTER_ALREADY_HAS_STORE,
+    DURATION_NEGATIVE,
+    DURATION_REQUIRED,
+    BID_INTERACTION_NOT_ALLOWED,
+
+    // Auctions and bids
+    ARTWORK_REQUIRED,
+    ARTWORK_NOT_EXHIBITED,
+    ARTWORK_ALREADY_IN_AUCTION,
+    CURRENCY_REQUIRED,
+    AUCTION_DATES_REQUIRED,
+    AUCTION_END_BEFORE_START,
+    AUCTION_END_IN_PAST,
+    BASE_PRICE_NEGATIVE,
+    BASE_PRICE_REQUIRED,
+    BASE_PRICE_NOT_SUGGESTED,
+    AUCTION_ALREADY_ACTIVE,
+    AUCTION_NOT_STARTED,
+    AUCTION_FINISHED,
+    AUCTION_CANCELLED,
+    SCHEDULED_AUCTION_CANNOT_FINISH,
+    AUCTION_WITHOUT_CURRENCY,
+    BID_CURRENCY_MISMATCH,
+    BID_TOO_LOW,
+    BID_RATE_LIMITED;
+
+    /** Code sent to the frontend, for example {@code artwork_not_found}. */
+    public String code() {
+        return name().toLowerCase(Locale.ROOT);
+    }
+
+    /** Key of the text in the message bundles. */
+    public String messageKey() {
+        return "error." + code();
+    }
+}

@@ -3,6 +3,7 @@ package com.barnizgallery.backend.patterns.adapter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
+import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.exception.FeatureDisabledException;
 
 /**
@@ -19,7 +20,7 @@ public class DisabledAiClient implements AiTextClient {
 
     @Override
     public String complete(String systemPrompt, String userPrompt) {
-        throw new FeatureDisabledException("AI is disabled: no AI provider is configured");
+        throw new FeatureDisabledException(ErrorCode.AI_DISABLED);
     }
 
     @Override

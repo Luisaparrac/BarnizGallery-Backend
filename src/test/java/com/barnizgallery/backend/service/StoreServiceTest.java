@@ -65,7 +65,7 @@ class StoreServiceTest {
 
         assertThatThrownBy(() -> storeService.create(request(1)))
                 .isInstanceOf(BusinessRuleException.class)
-                .hasMessageContaining("already has a store");
+                .hasMessageContaining("master_already_has_store");
         verify(storeRepository, never()).save(any());
     }
 

@@ -14,6 +14,7 @@ import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Auction;
 import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.enums.AuctionStatus;
+import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.patterns.builder.AuctionBuilder;
 import com.barnizgallery.backend.patterns.facade.AiFacade;
@@ -144,7 +145,7 @@ public class AuctionService {
     @Transactional(readOnly = true)
     public void requireExists(Long auctionId) {
         if (!auctionRepository.existsById(auctionId)) {
-            throw new ResourceNotFoundException("Auction", auctionId);
+            throw new ResourceNotFoundException(ErrorCode.AUCTION_NOT_FOUND, auctionId);
         }
     }
 
@@ -155,7 +156,7 @@ public class AuctionService {
     @Transactional
     public Auction getSyncedAuctionForUpdate(Long auctionId) {
         Auction auction = auctionRepository.findByIdForUpdate(auctionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Auction", auctionId));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.AUCTION_NOT_FOUND, auctionId));
         sync(auction, LocalDateTime.now(clock));
         return auction;
     }
@@ -192,6 +193,6 @@ public class AuctionService {
 
     private Auction getAuction(Long auctionId) {
         return auctionRepository.findByIdWithArtwork(auctionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Auction", auctionId));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.AUCTION_NOT_FOUND, auctionId));
     }
 }

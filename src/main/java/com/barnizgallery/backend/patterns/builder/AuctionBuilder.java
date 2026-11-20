@@ -11,6 +11,7 @@ import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Auction;
 import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.enums.AuctionStatus;
+import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.exception.BusinessRuleException;
 import com.barnizgallery.backend.patterns.facade.AiFacade;
 import com.barnizgallery.backend.repository.AuctionRepository;
@@ -87,34 +88,32 @@ public class AuctionBuilder {
      */
     public Auction build() {
         if (artwork == null) {
-            throw new BusinessRuleException("The artwork is required");
+            throw new BusinessRuleException(ErrorCode.ARTWORK_REQUIRED);
         }
         if (artwork.getStatus() != ArtworkStatus.EXHIBITED) {
-            throw new BusinessRuleException("Artwork " + artwork.getArtworkId()
-                    + " must be exhibited to be auctioned (current status: " + artwork.getStatus() + ")");
+            throw new BusinessRuleException(ErrorCode.ARTWORK_NOT_EXHIBITED, artwork.getArtworkId());
         }
         if (auctionRepository.existsByArtworkArtworkIdAndStatusIn(artwork.getArtworkId(),
                 EnumSet.of(AuctionStatus.SCHEDULED, AuctionStatus.ACTIVE))) {
-            throw new BusinessRuleException("Artwork " + artwork.getArtworkId()
-                    + " already has a scheduled or active auction");
+            throw new BusinessRuleException(ErrorCode.ARTWORK_ALREADY_IN_AUCTION, artwork.getArtworkId());
         }
         if (currency == null || !currency.matches("[A-Za-z]{3}")) {
-            throw BusinessRuleException.unprocessable("A three-letter currency is required");
+            throw BusinessRuleException.unprocessable(ErrorCode.CURRENCY_REQUIRED);
         }
         if (startDate == null || endDate == null) {
-            throw BusinessRuleException.unprocessable("startDate and endDate are required");
+            throw BusinessRuleException.unprocessable(ErrorCode.AUCTION_DATES_REQUIRED);
         }
         if (!endDate.isAfter(startDate)) {
-            throw BusinessRuleException.unprocessable("endDate must be after startDate");
+            throw BusinessRuleException.unprocessable(ErrorCode.AUCTION_END_BEFORE_START);
         }
         LocalDateTime now = LocalDateTime.now(clock);
         if (!endDate.isAfter(now)) {
-            throw BusinessRuleException.unprocessable("endDate must be in the future");
+            throw BusinessRuleException.unprocessable(ErrorCode.AUCTION_END_IN_PAST);
         }
 
         BigDecimal price = resolveBasePrice();
         if (price.signum() < 0) {
-            throw BusinessRuleException.unprocessable("basePrice must be >= 0");
+            throw BusinessRuleException.unprocessable(ErrorCode.BASE_PRICE_NEGATIVE);
         }
 
         Auction auction = new Auction();
@@ -132,10 +131,10 @@ public class AuctionBuilder {
             return basePrice;
         }
         if (priceAdvisor == null || !priceAdvisor.isAiEnabled()) {
-            throw BusinessRuleException.unprocessable("basePrice is required while AI is disabled");
+            throw BusinessRuleException.unprocessable(ErrorCode.BASE_PRICE_REQUIRED);
         }
         Optional<BigDecimal> suggested = priceAdvisor.suggestBasePrice(artwork);
         return suggested.orElseThrow(() -> BusinessRuleException.unprocessable(
-                "The AI could not suggest a base price; basePrice is required"));
+                ErrorCode.BASE_PRICE_NOT_SUGGESTED));
     }
 }

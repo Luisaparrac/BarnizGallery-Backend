@@ -15,6 +15,7 @@ import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Store;
 import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.enums.AuctionStatus;
+import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.mapper.ArtworkMapper;
 import com.barnizgallery.backend.repository.ArtworkRepository;
@@ -108,6 +109,6 @@ public class ArtworkService {
     @Transactional(readOnly = true)
     public Artwork getArtwork(Long artworkId) {
         return artworkRepository.findById(artworkId)
-                .orElseThrow(() -> new ResourceNotFoundException("Artwork", artworkId));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.ARTWORK_NOT_FOUND, artworkId));
     }
 }

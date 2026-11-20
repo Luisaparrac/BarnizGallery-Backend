@@ -2,6 +2,7 @@ package com.barnizgallery.backend.patterns.factorymethod;
 
 import org.springframework.stereotype.Component;
 
+import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.enums.InteractionAction;
 import com.barnizgallery.backend.exception.BusinessRuleException;
 
@@ -27,7 +28,7 @@ public class ViewInteractionFactory extends InteractionFactory {
     @Override
     protected void validateDuration(Integer durationSeconds) {
         if (durationSeconds == null) {
-            throw BusinessRuleException.unprocessable("durationSeconds is required for VIEW interactions");
+            throw BusinessRuleException.unprocessable(ErrorCode.DURATION_REQUIRED);
         }
     }
 }

@@ -56,7 +56,7 @@ class InteractionFactoryTest {
     void viewRequiresDuration() {
         assertThatThrownBy(() -> new ViewInteractionFactory().create(user, artwork, null))
                 .isInstanceOf(BusinessRuleException.class)
-                .hasMessageContaining("durationSeconds is required");
+                .hasMessageContaining("duration_required");
     }
 
     @Test

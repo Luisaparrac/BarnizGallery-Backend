@@ -1,9 +1,11 @@
 package com.barnizgallery.backend.exception;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,37 +22,34 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.barnizgallery.backend.dto.ErrorResponse;
 import com.barnizgallery.backend.dto.FieldErrorResponse;
+import com.barnizgallery.backend.enums.ErrorCode;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Translates exceptions into the common JSON error format:
- * {@code { timestamp, status, error, message, path }}.
+ * {@code { timestamp, status, error, code, message, path }}. The {@code code} is stable; the {@code message}
+ * comes from the message bundles.
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleNotFound(ResourceNotFoundException ex, HttpServletRequest request) {
-        return build(HttpStatus.NOT_FOUND, ex.getMessage(), request, null);
+    private final MessageSource messageSource;
+
+    public GlobalExceptionHandler(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
+
+    @ExceptionHandler(ApiException.class)
+    public ResponseEntity<ErrorResponse> handleApiException(ApiException ex, HttpServletRequest request) {
+        return build(ex.getStatus(), ex.getCode(), request, null, ex.getArgs());
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ErrorResponse> handleNoResource(NoResourceFoundException ex, HttpServletRequest request) {
-        return build(HttpStatus.NOT_FOUND, "Resource not found", request, null);
-    }
-
-    @ExceptionHandler(BusinessRuleException.class)
-    public ResponseEntity<ErrorResponse> handleBusinessRule(BusinessRuleException ex, HttpServletRequest request) {
-        return build(ex.getStatus(), ex.getMessage(), request, null);
-    }
-
-    @ExceptionHandler(FeatureDisabledException.class)
-    public ResponseEntity<ErrorResponse> handleFeatureDisabled(FeatureDisabledException ex,
-            HttpServletRequest request) {
-        return build(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage(), request, null);
+        return build(HttpStatus.NOT_FOUND, ErrorCode.RESOURCE_NOT_FOUND, request, null);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -59,28 +58,43 @@ public class GlobalExceptionHandler {
         List<FieldErrorResponse> fields = ex.getBindingResult().getFieldErrors().stream()
                 .map(error -> new FieldErrorResponse(error.getField(), error.getDefaultMessage()))
                 .toList();
-        return build(HttpStatus.BAD_REQUEST, "Validation failed", request, fields);
+        return build(HttpStatus.BAD_REQUEST, ErrorCode.VALIDATION_FAILED, request, fields);
     }
 
     @ExceptionHandler(HandlerMethodValidationException.class)
     public ResponseEntity<ErrorResponse> handleInvalidParameters(HandlerMethodValidationException ex,
             HttpServletRequest request) {
-        return build(HttpStatus.BAD_REQUEST, "Validation failed", request, null);
+        return build(HttpStatus.BAD_REQUEST, ErrorCode.VALIDATION_FAILED, request, null);
     }
 
-    @ExceptionHandler({ HttpMessageNotReadableException.class, MethodArgumentTypeMismatchException.class,
-            MissingServletRequestParameterException.class, MissingServletRequestPartException.class })
-    public ResponseEntity<ErrorResponse> handleBadRequest(Exception ex, HttpServletRequest request) {
-        String message = ex instanceof HttpMessageNotReadableException
-                ? "Malformed JSON body or invalid value"
-                : ex.getMessage();
-        return build(HttpStatus.BAD_REQUEST, message, request, null);
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleUnreadableBody(HttpMessageNotReadableException ex,
+            HttpServletRequest request) {
+        return build(HttpStatus.BAD_REQUEST, ErrorCode.MALFORMED_REQUEST, request, null);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException ex,
+            HttpServletRequest request) {
+        return build(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_PARAMETER, request, null, ex.getName());
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErrorResponse> handleMissingParameter(MissingServletRequestParameterException ex,
+            HttpServletRequest request) {
+        return build(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_PARAMETER, request, null, ex.getParameterName());
+    }
+
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<ErrorResponse> handleMissingPart(MissingServletRequestPartException ex,
+            HttpServletRequest request) {
+        return build(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_PARAMETER, request, null, ex.getRequestPartName());
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<ErrorResponse> handleMethodNotAllowed(HttpRequestMethodNotSupportedException ex,
             HttpServletRequest request) {
-        return build(HttpStatus.METHOD_NOT_ALLOWED, ex.getMessage(), request, null);
+        return build(HttpStatus.METHOD_NOT_ALLOWED, ErrorCode.METHOD_NOT_ALLOWED, request, null, ex.getMethod());
     }
 
     /** CHECK / UNIQUE / foreign key violations reported by PostgreSQL. */
@@ -89,20 +103,19 @@ public class GlobalExceptionHandler {
             HttpServletRequest request) {
         log.warn("Data integrity violation on {}: {}", request.getRequestURI(),
                 ex.getMostSpecificCause().getMessage());
-        return build(HttpStatus.CONFLICT,
-                "The operation violates a database constraint (duplicate value or invalid reference)",
-                request, null);
+        return build(HttpStatus.CONFLICT, ErrorCode.DATA_CONFLICT, request, null);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleUnexpected(Exception ex, HttpServletRequest request) {
         log.error("Unexpected error on {}", request.getRequestURI(), ex);
-        return build(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected server error", request, null);
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_ERROR, request, null);
     }
 
-    private ResponseEntity<ErrorResponse> build(HttpStatus status, String message, HttpServletRequest request,
-            List<FieldErrorResponse> fieldErrors) {
-        ErrorResponse body = ErrorResponse.of(status.value(), status.getReasonPhrase(), message,
+    private ResponseEntity<ErrorResponse> build(HttpStatus status, ErrorCode code, HttpServletRequest request,
+            List<FieldErrorResponse> fieldErrors, Object... args) {
+        String message = messageSource.getMessage(code.messageKey(), args, code.code(), Locale.ENGLISH);
+        ErrorResponse body = ErrorResponse.of(status.value(), status.getReasonPhrase(), code.code(), message,
                 request.getRequestURI(), fieldErrors);
         return ResponseEntity.status(status).body(body);
     }

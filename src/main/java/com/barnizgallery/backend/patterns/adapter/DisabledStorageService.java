@@ -4,6 +4,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.exception.FeatureDisabledException;
 
 /**
@@ -18,7 +19,7 @@ public class DisabledStorageService implements StorageService {
 
     @Override
     public String upload(MultipartFile file, String folder) {
-        throw new FeatureDisabledException("Photo storage is not configured; register photos by URL instead");
+        throw new FeatureDisabledException(ErrorCode.STORAGE_DISABLED);
     }
 
     @Override

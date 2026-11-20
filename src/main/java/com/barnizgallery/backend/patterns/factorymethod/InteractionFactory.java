@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Interaction;
 import com.barnizgallery.backend.entity.User;
+import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.enums.InteractionAction;
 import com.barnizgallery.backend.exception.BusinessRuleException;
 
@@ -31,7 +32,7 @@ public abstract class InteractionFactory {
             throw new IllegalArgumentException("User and artwork are required");
         }
         if (durationSeconds != null && durationSeconds < 0) {
-            throw BusinessRuleException.unprocessable("durationSeconds must be >= 0");
+            throw BusinessRuleException.unprocessable(ErrorCode.DURATION_NEGATIVE);
         }
         validateDuration(durationSeconds);
 
