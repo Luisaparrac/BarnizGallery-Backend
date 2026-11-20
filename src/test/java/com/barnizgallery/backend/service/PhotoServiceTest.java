@@ -7,8 +7,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.Optional;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -24,6 +22,7 @@ import com.barnizgallery.backend.dto.PhotoResponse;
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Photo;
 import com.barnizgallery.backend.enums.ArtworkStatus;
+import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.exception.FeatureDisabledException;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.patterns.adapter.StorageService;
@@ -44,6 +43,8 @@ class PhotoServiceTest {
     private ImageUploadValidator imageValidator;
     @Mock
     private OwnershipGuard ownershipGuard;
+    @Mock
+    private PhotoArrangementService arrangementService;
     @InjectMocks
     private PhotoService photoService;
 
@@ -73,7 +74,7 @@ class PhotoServiceTest {
 
     @Test
     void deleteMissingPhotoIs404() {
-        when(photoRepository.findById(5L)).thenReturn(Optional.empty());
+        when(arrangementService.ownedPhoto(5L)).thenThrow(new ResourceNotFoundException(ErrorCode.PHOTO_NOT_FOUND, 5L));
 
         assertThatThrownBy(() -> photoService.delete(5L)).isInstanceOf(ResourceNotFoundException.class);
     }
@@ -82,7 +83,7 @@ class PhotoServiceTest {
     void deleteExistingPhoto() {
         Photo photo = TestEntities.photo(5, TestEntities.artwork(3, TestEntities.store(1, TestEntities.master(1)),
                 ArtworkStatus.EXHIBITED), "https://img/front.jpg");
-        when(photoRepository.findById(5L)).thenReturn(Optional.of(photo));
+        when(arrangementService.ownedPhoto(5L)).thenReturn(photo);
 
         photoService.delete(5L);
 
@@ -116,7 +117,7 @@ class PhotoServiceTest {
         Photo photo = TestEntities.photo(5, TestEntities.artwork(3, TestEntities.store(1, TestEntities.master(1)),
                 ArtworkStatus.EXHIBITED), "https://img/front.jpg");
         photo.setStorageKey("museo/artworks/3/abc");
-        when(photoRepository.findById(5L)).thenReturn(Optional.of(photo));
+        when(arrangementService.ownedPhoto(5L)).thenReturn(photo);
         when(storageService.isEnabled()).thenReturn(true);
 
         photoService.delete(5L);

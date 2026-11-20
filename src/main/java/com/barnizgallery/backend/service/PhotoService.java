@@ -14,7 +14,6 @@ import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Photo;
 import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.exception.FeatureDisabledException;
-import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.mapper.ArtworkMapper;
 import com.barnizgallery.backend.patterns.adapter.StorageService;
 import com.barnizgallery.backend.patterns.adapter.StoredImage;
@@ -35,9 +34,12 @@ public class PhotoService {
     private final StorageService storageService;
     private final ImageUploadValidator imageValidator;
     private final OwnershipGuard ownershipGuard;
+    private final PhotoArrangementService arrangementService;
 
     public PhotoService(PhotoRepository photoRepository, ArtworkService artworkService,
-            StorageService storageService, ImageUploadValidator imageValidator, OwnershipGuard ownershipGuard) {
+            StorageService storageService, ImageUploadValidator imageValidator, OwnershipGuard ownershipGuard,
+            PhotoArrangementService arrangementService) {
+        this.arrangementService = arrangementService;
         this.ownershipGuard = ownershipGuard;
         this.photoRepository = photoRepository;
         this.artworkService = artworkService;
@@ -85,14 +87,14 @@ public class PhotoService {
 
     /**
      * Deletes the photo. An uploaded photo (with a storage key) is also deleted from the storage; if the storage
-     * is not configured any more, only the row is deleted and the file is reported in the log.
+     * is not configured any more, only the row is deleted and the file is reported in the log. The other photos
+     * close the gap in the order, and when the primary photo goes the next one becomes primary.
      */
     @Transactional
     public void delete(Long photoId) {
-        Photo photo = photoRepository.findById(photoId)
-                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.PHOTO_NOT_FOUND, photoId));
-        ownershipGuard.requireStore(photo.getArtwork().getStore());
+        Photo photo = arrangementService.ownedPhoto(photoId);
         photoRepository.delete(photo);
+        closeGap(photo);
         if (photo.getStorageKey() == null) {
             return;
         }
@@ -116,5 +118,17 @@ public class PhotoService {
         photo.setSortOrder(existing.isEmpty() ? 0 : existing.get(existing.size() - 1).getSortOrder() + 1);
         photo.setPrimary(existing.isEmpty());
         return photo;
+    }
+
+    private void closeGap(Photo removed) {
+        List<Photo> rest = arrangementService.photos(removed.getArtwork().getArtworkId()).stream()
+                .filter(photo -> !photo.getPhotoId().equals(removed.getPhotoId()))
+                .toList();
+        for (int i = 0; i < rest.size(); i++) {
+            rest.get(i).setSortOrder(i);
+        }
+        if (removed.isPrimary() && !rest.isEmpty()) {
+            rest.get(0).setPrimary(true);
+        }
     }
 }

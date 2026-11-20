@@ -125,7 +125,7 @@ Dates are ISO-8601 (UTC). Enum values are in English (`EXHIBITED`, `ACTIVE`, `PE
 | POST | `/api/artworks/{id}/photos/upload` | Multipart `file` (+ `angle`, `altEs`, `altEn`) uploaded to the storage (503 while disabled); goes last, the first photo is the primary one |
 | PUT | `/api/artworks/{id}/photos/order` | `{ photoIds: [...] }` every photo once, first to last (422 otherwise) |
 | PATCH | `/api/photos/{id}` | `{ altEs?, altEn?, angle?, primary? }`; `primary: true` makes it the main photo (thumbnail) |
-| DELETE | `/api/photos/{id}` | Delete a photo |
+| DELETE | `/api/photos/{id}` | Delete a photo (and its file in the storage); the rest close the gap and the next one becomes primary |
 
 ### Users
 | Method | Path | Description |
