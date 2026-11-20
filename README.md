@@ -225,6 +225,11 @@ the artisan) and `ADMIN_APPROVAL` (the administrator's final decision).
 | PUT | `/api/artisans/me/verification/{step}` | `{ evidenceUrl }` (https) for `IDENTITY`, `WORKSHOP` or `SAMPLES` → step `SUBMITTED` |
 | POST | `/api/artisans/me/verification/{step}/evidence` | Multipart `file` (JPEG/PNG/WebP) uploaded to the photo storage (503 while disabled) |
 
+### Artisan verification (administrators)
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/admin/verifications` | Masters waiting for a decision with their open steps (view `v_pending_verifications`) |
+
 ### Notifications (logged-in user)
 | Method | Path | Description |
 |---|---|---|
