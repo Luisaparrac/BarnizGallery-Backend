@@ -47,6 +47,9 @@ public class PaymentSimulationService {
         if (!SimulatedGateway.CODE.equals(payment.getGateway())) {
             throw new BusinessRuleException(ErrorCode.PAYMENT_NOT_SIMULATED, paymentId);
         }
+        if (payment.getStatus() != PaymentStatus.PENDING) {
+            throw new BusinessRuleException(ErrorCode.PAYMENT_NOT_PENDING, paymentId);
+        }
         if (!paymentSettings.testMode()) {
             throw new BusinessRuleException(ErrorCode.SIMULATED_PAYMENTS_DISABLED);
         }
