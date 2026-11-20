@@ -82,6 +82,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/cart/**", "/api/orders/**", "/api/payments/**", "/api/favorites/**",
                         "/api/users/me/addresses/**", "/api/users/me/favorites/**").hasRole(CUSTOMER)
                 .requestMatchers(HttpMethod.POST, "/api/auctions/*/bids").hasRole(CUSTOMER)
+                .requestMatchers(HttpMethod.POST, "/api/custom-requests/*/offers", "/api/custom-requests/*/offers/*/withdraw",
+                        "/api/custom-requests/*/decline").hasRole(ARTISAN)
+                .requestMatchers("/api/custom-requests/**").hasRole(CUSTOMER)
                 .requestMatchers("/api/artworks/**", "/api/photos/**").hasAnyRole(ADMIN, ARTISAN)
                 .anyRequest().authenticated();
     }
