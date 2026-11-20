@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.barnizgallery.backend.dto.CatalogEntryRequest;
 import com.barnizgallery.backend.dto.CatalogEntryResponse;
+import com.barnizgallery.backend.entity.Avatar;
 import com.barnizgallery.backend.entity.CatalogEntry;
 import com.barnizgallery.backend.entity.Color;
 import com.barnizgallery.backend.entity.Motif;
@@ -17,6 +18,7 @@ import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.exception.BusinessRuleException;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.mapper.CatalogMapper;
+import com.barnizgallery.backend.repository.AvatarRepository;
 import com.barnizgallery.backend.repository.CatalogEntryRepository;
 import com.barnizgallery.backend.repository.ColorRepository;
 import com.barnizgallery.backend.repository.MotifRepository;
@@ -35,14 +37,17 @@ public class CatalogAdminService {
     private final ShapeRepository shapeRepository;
     private final MotifRepository motifRepository;
     private final StyleRepository styleRepository;
+    private final AvatarRepository avatarRepository;
 
     public CatalogAdminService(ColorRepository colorRepository, ShapeRepository shapeRepository,
             MotifRepository motifRepository,
-            StyleRepository styleRepository) {
+            StyleRepository styleRepository,
+            AvatarRepository avatarRepository) {
         this.colorRepository = colorRepository;
         this.shapeRepository = shapeRepository;
         this.motifRepository = motifRepository;
         this.styleRepository = styleRepository;
+        this.avatarRepository = avatarRepository;
     }
 
     /** Every entry, active or not. */
@@ -84,6 +89,12 @@ public class CatalogAdminService {
         if (entry instanceof Color color) {
             color.setHex(request.hex());
         }
+        if (entry instanceof Avatar avatar) {
+            if (request.imageUrl() == null) {
+                throw BusinessRuleException.unprocessable(ErrorCode.AVATAR_IMAGE_REQUIRED);
+            }
+            avatar.setImageUrl(request.imageUrl());
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -93,6 +104,7 @@ public class CatalogAdminService {
             case SHAPES -> shapeRepository;
             case MOTIFS -> motifRepository;
             case STYLES -> styleRepository;
+            case AVATARS -> avatarRepository;
         };
         return (CatalogEntryRepository<CatalogEntry>) repository;
     }
@@ -103,6 +115,7 @@ public class CatalogAdminService {
             case SHAPES -> new Shape();
             case MOTIFS -> new Motif();
             case STYLES -> new Style();
+            case AVATARS -> new Avatar();
         };
     }
 }

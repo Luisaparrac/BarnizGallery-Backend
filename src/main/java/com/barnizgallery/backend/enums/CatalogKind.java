@@ -12,7 +12,8 @@ public enum CatalogKind {
     COLORS("colors"),
     SHAPES("shapes"),
     MOTIFS("motifs"),
-    STYLES("styles");
+    STYLES("styles"),
+    AVATARS("avatars");
 
     private final String path;
 

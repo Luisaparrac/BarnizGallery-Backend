@@ -172,10 +172,10 @@ store templates, each with its `code` and its names in Spanish and English. Requ
 | Method | Path | Description |
 |---|---|---|
 | GET | `/api/admin/catalogs/{catalog}` | Every entry, active or not |
-| POST | `/api/admin/catalogs/{catalog}` | `{ code, nameEs, nameEn, sortOrder?, active?, hex? }` → 201 (409 if the code exists) |
+| POST | `/api/admin/catalogs/{catalog}` | `{ code, nameEs, nameEn, sortOrder?, active?, hex? (colors), imageUrl (avatars, https) }` → 201 (409 if the code exists) |
 | PUT | `/api/admin/catalogs/{catalog}/{code}` | Edit names, order, extra fields or `active`; the code never changes |
 
-`{catalog}`: `colors`, `shapes`, `motifs`, `styles`. Entries are never deleted: `active=false` hides them from `/api/catalogs` and from new
+`{catalog}`: `colors`, `shapes`, `motifs`, `styles`, `avatars`. Entries are never deleted: `active=false` hides them from `/api/catalogs` and from new
 requests.
 
 ### Authentication
