@@ -12,7 +12,7 @@ import jakarta.persistence.Table;
  */
 @Entity
 @Table(name = "avatars")
-public class Avatar {
+public class Avatar implements CatalogEntry {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

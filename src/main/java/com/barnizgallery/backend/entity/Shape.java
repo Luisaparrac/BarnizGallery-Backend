@@ -12,7 +12,7 @@ import jakarta.persistence.Table;
  */
 @Entity
 @Table(name = "shapes")
-public class Shape {
+public class Shape implements CatalogEntry {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
