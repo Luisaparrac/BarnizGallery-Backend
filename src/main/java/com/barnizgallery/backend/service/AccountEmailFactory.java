@@ -36,6 +36,14 @@ public class AccountEmailFactory {
         return build(user, "mail.verify", "/verify-email?token=" + encode(token), validity);
     }
 
+    /**
+     * Email with the link to choose a new password. Users migrated from v1 have no password yet and use it to
+     * create their first one.
+     */
+    public EmailMessage passwordReset(User user, String token, Duration validity) {
+        return build(user, "mail.reset", "/reset-password?token=" + encode(token), validity);
+    }
+
     private EmailMessage build(User user, String prefix, String path, Duration validity) {
         Locale locale = locale(user);
         String link = frontendUrl + path;
