@@ -6,7 +6,6 @@ import com.barnizgallery.backend.dto.ArtisanOrderLineResponse;
 import com.barnizgallery.backend.dto.OrderItemResponse;
 import com.barnizgallery.backend.dto.OrderResponse;
 import com.barnizgallery.backend.dto.OrderStatusChangeResponse;
-import com.barnizgallery.backend.dto.OrderSummaryResponse;
 import com.barnizgallery.backend.dto.PaymentObligationResponse;
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Order;
@@ -23,17 +22,19 @@ public final class OrderMapper {
     }
 
     public static OrderResponse toResponse(Order order, List<OrderItem> items, List<PaymentObligation> obligations) {
+        return toResponse(order, items, obligations, List.of());
+    }
+
+    /** The order with its lines, obligations and status changes (frontend names included). */
+    public static OrderResponse toResponse(Order order, List<OrderItem> items, List<PaymentObligation> obligations,
+            List<OrderStatusChangeResponse> history) {
         return new OrderResponse(order.getOrderId(), order.getOrderCode(), order.getOrderType(), order.getStatus(),
                 order.getSubtotal(), order.getShippingCost(), order.getTotal(), order.getCurrency(),
                 order.getShippingAddress(), order.getPaymentDueAt(), order.getPaidAt(), order.getCreatedAt(),
                 items.stream().map(OrderMapper::toResponse).toList(),
-                obligations.stream().map(OrderMapper::toResponse).toList());
-    }
-
-    public static OrderSummaryResponse toSummary(Order order) {
-        return new OrderSummaryResponse(order.getOrderId(), order.getOrderCode(), order.getOrderType(),
-                order.getStatus(), order.getTotal(), order.getCurrency(), order.getPaymentDueAt(), order.getPaidAt(),
-                order.getCreatedAt());
+                obligations.stream().map(OrderMapper::toResponse).toList(), order.getOrderId(), order.getOrderCode(),
+                order.getOrderType(), order.getBuyer().getUserId(), order.getBuyer().getName(), order.getPlatformFee(),
+                null, history);
     }
 
     public static ArtisanOrderLineResponse toArtisanLine(OrderItem item) {
@@ -51,12 +52,16 @@ public final class OrderMapper {
         return new OrderItemResponse(item.getOrderItemId(), item.getStore().getStoreId(),
                 artwork == null ? null : artwork.getArtworkId(), artwork == null ? null : artwork.getTitleEs(),
                 artwork == null ? null : artwork.getTitleEn(), item.getQuantity(), item.getUnitPrice(),
-                item.getLineTotal(), item.getFulfillmentStatus(), item.getCarrier(), item.getTrackingNumber());
+                item.getLineTotal(), item.getFulfillmentStatus(), item.getCarrier(), item.getTrackingNumber(),
+                item.getOrderItemId(), item.getOrder().getOrderId(), item.getStore().getNameEs(),
+                item.getAuction() == null ? null : item.getAuction().getAuctionId(),
+                item.getCustomOffer() == null ? null : item.getCustomOffer().getCustomOfferId(),
+                artwork == null ? null : artwork.getTitleEs(), item.getArtisanNetAmount());
     }
 
     public static OrderStatusChangeResponse toResponse(OrderStatusHistory change) {
         return new OrderStatusChangeResponse(change.getOldStatus(), change.getNewStatus(), change.getChangedAt(),
-                change.getNote());
+                change.getNote(), change.getOldStatus(), change.getNewStatus());
     }
 
     public static PaymentObligationResponse toResponse(PaymentObligation obligation) {

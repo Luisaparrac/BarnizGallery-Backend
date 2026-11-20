@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.barnizgallery.backend.dto.OrderResponse;
 import com.barnizgallery.backend.dto.OrderStatusChangeResponse;
-import com.barnizgallery.backend.dto.OrderSummaryResponse;
 import com.barnizgallery.backend.entity.Order;
 import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
@@ -40,19 +39,25 @@ public class OrderQueryService {
         this.currentUser = currentUser;
     }
 
-    /** The buyer's orders, newest first. */
+    /** The buyer's orders, newest first, complete (lines, obligations and history) as the frontend reads them. */
     @Transactional(readOnly = true)
-    public List<OrderSummaryResponse> mine() {
+    public List<OrderResponse> mine() {
         return orderRepository.findByBuyerUserIdOrderByOrderIdDesc(currentUser.requireId()).stream()
-                .map(OrderMapper::toSummary)
+                .map(this::toResponse)
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public OrderResponse mine(Long orderId) {
-        Order order = myOrder(orderId);
+        return toResponse(myOrder(orderId));
+    }
+
+    private OrderResponse toResponse(Order order) {
+        Long orderId = order.getOrderId();
         return OrderMapper.toResponse(order, itemRepository.findByOrderOrderIdOrderByOrderItemIdAsc(orderId),
-                obligationRepository.findByOrderOrderIdOrderByObligationIdAsc(orderId));
+                obligationRepository.findByOrderOrderIdOrderByObligationIdAsc(orderId),
+                historyRepository.findByOrderOrderIdOrderByChangedAtAscHistoryIdAsc(orderId).stream()
+                        .map(OrderMapper::toResponse).toList());
     }
 
     /**

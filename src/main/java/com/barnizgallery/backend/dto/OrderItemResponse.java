@@ -18,5 +18,12 @@ public record OrderItemResponse(
         BigDecimal lineTotal,
         FulfillmentStatus fulfillmentStatus,
         String carrier,
-        String trackingNumber) {
+        String trackingNumber,
+        Long id,
+        Long orderId,
+        String storeName,
+        Long auctionId,
+        Long customOfferId,
+        String description,
+        BigDecimal artisanAmount) {
 }

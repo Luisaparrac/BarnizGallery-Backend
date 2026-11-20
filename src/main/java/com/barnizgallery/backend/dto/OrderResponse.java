@@ -25,5 +25,13 @@ public record OrderResponse(
         Instant paidAt,
         Instant createdAt,
         List<OrderItemResponse> items,
-        List<PaymentObligationResponse> obligations) {
+        List<PaymentObligationResponse> obligations,
+        Long id,
+        String code,
+        OrderType type,
+        Long buyerId,
+        String buyerName,
+        BigDecimal platformFee,
+        String notes,
+        List<OrderStatusChangeResponse> history) {
 }

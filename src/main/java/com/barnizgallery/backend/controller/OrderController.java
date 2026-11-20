@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.barnizgallery.backend.dto.CheckoutRequest;
 import com.barnizgallery.backend.dto.OrderResponse;
 import com.barnizgallery.backend.dto.OrderStatusChangeResponse;
-import com.barnizgallery.backend.dto.OrderSummaryResponse;
 import com.barnizgallery.backend.service.CheckoutService;
 import com.barnizgallery.backend.service.OrderCancelService;
 import com.barnizgallery.backend.service.OrderQueryService;
@@ -44,7 +43,7 @@ public class OrderController {
 
     @GetMapping
     @Operation(summary = "The buyer's orders, newest first")
-    public List<OrderSummaryResponse> mine() {
+    public List<OrderResponse> mine() {
         return queryService.mine();
     }
 
