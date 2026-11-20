@@ -34,12 +34,15 @@ class InteractionServiceTest {
     private UserService userService;
     @Mock
     private ArtworkService artworkService;
+    @Mock
+    private StoreService storeService;
     private InteractionService interactionService;
 
     @BeforeEach
     void setUp() {
         InteractionFactoryProvider provider = TestFactories.provider();
-        interactionService = new InteractionService(interactionRepository, provider, userService, artworkService);
+        interactionService = new InteractionService(interactionRepository, provider, userService, artworkService,
+                storeService);
     }
 
     @Test
@@ -50,7 +53,7 @@ class InteractionServiceTest {
         when(interactionRepository.save(any(Interaction.class))).thenAnswer(inv -> inv.getArgument(0));
 
         InteractionResponse response = interactionService.record(
-                new InteractionRequest(1L, 2L, InteractionAction.ZOOM, null));
+                new InteractionRequest(1L, 2L, null, InteractionAction.ZOOM, null));
 
         assertThat(response.action()).isEqualTo(InteractionAction.ZOOM);
         assertThat(response.artworkId()).isEqualTo(2);
@@ -58,8 +61,31 @@ class InteractionServiceTest {
 
     @Test
     void bidCannotBeRecordedFromTheEndpoint() {
-        assertThatThrownBy(() -> interactionService.record(new InteractionRequest(1L, 2L, InteractionAction.BID, null)))
+        assertThatThrownBy(() -> interactionService.record(new InteractionRequest(1L, 2L, null, InteractionAction.BID, null)))
                 .isInstanceOf(BusinessRuleException.class);
         verify(interactionRepository, never()).save(any());
+    }
+
+    @Test
+    void purchasesAreRecordedOnlyByTheBackend() {
+        assertThatThrownBy(() -> interactionService.record(
+                new InteractionRequest(1L, 2L, null, InteractionAction.PURCHASE, null)))
+                .hasMessage("interaction_recorded_by_server [comprar]");
+    }
+
+    @Test
+    void storeVisitIsRecordedWithTheStore() {
+        when(userService.getUser(1L)).thenReturn(TestEntities.user(1, Language.ES));
+        when(storeService.getStore(3L)).thenReturn(TestEntities.store(3, TestEntities.master(3)));
+        when(interactionRepository.save(any(Interaction.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        InteractionResponse response = interactionService.record(
+                new InteractionRequest(1L, null, 3L, InteractionAction.STORE_VISIT, null));
+
+        assertThat(response.storeId()).isEqualTo(3L);
+        assertThat(response.artworkId()).isNull();
+        assertThatThrownBy(() -> interactionService.record(
+                new InteractionRequest(1L, 2L, null, InteractionAction.STORE_VISIT, null)))
+                .hasMessage("interaction_target_invalid [visitar_tienda]");
     }
 }

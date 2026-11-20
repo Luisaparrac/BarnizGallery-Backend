@@ -28,28 +28,47 @@ public class InteractionService {
     private final InteractionFactoryProvider factoryProvider;
     private final UserService userService;
     private final ArtworkService artworkService;
+    private final StoreService storeService;
 
     public InteractionService(InteractionRepository interactionRepository,
             InteractionFactoryProvider factoryProvider, UserService userService,
-            ArtworkService artworkService) {
+            ArtworkService artworkService, StoreService storeService) {
         this.interactionRepository = interactionRepository;
         this.factoryProvider = factoryProvider;
         this.userService = userService;
         this.artworkService = artworkService;
+        this.storeService = storeService;
     }
 
     /**
-     * Records an interaction sent by the frontend. BID interactions are not accepted here:
-     * they are recorded automatically when a real bid is placed.
+     * Records an interaction sent by the frontend, with an artwork or (store-level actions) with a store. Bids and
+     * purchases are not accepted here: the backend records them when they really happen.
      */
     @Transactional
     public InteractionResponse record(InteractionRequest request) {
-        if (request.action() == InteractionAction.BID) {
-            throw BusinessRuleException.unprocessable(ErrorCode.BID_INTERACTION_NOT_ALLOWED);
+        InteractionFactory factory = factoryProvider.forAction(request.action());
+        if (factory.recordedByServer()) {
+            throw BusinessRuleException.unprocessable(ErrorCode.INTERACTION_RECORDED_BY_SERVER,
+                    request.action().getDbValue());
         }
         User user = userService.getUser(request.userId());
-        Artwork artwork = artworkService.getArtwork(request.artworkId());
-        return InteractionMapper.toResponse(save(user, artwork, request.action(), request.durationSeconds()));
+        Interaction interaction;
+        if (factory.isStoreLevel()) {
+            if (request.storeId() == null) {
+                throw BusinessRuleException.unprocessable(ErrorCode.INTERACTION_TARGET_INVALID,
+                        request.action().getDbValue());
+            }
+            interaction = factory.createForStore(user, storeService.getStore(request.storeId()),
+                    request.durationSeconds());
+        } else {
+            if (request.artworkId() == null) {
+                throw BusinessRuleException.unprocessable(ErrorCode.INTERACTION_TARGET_INVALID,
+                        request.action().getDbValue());
+            }
+            interaction = factory.create(user, artworkService.getArtwork(request.artworkId()),
+                    request.durationSeconds());
+        }
+        return InteractionMapper.toResponse(interactionRepository.save(interaction));
     }
 
     /** Creates the interaction with the right factory and saves it. Also used by the bid observer. */

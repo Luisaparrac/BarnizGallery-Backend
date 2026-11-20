@@ -22,4 +22,9 @@ public class BidInteractionFactory extends InteractionFactory {
     public int weight() {
         return 5;
     }
+
+    @Override
+    public boolean recordedByServer() {
+        return true;
+    }
 }

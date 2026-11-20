@@ -10,7 +10,10 @@ public enum InteractionAction implements DbValueEnum {
     BID("ofertar"),
     FAVORITE("favorito"),
     ADD_TO_CART("agregar_carrito"),
-    SHARE("compartir");
+    SHARE("compartir"),
+    PURCHASE("comprar"),
+    STORE_VISIT("visitar_tienda"),
+    CUSTOM_ORDER("encargar");
 
     private final String dbValue;
 

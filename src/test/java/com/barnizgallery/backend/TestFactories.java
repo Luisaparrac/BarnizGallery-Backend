@@ -8,6 +8,9 @@ import com.barnizgallery.backend.patterns.factorymethod.BidInteractionFactory;
 import com.barnizgallery.backend.patterns.factorymethod.FavoriteInteractionFactory;
 import com.barnizgallery.backend.patterns.factorymethod.AddToCartInteractionFactory;
 import com.barnizgallery.backend.patterns.factorymethod.ShareInteractionFactory;
+import com.barnizgallery.backend.patterns.factorymethod.PurchaseInteractionFactory;
+import com.barnizgallery.backend.patterns.factorymethod.StoreVisitInteractionFactory;
+import com.barnizgallery.backend.patterns.factorymethod.CustomOrderInteractionFactory;
 import com.barnizgallery.backend.patterns.factorymethod.InteractionFactoryProvider;
 
 /**
@@ -24,6 +27,9 @@ public final class TestFactories {
                 new BidInteractionFactory(),
                 new FavoriteInteractionFactory(),
                 new AddToCartInteractionFactory(),
-                new ShareInteractionFactory()));
+                new ShareInteractionFactory(),
+                new PurchaseInteractionFactory(),
+                new StoreVisitInteractionFactory(),
+                new CustomOrderInteractionFactory()));
     }
 }
