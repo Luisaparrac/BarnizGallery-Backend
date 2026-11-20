@@ -91,7 +91,6 @@ Requirements: Java 21 and a local PostgreSQL 18.
 | `AI_SERVICE_URL` | Base URL of the MUSEO AI service, without a trailing `/` (empty disables it) | – |
 | `AI_SERVICE_KEY` | Shared key sent in the `X-API-Key` header to the AI service (empty disables it) | – |
 | `AI_API_KEY` | Not used yet: it will be added together with the adapter when the AI provider is chosen | – |
-| `STORAGE_PROVIDER` | Photo storage provider (not chosen yet) | `none` |
 | `JAVA_TOOL_OPTIONS` | `-XX:MaxRAMPercentage=75 -XX:+UseSerialGC -Xss512k` (already set in the Dockerfile) | – |
 
 ## REST API
@@ -207,7 +206,7 @@ action changes their status.
 |---|---|---|
 | AI service (price suggestions, recommendation strategy `ai-service`) | Enabled when configured | Set `AI_SERVICE_URL` and `AI_SERVICE_KEY` |
 | AI text model (recommendation strategy `ai`, AI bid review) | Disabled – provider not chosen | When the provider is chosen: add an adapter implementing `AiTextClient`, add the `AI_API_KEY` property, and set `AI_PROVIDER` |
-| Photo storage | Disabled – provider not chosen | Add an adapter implementing `StorageService` and set `STORAGE_PROVIDER` |
+| Photo storage (Cloudinary, JPEG/PNG/WebP up to 5 MB) | Enabled when configured | Set `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY` and `CLOUDINARY_API_SECRET` |
 
 While an integration is disabled its endpoints answer **503** and nothing is invented: recommendations
 use the deterministic strategies and bids are reviewed with deterministic rules.
