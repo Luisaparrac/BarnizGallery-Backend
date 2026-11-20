@@ -347,6 +347,12 @@ the database).
 | PUT | `/api/artisans/me/artworks/{artworkId}` | Replace the data of an artwork (the status does not change) |
 | PATCH | `/api/artisans/me/artworks/{artworkId}/status` | `{ status }`: `DRAFT` ↔ `EXHIBITED` ↔ `ARCHIVED`, and `SOLD` → `ARCHIVED`; artworks in auction or reserved change only through the auction or the order (409) |
 
+### Conversations and reports (logged-in user)
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/conversations` | Conversations where the user is the customer or the master: `{ id, customerId, customerName, masterId, masterName, artworkId, customRequestId, orderId, lastMessageAt, lastMessagePreview, unreadCount }` |
+| POST | `/api/conversations` | `{ masterId, content, subject?, artworkId? \| customRequestId? \| orderId? }` → 201 with the first message (`subject` is not stored: no column) |
+
 ### Notifications (logged-in user)
 | GET | `/api/notifications/unread-count` | `{ count }` of unread notifications |
 | Method | Path | Description |
