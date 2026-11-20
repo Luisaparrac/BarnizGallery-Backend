@@ -86,6 +86,8 @@ Requirements: Java 21 and a local PostgreSQL 18.
 | `BREVO_API_KEY` / `MAIL_FROM` / `MAIL_FROM_NAME` | Brevo API key and the verified sender of the account emails (empty = emails disabled) | – / – / `MUSEO Barniz de Pasto` |
 | `WOMPI_PUBLIC_KEY` / `WOMPI_INTEGRITY_SECRET` / `WOMPI_EVENTS_SECRET` | Wompi keys for COP payments (empty = Wompi disabled; `pub_test_` keys use the sandbox) | – |
 | `WOMPI_BASE_URL` | Wompi Web Checkout URL | `https://checkout.wompi.co/p/` |
+| `PAYPAL_CLIENT_ID` / `PAYPAL_CLIENT_SECRET` / `PAYPAL_WEBHOOK_ID` | PayPal REST app and webhook for USD payments (empty = PayPal disabled) | – |
+| `PAYPAL_BASE_URL` | PayPal REST API base URL | `https://api-m.sandbox.paypal.com` |
 | `FLYWAY_ENABLED` | Run the Flyway migrations on start (baseline 1 on an existing v1 database, then V2) | `true` |
 | `PORT` | HTTP port (set by Render) | `8080` |
 | `CORS_ALLOWED_ORIGINS` | Comma-separated frontend origins (REST and WebSocket) | `http://localhost:5173,http://localhost:3000` |
