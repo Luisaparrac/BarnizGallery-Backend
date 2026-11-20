@@ -345,10 +345,18 @@ rounded half up to cents; artisan net = line total − fee; total = subtotal + s
 | POST | `/api/custom-requests/{id}/offers/{offerId}/accept` · `/reject` | Customer (owner) | Accept → `{ request, orderId }`: other offers rejected (`OFFER_REJECTED`), `encargo` order with `anticipo` (`custom_orders.deposit_percent`) and `saldo` obligations (`OFFER_ACCEPTED`) / reject one |
 | POST | `/api/custom-requests/{id}/decline` | Approved artisan | `{ reason }`; the customer of a request addressed to them is told (declines are not stored) |
 | GET | `/api/artisan/custom-requests/open` · `/accepted` · `/declined` | Approved artisan | Open requests for everybody or for them / accepted offers / always empty |
+| POST | `/api/custom-requests/{id}/designs` | Customer (owner, draft) | One AI design (`POST /v1/designs` of the AI service, 1 image). Limit `custom_orders.max_ai_designs` counted with every saved design (409; null → 409 `setting_not_configured`). A failure is saved as `FAILED` with the reason in `prompt`; every call goes to `ai_usage_log` |
+| POST | `/api/custom-requests/{id}/designs/{designId}/select` | Customer (owner, draft) | Choose one `COMPLETED` design (404 otherwise) |
 
 Statuses follow the frontend names (`DRAFT`, `PUBLISHED`, `WITH_OFFERS`, `ACCEPTED`, `IN_PRODUCTION`, `DELIVERED`,
 `CANCELLED`, `EXPIRED`); `state` keeps the approved one. The approved deposit payment moves the request to
 `IN_PRODUCTION` and the balance to `COMPLETED`.
+
+Images are stored as `data:` URIs in `custom_request_designs.image_url` until Cloudinary is configured.
+
+**Bid review:** a bid that passes the fixed rules is sent to the AI service (`POST /v1/bids/assess`) before it is
+saved. The service never rejects it: a `SUSPICIOUS` answer stores `review_status = sospechosa` and the reasons in
+`review_reason`; when the service is off or fails, the bid is saved without a mark.
 
 ### Payments
 | Method | Path | Description |
