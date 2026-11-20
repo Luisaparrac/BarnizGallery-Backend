@@ -4,11 +4,13 @@ import java.util.List;
 
 import com.barnizgallery.backend.dto.OrderItemResponse;
 import com.barnizgallery.backend.dto.OrderResponse;
+import com.barnizgallery.backend.dto.OrderStatusChangeResponse;
 import com.barnizgallery.backend.dto.OrderSummaryResponse;
 import com.barnizgallery.backend.dto.PaymentObligationResponse;
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Order;
 import com.barnizgallery.backend.entity.OrderItem;
+import com.barnizgallery.backend.entity.OrderStatusHistory;
 import com.barnizgallery.backend.entity.PaymentObligation;
 
 /**
@@ -39,6 +41,11 @@ public final class OrderMapper {
                 artwork == null ? null : artwork.getArtworkId(), artwork == null ? null : artwork.getTitleEs(),
                 artwork == null ? null : artwork.getTitleEn(), item.getQuantity(), item.getUnitPrice(),
                 item.getLineTotal(), item.getFulfillmentStatus(), item.getCarrier(), item.getTrackingNumber());
+    }
+
+    public static OrderStatusChangeResponse toResponse(OrderStatusHistory change) {
+        return new OrderStatusChangeResponse(change.getOldStatus(), change.getNewStatus(), change.getChangedAt(),
+                change.getNote());
     }
 
     public static PaymentObligationResponse toResponse(PaymentObligation obligation) {

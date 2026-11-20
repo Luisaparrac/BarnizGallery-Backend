@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.barnizgallery.backend.dto.OrderResponse;
+import com.barnizgallery.backend.dto.OrderStatusChangeResponse;
 import com.barnizgallery.backend.dto.OrderSummaryResponse;
 import com.barnizgallery.backend.entity.Order;
 import com.barnizgallery.backend.enums.ErrorCode;
@@ -13,6 +14,7 @@ import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.mapper.OrderMapper;
 import com.barnizgallery.backend.repository.OrderItemRepository;
 import com.barnizgallery.backend.repository.OrderRepository;
+import com.barnizgallery.backend.repository.OrderStatusHistoryRepository;
 import com.barnizgallery.backend.repository.PaymentObligationRepository;
 import com.barnizgallery.backend.security.CurrentUser;
 
@@ -26,9 +28,12 @@ public class OrderQueryService {
     private final OrderItemRepository itemRepository;
     private final PaymentObligationRepository obligationRepository;
     private final CurrentUser currentUser;
+    private final OrderStatusHistoryRepository historyRepository;
 
     public OrderQueryService(OrderRepository orderRepository, OrderItemRepository itemRepository,
-            PaymentObligationRepository obligationRepository, CurrentUser currentUser) {
+            PaymentObligationRepository obligationRepository, CurrentUser currentUser,
+            OrderStatusHistoryRepository historyRepository) {
+        this.historyRepository = historyRepository;
         this.orderRepository = orderRepository;
         this.itemRepository = itemRepository;
         this.obligationRepository = obligationRepository;
@@ -48,6 +53,18 @@ public class OrderQueryService {
         Order order = myOrder(orderId);
         return OrderMapper.toResponse(order, itemRepository.findByOrderOrderIdOrderByOrderItemIdAsc(orderId),
                 obligationRepository.findByOrderOrderIdOrderByObligationIdAsc(orderId));
+    }
+
+    /**
+     * Status changes of an own order, oldest first. The database writes them when the status changes (the
+     * creation as {@code pendiente_pago} is not a change).
+     */
+    @Transactional(readOnly = true)
+    public List<OrderStatusChangeResponse> history(Long orderId) {
+        myOrder(orderId);
+        return historyRepository.findByOrderOrderIdOrderByChangedAtAscHistoryIdAsc(orderId).stream()
+                .map(OrderMapper::toResponse)
+                .toList();
     }
 
     /** An order of the logged-in buyer (404 otherwise). */

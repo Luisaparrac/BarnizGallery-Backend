@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.barnizgallery.backend.dto.CheckoutRequest;
 import com.barnizgallery.backend.dto.OrderResponse;
+import com.barnizgallery.backend.dto.OrderStatusChangeResponse;
 import com.barnizgallery.backend.dto.OrderSummaryResponse;
 import com.barnizgallery.backend.service.CheckoutService;
 import com.barnizgallery.backend.service.OrderQueryService;
@@ -41,6 +42,12 @@ public class OrderController {
     @Operation(summary = "The buyer's orders, newest first")
     public List<OrderSummaryResponse> mine() {
         return queryService.mine();
+    }
+
+    @GetMapping("/{orderId}/history")
+    @Operation(summary = "Status changes of an own order, oldest first")
+    public List<OrderStatusChangeResponse> history(@PathVariable Long orderId) {
+        return queryService.history(orderId);
     }
 
     @GetMapping("/{orderId}")

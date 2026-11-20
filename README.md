@@ -254,6 +254,7 @@ the artisan) and `ADMIN_APPROVAL` (the administrator's final decision).
 | POST | `/api/orders/checkout` | `{ addressId }` → 201 order `PENDING_PAYMENT` (type `PURCHASE`) with its lines and one `SINGLE_PAYMENT` obligation; each line is reserved by `museo.reserve_order_item` until `paymentDueAt` (now + `cart.reservation_minutes`) and the cart is emptied. 409 when the cart is empty, mixes currencies, a line is not for sale, the database refuses the reservation or a setting is missing |
 | GET | `/api/orders` | The buyer's orders, newest first |
 | GET | `/api/orders/{orderId}` | An own order with lines (`fulfillmentStatus`, carrier, tracking) and payment obligations |
+| GET | `/api/orders/{orderId}/history` | Status changes recorded by the database (`oldStatus`, `newStatus`, `changedAt`, `note`) |
 
 Checkout amounts (`OrderBuilder`, Builder pattern): fee per line = line total × `platform.commission_rate`,
 rounded half up to cents; artisan net = line total − fee; total = subtotal + shipping. Shipping comes from
