@@ -23,5 +23,8 @@ public record StorePageResponse(
         Instant publishedAt,
         MasterResponse master,
         List<StoreSectionResponse> sections,
-        List<ArtworkSummaryResponse> artworks) {
+        List<ArtworkSummaryResponse> artworks,
+        StoreDataResponse store,
+        MasterDataResponse masterData,
+        int artworkCount) {
 }

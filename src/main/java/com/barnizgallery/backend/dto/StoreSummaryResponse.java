@@ -17,5 +17,7 @@ public record StoreSummaryResponse(
         String logoUrl,
         String bannerUrl,
         StoreStatus status,
-        long artworkCount) {
+        long artworkCount,
+        StoreDataResponse store,
+        MasterDataResponse master) {
 }

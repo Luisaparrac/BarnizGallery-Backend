@@ -142,7 +142,7 @@ Dates are ISO-8601 (UTC). Enum values are in English (`EXHIBITED`, `ACTIVE`, `PE
 | GET | `/api/masters` | Active masters (archived ones keep their history but are not listed) |
 | GET | `/api/masters/{id}` | Master + its store (an archived master is 404 except for administrators) |
 | POST / PUT | `/api/masters`, `/api/masters/{id}` | Create / update master |
-| GET | `/api/stores` | Published stores of approved masters, newest first, with slug, logo, banner and count of public artworks |
+| GET | `/api/stores` | Published stores of approved masters, newest first, with slug, logo, banner and count of public artworks; also `store` and `master` as the frontend reads them (`StoreSummary`) |
 | GET | `/api/stores/{slug}` | Public page of a published store (approved master): visible sections in order and exhibited or auctioned artworks; 404 otherwise |
 | GET | `/api/artworks?color=&motif=&shape=&style=&currency=&minPrice=&maxPrice=&store=&page=&size=` | Public gallery (view `v_artwork_catalog`): exhibited or auctioned artworks of published stores of approved masters, newest first; codes of the catalogs, store slug; a price range needs `currency` (422) |
 | GET | `/api/artworks/{idOrSlug}` | Artwork + photos + current auction by id or slug (404 unless it is in the public gallery); also carries the frontend shape: `artwork`, `storeSlug`, `storeNameEs/En`, `masterId`, `masterName`, `favoriteCount`, `activeAuctionId`, `isFavorite` |

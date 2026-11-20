@@ -26,6 +26,7 @@ public final class StoreEditorMapper {
     public static StoreSectionResponse toResponse(StoreSection section) {
         return new StoreSectionResponse(section.getStoreSectionId(), section.getSectionType(), section.getTitleEs(),
                 section.getTitleEn(), section.getContentEs(), section.getContentEn(), section.getImageUrl(),
-                section.getConfig(), section.getSortOrder(), section.isVisible());
+                section.getConfig(), section.getSortOrder(), section.isVisible(), section.getStoreSectionId(),
+                section.getSectionType(), section.isVisible());
     }
 }

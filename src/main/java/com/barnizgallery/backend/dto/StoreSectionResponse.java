@@ -15,5 +15,8 @@ public record StoreSectionResponse(
         String imageUrl,
         @JsonRawValue String config,
         Integer sortOrder,
-        boolean visible) {
+        boolean visible,
+        Long id,
+        String type,
+        boolean isVisible) {
 }
