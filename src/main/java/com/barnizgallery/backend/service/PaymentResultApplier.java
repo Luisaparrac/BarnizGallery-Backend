@@ -1,5 +1,8 @@
 package com.barnizgallery.backend.service;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
 
@@ -21,24 +24,30 @@ import com.barnizgallery.backend.repository.PaymentRepository;
 @Component
 public class PaymentResultApplier {
 
+    private static final Set<PaymentStatus> FINAL = EnumSet.of(PaymentStatus.APPROVED, PaymentStatus.DECLINED,
+            PaymentStatus.EXPIRED);
+
     private final PaymentRepository paymentRepository;
 
     public PaymentResultApplier(PaymentRepository paymentRepository) {
         this.paymentRepository = paymentRepository;
     }
 
-    /** Returns true when the payment changed. */
+    /**
+     * Returns true when the payment changed. A declined or expired payment lets the database decide whether the
+     * reservations are released: it keeps them while their time is not over, so the buyer can try again.
+     */
     public boolean apply(Payment payment, GatewayEvent event) {
-        if (payment.getStatus() != PaymentStatus.PENDING || event.status() != PaymentStatus.APPROVED) {
+        if (payment.getStatus() != PaymentStatus.PENDING || !FINAL.contains(event.status())) {
             return false;
         }
-        payment.setStatus(PaymentStatus.APPROVED);
+        payment.setStatus(event.status());
         payment.setGatewayTransactionId(event.gatewayTransactionId());
         payment.setRawResponse(event.payload());
         try {
             paymentRepository.saveAndFlush(payment);
         } catch (DataAccessException ex) {
-            if (DatabaseErrors.isRuleViolation(ex)) {
+            if (DatabaseErrors.isRuleViolation(ex) && event.status() == PaymentStatus.APPROVED) {
                 throw new BusinessRuleException(ErrorCode.PAYMENT_APPROVAL_REJECTED, event.reference());
             }
             throw ex;
