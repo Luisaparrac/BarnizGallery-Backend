@@ -1,11 +1,15 @@
 package com.barnizgallery.backend.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.barnizgallery.backend.dto.ArtworkSummaryResponse;
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.Favorite;
 import com.barnizgallery.backend.entity.FavoriteId;
+import com.barnizgallery.backend.mapper.ArtworkMapper;
 import com.barnizgallery.backend.repository.FavoriteRepository;
 import com.barnizgallery.backend.repository.UserRepository;
 import com.barnizgallery.backend.security.CurrentUser;
@@ -28,6 +32,17 @@ public class FavoriteService {
         this.userRepository = userRepository;
         this.artworkService = artworkService;
         this.currentUser = currentUser;
+    }
+
+    /**
+     * Favorite artworks, last saved first. Artworks that left the gallery (sold, archived...) stay listed with
+     * their current status; deleted ones are left out.
+     */
+    @Transactional(readOnly = true)
+    public List<ArtworkSummaryResponse> mine() {
+        return favoriteRepository.findArtworksOfUser(currentUser.requireId()).stream()
+                .map(ArtworkMapper::toSummary)
+                .toList();
     }
 
     @Transactional

@@ -1,13 +1,17 @@
 package com.barnizgallery.backend.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.barnizgallery.backend.dto.ArtworkSummaryResponse;
 import com.barnizgallery.backend.service.FavoriteService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,6 +29,12 @@ public class FavoriteController {
 
     public FavoriteController(FavoriteService favoriteService) {
         this.favoriteService = favoriteService;
+    }
+
+    @GetMapping
+    @Operation(summary = "Favorite artworks, last saved first")
+    public List<ArtworkSummaryResponse> mine() {
+        return favoriteService.mine();
     }
 
     @PutMapping("/{artworkId}")
