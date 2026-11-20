@@ -1,6 +1,7 @@
 package com.barnizgallery.backend.patterns.strategy;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -22,16 +23,15 @@ import com.barnizgallery.backend.exception.FeatureDisabledException;
 import com.barnizgallery.backend.mapper.ArtworkMapper;
 import com.barnizgallery.backend.mapper.UserMapper;
 import com.barnizgallery.backend.patterns.adapter.AiTextClient;
-import com.barnizgallery.backend.repository.ArtworkRepository;
-import com.barnizgallery.backend.repository.StoreRepository;
 import com.barnizgallery.backend.repository.TasteProfileRepository;
 
 /**
  * <b>Strategy pattern – ConcreteStrategy "ai".</b>
  * <p>
- * Asks the AI model (through the {@link AiTextClient} adapter) to rank the stores.
- * Only available when an AI provider is configured. Answers that cannot be parsed
- * or that mention unknown stores are ignored: nothing is invented.
+ * Asks the AI model (through the {@link AiTextClient} adapter) to rank the stores that have artworks in the
+ * public catalog ({@link PublicArtworkCatalog}); without public artworks the answer is empty and the provider is
+ * not called. Only available when an AI provider is configured. Answers that cannot be parsed or that mention
+ * other stores are ignored: nothing is invented.
  */
 @Component
 public class AiStrategy implements RecommendationStrategy {
@@ -45,16 +45,14 @@ public class AiStrategy implements RecommendationStrategy {
             in the requested language. Use only the store ids you receive.""";
 
     private final AiTextClient aiClient;
-    private final StoreRepository storeRepository;
-    private final ArtworkRepository artworkRepository;
+    private final PublicArtworkCatalog publicCatalog;
     private final TasteProfileRepository tasteProfileRepository;
     private final HybridStrategy hybridStrategy;
 
-    public AiStrategy(AiTextClient aiClient, StoreRepository storeRepository, ArtworkRepository artworkRepository,
+    public AiStrategy(AiTextClient aiClient, PublicArtworkCatalog publicCatalog,
             TasteProfileRepository tasteProfileRepository, HybridStrategy hybridStrategy) {
         this.aiClient = aiClient;
-        this.storeRepository = storeRepository;
-        this.artworkRepository = artworkRepository;
+        this.publicCatalog = publicCatalog;
         this.tasteProfileRepository = tasteProfileRepository;
         this.hybridStrategy = hybridStrategy;
     }
@@ -69,26 +67,36 @@ public class AiStrategy implements RecommendationStrategy {
         if (!aiClient.isEnabled()) {
             throw new FeatureDisabledException(ErrorCode.AI_STRATEGY_DISABLED);
         }
-        String answer = aiClient.complete(SYSTEM_PROMPT, buildUserPrompt(user));
-        Set<Long> validStores = new LinkedHashSet<>();
-        storeRepository.findAll().forEach(store -> validStores.add(store.getStoreId()));
-        List<RecommendationResult> results = parse(answer, validStores);
+        List<Artwork> publicArtworks = publicCatalog.artworks();
+        if (publicArtworks.isEmpty()) {
+            return List.of();
+        }
+        Map<Long, Store> stores = new LinkedHashMap<>();
+        publicArtworks.forEach(artwork -> stores.putIfAbsent(artwork.getStore().getStoreId(), artwork.getStore()));
+        String answer = aiClient.complete(SYSTEM_PROMPT, buildUserPrompt(user, publicArtworks, stores.values()));
+        List<RecommendationResult> results = parse(answer, stores.keySet());
         results.sort(Comparator.comparing(RecommendationResult::score).reversed());
         return results;
     }
 
-    /** The text model only ranks stores; artworks are recommended by the hybrid strategy. */
+    /**
+     * The text model only ranks stores; artworks are recommended by the hybrid strategy, which also uses the public
+     * catalog. Without public artworks the answer is empty.
+     */
     @Override
     public List<RecommendationResult> recommendArtworks(User user) {
         if (!aiClient.isEnabled()) {
             throw new FeatureDisabledException(ErrorCode.AI_STRATEGY_DISABLED);
         }
+        if (publicCatalog.artworks().isEmpty()) {
+            return List.of();
+        }
         return hybridStrategy.recommendArtworks(user);
     }
 
-    private String buildUserPrompt(User user) {
+    private String buildUserPrompt(User user, List<Artwork> publicArtworks, Collection<Store> stores) {
         Map<Long, Set<String>> tagsByStore = new LinkedHashMap<>();
-        for (Artwork artwork : artworkRepository.findAllByOrderByArtworkIdAsc()) {
+        for (Artwork artwork : publicArtworks) {
             Set<String> tags = tagsByStore.computeIfAbsent(artwork.getStore().getStoreId(), id -> new LinkedHashSet<>());
             tags.addAll(ArtworkMapper.colorCodes(artwork));
             tags.addAll(ArtworkMapper.motifCodes(artwork));
@@ -99,7 +107,7 @@ public class AiStrategy implements RecommendationStrategy {
         tasteProfileRepository.findByUserUserId(user.getUserId()).ifPresent((TasteProfile p) -> prompt
                 .append("User preferences: ").append(UserMapper.toResponse(p)).append('\n'));
         prompt.append("Stores:\n");
-        for (Store store : storeRepository.findAllWithMaster()) {
+        for (Store store : stores) {
             prompt.append(store.getStoreId()).append(" | ").append(store.getNameEn())
                     .append(" | tags=").append(tagsByStore.getOrDefault(store.getStoreId(), Set.of())).append('\n');
         }

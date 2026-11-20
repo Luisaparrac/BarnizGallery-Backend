@@ -4,7 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
@@ -14,6 +17,7 @@ import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import com.barnizgallery.backend.TestEntities;
 import com.barnizgallery.backend.TestFactories;
@@ -32,7 +36,6 @@ import com.barnizgallery.backend.repository.ArtworkCatalogViewRepository;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.InteractionRepository;
 import com.barnizgallery.backend.repository.StoreInteraction;
-import com.barnizgallery.backend.repository.StoreRepository;
 import com.barnizgallery.backend.repository.TasteProfileRepository;
 
 /**
@@ -209,17 +212,44 @@ class RecommendationStrategiesTest {
 
     @Test
     void aiStrategyRefusesToRunWhenAiIsDisabled() {
-        AiStrategy aiStrategy = new AiStrategy(new DisabledAiClient(), mock(StoreRepository.class), artworkRepository,
-                tasteProfileRepository, hybridStrategy);
+        AiStrategy aiStrategy = new AiStrategy(new DisabledAiClient(), publicCatalog, tasteProfileRepository,
+                hybridStrategy);
 
         assertThatThrownBy(() -> aiStrategy.recommend(userEs)).isInstanceOf(FeatureDisabledException.class);
     }
 
     @Test
+    void aiStrategyOnlyOffersStoresOfThePublicCatalog() {
+        AiTextClient ai = mock(AiTextClient.class);
+        when(ai.isEnabled()).thenReturn(true);
+        when(ai.complete(anyString(), anyString())).thenReturn("1|90|Colores que te gustan\n2|80|Tienda sin publicar");
+        when(catalogRepository.findAllArtworkIds()).thenReturn(List.of(10L, 11L));
+        AiStrategy aiStrategy = new AiStrategy(ai, publicCatalog, tasteProfileRepository, hybridStrategy);
+
+        List<RecommendationResult> results = aiStrategy.recommend(userEs);
+
+        assertThat(results).extracting(RecommendationResult::storeId).containsExactly(1L);
+        ArgumentCaptor<String> prompt = ArgumentCaptor.forClass(String.class);
+        verify(ai).complete(anyString(), prompt.capture());
+        assertThat(prompt.getValue()).contains("1 | Store 1").doesNotContain("2 | Store 2");
+    }
+
+    @Test
+    void aiStrategyWithoutPublicArtworksIsEmptyAndDoesNotCallTheProvider() {
+        AiTextClient ai = mock(AiTextClient.class);
+        when(ai.isEnabled()).thenReturn(true);
+        when(catalogRepository.findAllArtworkIds()).thenReturn(List.of());
+        AiStrategy aiStrategy = new AiStrategy(ai, publicCatalog, tasteProfileRepository, hybridStrategy);
+
+        assertThat(aiStrategy.recommend(userEs)).isEmpty();
+        assertThat(aiStrategy.recommendArtworks(userEs)).isEmpty();
+        verify(ai, never()).complete(anyString(), anyString());
+    }
+
+    @Test
     void resolverPicksByNameAndDefaultsToHybrid() {
         AiTextClient ai = new DisabledAiClient();
-        AiStrategy aiStrategy = new AiStrategy(ai, mock(StoreRepository.class), artworkRepository,
-                tasteProfileRepository, hybridStrategy);
+        AiStrategy aiStrategy = new AiStrategy(ai, publicCatalog, tasteProfileRepository, hybridStrategy);
         RecommendationStrategyResolver resolver = new RecommendationStrategyResolver(
                 List.of(profileStrategy, interactionStrategy, hybridStrategy, aiStrategy), ai);
 
