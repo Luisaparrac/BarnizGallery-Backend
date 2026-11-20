@@ -2,6 +2,7 @@ package com.barnizgallery.backend.mapper;
 
 import java.util.List;
 
+import com.barnizgallery.backend.dto.ArtisanOrderLineResponse;
 import com.barnizgallery.backend.dto.OrderItemResponse;
 import com.barnizgallery.backend.dto.OrderResponse;
 import com.barnizgallery.backend.dto.OrderStatusChangeResponse;
@@ -33,6 +34,16 @@ public final class OrderMapper {
         return new OrderSummaryResponse(order.getOrderId(), order.getOrderCode(), order.getOrderType(),
                 order.getStatus(), order.getTotal(), order.getCurrency(), order.getPaymentDueAt(), order.getPaidAt(),
                 order.getCreatedAt());
+    }
+
+    public static ArtisanOrderLineResponse toArtisanLine(OrderItem item) {
+        Order order = item.getOrder();
+        Artwork artwork = item.getArtwork();
+        return new ArtisanOrderLineResponse(item.getOrderItemId(), order.getOrderId(), order.getOrderCode(),
+                order.getStatus(), order.getPaidAt(), artwork == null ? null : artwork.getArtworkId(),
+                artwork == null ? null : artwork.getTitleEs(), artwork == null ? null : artwork.getTitleEn(),
+                item.getQuantity(), item.getLineTotal(), item.getArtisanNetAmount(), item.getCurrency(),
+                item.getFulfillmentStatus(), item.getCarrier(), item.getTrackingNumber(), order.getShippingAddress());
     }
 
     public static OrderItemResponse toResponse(OrderItem item) {

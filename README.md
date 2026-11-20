@@ -243,6 +243,11 @@ the artisan) and `ADMIN_APPROVAL` (the administrator's final decision).
 | Method | Path | Description |
 |---|---|---|
 
+### Shipping (artisans)
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/artisans/me/orders` | Paid lines of the store (`PAID`, `IN_PREPARATION`, `SHIPPED`, `DELIVERED` orders) with buyer address, amounts and `fulfillmentStatus` |
+
 ### Cart and orders
 | Method | Path | Description |
 |---|---|---|
