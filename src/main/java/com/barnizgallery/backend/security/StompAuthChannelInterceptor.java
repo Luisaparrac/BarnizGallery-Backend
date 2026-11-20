@@ -19,10 +19,12 @@ import org.springframework.stereotype.Component;
 /**
  * Security of the STOMP channel:
  * <ul>
- * <li>{@code CONNECT} needs a valid access token in the {@code Authorization: Bearer ...} STOMP header;</li>
+ * <li>{@code CONNECT} without an {@code Authorization} header opens an anonymous session that can only follow
+ * {@code /topic/auctions/**}; with the header, the access token must be valid (a wrong token is refused, never
+ * downgraded to anonymous);</li>
  * <li>a user may only subscribe to {@code /topic/users/<own id>/notifications};</li>
  * <li>{@code /topic/admin/**} is only for administrators;</li>
- * <li>{@code /topic/auctions/**} stays open to every connected client, read only;</li>
+ * <li>{@code /topic/auctions/**} is open to every client, logged in or anonymous, read only;</li>
  * <li>clients never send messages: every {@code SEND} is refused.</li>
  * </ul>
  * A refused frame closes the session with a STOMP {@code ERROR} frame.
@@ -30,6 +32,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class StompAuthChannelInterceptor implements ChannelInterceptor {
 
+    static final String AUCTION_TOPICS = "/topic/auctions/";
     static final Pattern USER_TOPIC = Pattern.compile("/topic/users/(\\d+)/notifications");
 
     private final JwtDecoder jwtDecoder;
@@ -46,7 +49,10 @@ public class StompAuthChannelInterceptor implements ChannelInterceptor {
         }
         StompCommand command = accessor.getCommand();
         if (command == StompCommand.CONNECT) {
-            accessor.setUser(authenticate(accessor.getFirstNativeHeader("Authorization")));
+            String header = accessor.getFirstNativeHeader("Authorization");
+            if (header != null) {
+                accessor.setUser(authenticate(header));
+            }
         } else if (command == StompCommand.SUBSCRIBE) {
             checkSubscription(accessor.getDestination(), (Authentication) accessor.getUser());
         } else if (command == StompCommand.SEND) {
@@ -56,7 +62,7 @@ public class StompAuthChannelInterceptor implements ChannelInterceptor {
     }
 
     private Authentication authenticate(String header) {
-        if (header == null || !header.startsWith("Bearer ")) {
+        if (!header.startsWith("Bearer ")) {
             throw new MessageDeliveryException("A Bearer access token is required to connect");
         }
         try {
@@ -72,8 +78,14 @@ public class StompAuthChannelInterceptor implements ChannelInterceptor {
     }
 
     static void checkSubscription(String destination, Authentication user) {
-        if (destination == null || user == null) {
+        if (destination == null) {
             throw new MessageDeliveryException("Subscription refused");
+        }
+        if (user == null) {
+            if (!destination.startsWith(AUCTION_TOPICS)) {
+                throw new MessageDeliveryException("Log in to follow this topic");
+            }
+            return;
         }
         Matcher userTopic = USER_TOPIC.matcher(destination);
         if (userTopic.matches()) {
@@ -89,7 +101,7 @@ public class StompAuthChannelInterceptor implements ChannelInterceptor {
             }
             return;
         }
-        if (!destination.startsWith("/topic/auctions/")) {
+        if (!destination.startsWith(AUCTION_TOPICS)) {
             throw new MessageDeliveryException("Unknown topic");
         }
     }

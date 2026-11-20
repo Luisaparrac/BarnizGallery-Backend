@@ -44,8 +44,6 @@ class StompAuthChannelInterceptorTest {
 
         Authentication user = (Authentication) StompHeaderAccessor.wrap(accepted).getUser();
         assertThat(user.getName()).isEqualTo("7");
-        assertThatThrownBy(() -> interceptor.preSend(message(StompHeaderAccessor.create(StompCommand.CONNECT)),
-                channel)).isInstanceOf(MessageDeliveryException.class);
         StompHeaderAccessor forged = StompHeaderAccessor.create(StompCommand.CONNECT);
         forged.setNativeHeader("Authorization", "Bearer not.a.token");
         assertThatThrownBy(() -> interceptor.preSend(message(forged), channel))
@@ -68,6 +66,19 @@ class StompAuthChannelInterceptorTest {
                 .isInstanceOf(MessageDeliveryException.class);
         assertThatCode(() -> StompAuthChannelInterceptor.checkSubscription("/topic/admin/anomalies",
                 authentication(1, UserRole.ADMIN))).doesNotThrowAnyException();
+    }
+
+    @Test
+    void anonymousClientsOnlyFollowAuctions() {
+        Message<?> anonymous = interceptor.preSend(message(StompHeaderAccessor.create(StompCommand.CONNECT)), channel);
+
+        assertThat(StompHeaderAccessor.wrap(anonymous).getUser()).isNull();
+        assertThatCode(() -> StompAuthChannelInterceptor.checkSubscription("/topic/auctions/1", null))
+                .doesNotThrowAnyException();
+        assertThatThrownBy(() -> StompAuthChannelInterceptor.checkSubscription("/topic/users/7/notifications", null))
+                .isInstanceOf(MessageDeliveryException.class);
+        assertThatThrownBy(() -> StompAuthChannelInterceptor.checkSubscription("/topic/admin/anomalies", null))
+                .isInstanceOf(MessageDeliveryException.class);
     }
 
     @Test

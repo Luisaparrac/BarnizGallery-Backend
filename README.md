@@ -336,11 +336,13 @@ of the logged-in user, or else of the `Accept-Language` header (`es` or `en`; Sp
 ## WebSocket contract (STOMP)
 
 - Endpoint: `/ws` with SockJS (`new SockJS(BASE_URL + "/ws")`); native WebSocket clients use `/ws/websocket`.
-- **Authentication:** the `CONNECT` frame must carry the access token in a STOMP header:
+- **Anonymous visitors** can `CONNECT` without headers and follow `/topic/auctions/{auctionId}` only (read only).
+- **Authentication:** logged-in users send the access token in a STOMP header of the `CONNECT` frame:
   `client.connect({ Authorization: "Bearer " + accessToken }, onConnected)` (with `@stomp/stompjs`:
-  `connectHeaders: { Authorization: "Bearer " + accessToken }`). Without a valid token the server answers with
-  an `ERROR` frame and closes the session; reconnect with a fresh token after `/api/auth/refresh`.
-- **Subscriptions:** `/topic/auctions/{auctionId}` for every connected user; `/topic/users/{userId}/notifications`
+  `connectHeaders: { Authorization: "Bearer " + accessToken }`). An invalid or expired token is answered with an
+  `ERROR` frame that closes the session (it is never treated as anonymous); reconnect with a fresh token after
+  `/api/auth/refresh`.
+- **Subscriptions:** `/topic/auctions/{auctionId}` for everybody, anonymous included; `/topic/users/{userId}/notifications`
   only for that same user; `/topic/admin/**` only for administrators. Topics are read only: `SEND` frames are
   refused.
 - Application prefix: `/app`. Broker prefix: `/topic`.
