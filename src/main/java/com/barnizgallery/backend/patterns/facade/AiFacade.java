@@ -85,6 +85,11 @@ public class AiFacade {
         return strategyResolver.resolve(strategyName).recommend(user);
     }
 
+    /** Recommends available artworks with the strategy chosen by name (Strategy pattern). */
+    public List<RecommendationResult> recommendArtworks(User user, String strategyName) {
+        return strategyResolver.resolve(strategyName).recommendArtworks(user);
+    }
+
     /**
      * Base price suggested by the AI, in the auction currency. The AI service is tried first, then the AI text
      * client. Returns empty when neither gives a valid price (AI disabled, fewer than 3 comparables, errors or

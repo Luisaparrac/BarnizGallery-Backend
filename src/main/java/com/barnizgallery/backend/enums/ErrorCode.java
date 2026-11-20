@@ -80,6 +80,7 @@ public enum ErrorCode {
     UNKNOWN_BUDGET_RANGE,
     UNKNOWN_AVATAR_CODE,
     UNKNOWN_STRATEGY,
+    UNKNOWN_RECOMMENDATION_TARGET,
 
     // Stores and interactions
     MASTER_ALREADY_HAS_STORE,

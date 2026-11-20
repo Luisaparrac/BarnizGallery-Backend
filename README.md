@@ -141,7 +141,7 @@ Dates are ISO-8601 (UTC). Enum values are in English (`EXHIBITED`, `ACTIVE`, `PE
 |---|---|---|
 | POST | `/api/interactions` | `{ userId, artworkId, action, durationSeconds }` – `VIEW` (duration required), `ZOOM`. `BID` interactions are recorded automatically |
 | GET | `/api/users/{id}/interactions` | History |
-| POST | `/api/users/{id}/recommendations?strategy=hybrid` | Compute (`profile`, `interactions`, `hybrid`, `ai`, `ai-service`) and replace previous ones. `ai-service` asks the AI service and falls back to `hybrid` if it is disabled or fails |
+| POST | `/api/users/{id}/recommendations?strategy=hybrid` | Compute recommendations of `target=stores` (default) or `target=artworks` with a strategy (`profile`, `interactions`, `hybrid`, `ai`, `ai-service`) and replace the previous ones of that target. `ai-service` asks the AI service and falls back to `hybrid` if it is disabled or fails |
 | GET | `/api/users/{id}/recommendations` | Last saved recommendations |
 
 ### Auctions and bids

@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * A store recommended to a user (score from 0 to 100).
+ * A store or an artwork recommended to a user (score from 0 to 100); the other id is null.
  */
 public record RecommendationResponse(
         Long recommendationId,

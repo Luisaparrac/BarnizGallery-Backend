@@ -32,11 +32,12 @@ public class RecommendationController {
 
     @PostMapping
     @PreAuthorize("@access.isSelfOrAdmin(#id)")
-    @Operation(summary = "Compute recommendations (strategy = profile | interactions | hybrid | ai | ai-service) "
-            + "and replace the previous ones; ai-service falls back to hybrid when the AI service fails")
+    @Operation(summary = "Compute recommendations of stores or artworks (target = stores | artworks; strategy = "
+            + "profile | interactions | hybrid | ai | ai-service) and replace the previous ones of that target")
     public List<RecommendationResponse> compute(@PathVariable Long id,
-            @RequestParam(defaultValue = "hybrid") String strategy) {
-        return recommendationService.compute(id, strategy);
+            @RequestParam(defaultValue = "hybrid") String strategy,
+            @RequestParam(defaultValue = RecommendationService.STORES) String target) {
+        return recommendationService.compute(id, strategy, target);
     }
 
     @GetMapping

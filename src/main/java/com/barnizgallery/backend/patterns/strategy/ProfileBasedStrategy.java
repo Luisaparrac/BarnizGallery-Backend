@@ -56,6 +56,14 @@ public class ProfileBasedStrategy implements RecommendationStrategy {
         return results;
     }
 
+    @Override
+    public List<RecommendationResult> recommendArtworks(User user) {
+        return matches(user).stream()
+                .map(match -> RecommendationResult.ofArtwork(match.artwork().getArtworkId(), match.score(),
+                        ProfileMatcher.reason(user, match)))
+                .toList();
+    }
+
     /** Available artworks that match some part of the profile, best first. */
     List<ProfileMatch> matches(User user) {
         Optional<TasteProfile> profile = tasteProfileRepository.findByUserUserId(user.getUserId());

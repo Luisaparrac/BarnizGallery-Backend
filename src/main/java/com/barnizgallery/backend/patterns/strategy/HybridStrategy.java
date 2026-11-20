@@ -49,17 +49,30 @@ public class HybridStrategy implements RecommendationStrategy {
         if (interactionRepository.countByUserUserId(user.getUserId()) < MIN_INTERACTIONS) {
             return byProfile;
         }
-        List<RecommendationResult> byInteractions = interactionStrategy.recommend(user);
+        return combine(interactionStrategy.recommend(user), byProfile, false);
+    }
 
+    @Override
+    public List<RecommendationResult> recommendArtworks(User user) {
+        List<RecommendationResult> byProfile = profileStrategy.recommendArtworks(user);
+        if (interactionRepository.countByUserUserId(user.getUserId()) < MIN_INTERACTIONS) {
+            return byProfile;
+        }
+        return combine(interactionStrategy.recommendArtworks(user), byProfile, true);
+    }
+
+    /** 60 % interactions + 40 % profile for every store (or artwork) found by either strategy. */
+    private static List<RecommendationResult> combine(List<RecommendationResult> byInteractions,
+            List<RecommendationResult> byProfile, boolean artworks) {
         Map<Long, RecommendationResult> profileMap = toMap(byProfile);
         Map<Long, RecommendationResult> interactionMap = toMap(byInteractions);
-        Set<Long> storeIds = new LinkedHashSet<>(interactionMap.keySet());
-        storeIds.addAll(profileMap.keySet());
+        Set<Long> ids = new LinkedHashSet<>(interactionMap.keySet());
+        ids.addAll(profileMap.keySet());
 
         List<RecommendationResult> results = new ArrayList<>();
-        for (Long storeId : storeIds) {
-            RecommendationResult fromInteractions = interactionMap.get(storeId);
-            RecommendationResult fromProfile = profileMap.get(storeId);
+        for (Long id : ids) {
+            RecommendationResult fromInteractions = interactionMap.get(id);
+            RecommendationResult fromProfile = profileMap.get(id);
             double score = INTERACTION_WEIGHT * scoreOf(fromInteractions) + PROFILE_WEIGHT * scoreOf(fromProfile);
             List<String> reasons = new ArrayList<>();
             if (fromInteractions != null) {
@@ -68,7 +81,9 @@ public class HybridStrategy implements RecommendationStrategy {
             if (fromProfile != null) {
                 reasons.add(fromProfile.reason());
             }
-            results.add(RecommendationResult.of(storeId, score, String.join(" · ", reasons)));
+            String reason = String.join(" · ", reasons);
+            results.add(artworks ? RecommendationResult.ofArtwork(id, score, reason)
+                    : RecommendationResult.of(id, score, reason));
         }
         results.sort(Comparator.comparing(RecommendationResult::score).reversed());
         return results;
@@ -76,7 +91,7 @@ public class HybridStrategy implements RecommendationStrategy {
 
     private static Map<Long, RecommendationResult> toMap(List<RecommendationResult> results) {
         Map<Long, RecommendationResult> map = new LinkedHashMap<>();
-        results.forEach(r -> map.put(r.storeId(), r));
+        results.forEach(r -> map.put(r.targetId(), r));
         return map;
     }
 

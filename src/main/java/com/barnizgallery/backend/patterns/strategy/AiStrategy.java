@@ -48,13 +48,15 @@ public class AiStrategy implements RecommendationStrategy {
     private final StoreRepository storeRepository;
     private final ArtworkRepository artworkRepository;
     private final TasteProfileRepository tasteProfileRepository;
+    private final HybridStrategy hybridStrategy;
 
     public AiStrategy(AiTextClient aiClient, StoreRepository storeRepository, ArtworkRepository artworkRepository,
-            TasteProfileRepository tasteProfileRepository) {
+            TasteProfileRepository tasteProfileRepository, HybridStrategy hybridStrategy) {
         this.aiClient = aiClient;
         this.storeRepository = storeRepository;
         this.artworkRepository = artworkRepository;
         this.tasteProfileRepository = tasteProfileRepository;
+        this.hybridStrategy = hybridStrategy;
     }
 
     @Override
@@ -73,6 +75,15 @@ public class AiStrategy implements RecommendationStrategy {
         List<RecommendationResult> results = parse(answer, validStores);
         results.sort(Comparator.comparing(RecommendationResult::score).reversed());
         return results;
+    }
+
+    /** The text model only ranks stores; artworks are recommended by the hybrid strategy. */
+    @Override
+    public List<RecommendationResult> recommendArtworks(User user) {
+        if (!aiClient.isEnabled()) {
+            throw new FeatureDisabledException(ErrorCode.AI_STRATEGY_DISABLED);
+        }
+        return hybridStrategy.recommendArtworks(user);
     }
 
     private String buildUserPrompt(User user) {

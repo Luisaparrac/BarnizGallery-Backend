@@ -13,13 +13,18 @@ import com.barnizgallery.backend.entity.Recommendation;
  */
 public interface RecommendationRepository extends JpaRepository<Recommendation, Long> {
 
-    /** Saved recommendations of a user with their store, best score first. */
-    @Query("select r from Recommendation r join fetch r.store where r.user.userId = :userId "
-            + "order by r.score desc nulls last, r.recommendationId")
-    List<Recommendation> findByUserWithStore(Long userId);
+    /** Saved recommendations of a user (stores and artworks), best score first. */
+    @Query("select r from Recommendation r left join fetch r.store left join fetch r.artwork "
+            + "where r.user.userId = :userId order by r.score desc nulls last, r.recommendationId")
+    List<Recommendation> findByUserWithTarget(Long userId);
 
-    /** Removes the previous recommendations of a user before saving new ones. */
+    /** Removes the previous store recommendations of a user before saving new ones. */
     @Modifying
-    @Query("delete from Recommendation r where r.user.userId = :userId")
-    int deleteByUserId(Long userId);
+    @Query("delete from Recommendation r where r.user.userId = :userId and r.store is not null")
+    int deleteStoresByUserId(Long userId);
+
+    /** Removes the previous artwork recommendations of a user before saving new ones. */
+    @Modifying
+    @Query("delete from Recommendation r where r.user.userId = :userId and r.artwork is not null")
+    int deleteArtworksByUserId(Long userId);
 }

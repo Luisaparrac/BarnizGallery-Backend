@@ -8,8 +8,10 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
+import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.User;
 import com.barnizgallery.backend.patterns.factorymethod.InteractionFactoryProvider;
+import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.InteractionRepository;
 import com.barnizgallery.backend.repository.StoreInteraction;
 
@@ -29,11 +31,13 @@ public class InteractionBasedStrategy implements RecommendationStrategy {
 
     private final InteractionRepository interactionRepository;
     private final InteractionFactoryProvider factoryProvider;
+    private final ArtworkRepository artworkRepository;
 
     public InteractionBasedStrategy(InteractionRepository interactionRepository,
-            InteractionFactoryProvider factoryProvider) {
+            InteractionFactoryProvider factoryProvider, ArtworkRepository artworkRepository) {
         this.interactionRepository = interactionRepository;
         this.factoryProvider = factoryProvider;
+        this.artworkRepository = artworkRepository;
     }
 
     @Override
@@ -64,6 +68,27 @@ public class InteractionBasedStrategy implements RecommendationStrategy {
                     "You interacted " + count + " times with artworks in this store");
             results.add(RecommendationResult.of(storeId, 100.0 * points / max, reason));
         });
+        results.sort(Comparator.comparing(RecommendationResult::score).reversed());
+        return results;
+    }
+
+    /** Available artworks of the stores the user interacted with; each one gets the score of its store. */
+    @Override
+    public List<RecommendationResult> recommendArtworks(User user) {
+        Map<Long, RecommendationResult> byStore = new LinkedHashMap<>();
+        recommend(user).forEach(result -> byStore.put(result.storeId(), result));
+        if (byStore.isEmpty()) {
+            return List.of();
+        }
+        List<RecommendationResult> results = new ArrayList<>();
+        for (Artwork artwork : artworkRepository.findByDeletedAtIsNullAndStatusInOrderByArtworkIdAsc(
+                ProfileBasedStrategy.AVAILABLE, AiServiceStrategy.CANDIDATES)) {
+            RecommendationResult store = byStore.get(artwork.getStore().getStoreId());
+            if (store != null) {
+                results.add(RecommendationResult.ofArtwork(artwork.getArtworkId(), store.score().doubleValue(),
+                        store.reason()));
+            }
+        }
         results.sort(Comparator.comparing(RecommendationResult::score).reversed());
         return results;
     }

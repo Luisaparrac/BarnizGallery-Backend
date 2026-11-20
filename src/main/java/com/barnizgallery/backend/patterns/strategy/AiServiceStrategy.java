@@ -91,6 +91,30 @@ public class AiServiceStrategy implements RecommendationStrategy {
         }
     }
 
+    /** Artworks ranked by the AI service (score 0-1 → 0-100); falls back to the hybrid strategy. */
+    @Override
+    public List<RecommendationResult> recommendArtworks(User user) {
+        if (!aiService.isAvailable()) {
+            return fallback.recommendArtworks(user);
+        }
+        List<Artwork> available = artworkRepository.findByDeletedAtIsNullAndStatusInOrderByArtworkIdAsc(AVAILABLE,
+                CANDIDATES);
+        if (available.isEmpty()) {
+            return fallback.recommendArtworks(user);
+        }
+        try {
+            List<AiRecommendationItem> items = aiService.recommend(request(user, available)).items();
+            return (items == null ? List.<AiRecommendationItem>of() : items).stream()
+                    .filter(item -> item.score() > 0)
+                    .map(item -> RecommendationResult.ofArtwork(item.artworkId(), item.score() * 100,
+                            AiReasonText.describe(user, item.reasons() == null ? List.of() : List.of(item.reasons()))))
+                    .toList();
+        } catch (AiServiceException ex) {
+            log.warn("Artwork recommendations for user {} without the AI service: {}", user.getUserId(), ex.getCode());
+            return fallback.recommendArtworks(user);
+        }
+    }
+
     private AiRecommendationRequest request(User user, List<Artwork> available) {
         Map<Long, Long> popularity = interactionRepository.countGroupedByArtwork().stream()
                 .collect(Collectors.toMap(ArtworkInteractionCount::getArtworkId,

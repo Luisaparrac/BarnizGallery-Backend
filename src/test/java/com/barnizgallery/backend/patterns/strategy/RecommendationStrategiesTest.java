@@ -60,7 +60,7 @@ class RecommendationStrategiesTest {
     @BeforeEach
     void setUp() {
         profileStrategy = new ProfileBasedStrategy(tasteProfileRepository, artworkRepository);
-        interactionStrategy = new InteractionBasedStrategy(interactionRepository, factoryProvider);
+        interactionStrategy = new InteractionBasedStrategy(interactionRepository, factoryProvider, artworkRepository);
         hybridStrategy = new HybridStrategy(profileStrategy, interactionStrategy, interactionRepository);
         when(artworkRepository.findByDeletedAtIsNullAndStatusInOrderByArtworkIdAsc(anyCollection(), any()))
                 .thenReturn(List.of(
@@ -180,7 +180,7 @@ class RecommendationStrategiesTest {
     @Test
     void aiStrategyRefusesToRunWhenAiIsDisabled() {
         AiStrategy aiStrategy = new AiStrategy(new DisabledAiClient(), mock(StoreRepository.class), artworkRepository,
-                tasteProfileRepository);
+                tasteProfileRepository, hybridStrategy);
 
         assertThatThrownBy(() -> aiStrategy.recommend(userEs)).isInstanceOf(FeatureDisabledException.class);
     }
@@ -189,7 +189,7 @@ class RecommendationStrategiesTest {
     void resolverPicksByNameAndDefaultsToHybrid() {
         AiTextClient ai = new DisabledAiClient();
         AiStrategy aiStrategy = new AiStrategy(ai, mock(StoreRepository.class), artworkRepository,
-                tasteProfileRepository);
+                tasteProfileRepository, hybridStrategy);
         RecommendationStrategyResolver resolver = new RecommendationStrategyResolver(
                 List.of(profileStrategy, interactionStrategy, hybridStrategy, aiStrategy), ai);
 
