@@ -334,6 +334,22 @@ Checkout amounts (`OrderBuilder`, Builder pattern): fee per line = line total ×
 rounded half up to cents; artisan net = line total − fee; total = subtotal + shipping. Shipping comes from
 `shipping.fixed_amount.<CURRENCY>` or, for orders in `currency.default`, from `shipping.fixed_amount`.
 
+### Custom orders (encargos)
+| Method | Path | Who | Description |
+|---|---|---|---|
+| GET / POST | `/api/custom-requests` | Customer | Own requests / create a draft `{ title, description, shapeId, styleId, colorIds, motifIds, sizeNotes, offeredPrice, desiredDate, targetMasterId }` |
+| GET / PUT | `/api/custom-requests/{id}` | Customer (owner) | Read / edit a draft |
+| POST | `/api/custom-requests/{id}/publish` · `/cancel` | Customer (owner) | Publish (description required, design not required) / cancel a draft or open request |
+| POST | `/api/custom-requests/{id}/offers` | Approved artisan | `{ type: ACCEPT_PRICE \| COUNTER_OFFER, price, estimatedDays, message }`; the customer gets `NEW_CUSTOM_OFFER` |
+| POST | `/api/custom-requests/{id}/offers/{offerId}/withdraw` | Approved artisan (owner) | Withdraw an active offer (stored as expired) |
+| POST | `/api/custom-requests/{id}/offers/{offerId}/accept` · `/reject` | Customer (owner) | Accept → `{ request, orderId }`: other offers rejected (`OFFER_REJECTED`), `encargo` order with `anticipo` (`custom_orders.deposit_percent`) and `saldo` obligations (`OFFER_ACCEPTED`) / reject one |
+| POST | `/api/custom-requests/{id}/decline` | Approved artisan | `{ reason }`; the customer of a request addressed to them is told (declines are not stored) |
+| GET | `/api/artisan/custom-requests/open` · `/accepted` · `/declined` | Approved artisan | Open requests for everybody or for them / accepted offers / always empty |
+
+Statuses follow the frontend names (`DRAFT`, `PUBLISHED`, `WITH_OFFERS`, `ACCEPTED`, `IN_PRODUCTION`, `DELIVERED`,
+`CANCELLED`, `EXPIRED`); `state` keeps the approved one. The approved deposit payment moves the request to
+`IN_PRODUCTION` and the balance to `COMPLETED`.
+
 ### Payments
 | Method | Path | Description |
 |---|---|---|

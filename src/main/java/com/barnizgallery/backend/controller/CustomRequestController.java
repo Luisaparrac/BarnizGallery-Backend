@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.barnizgallery.backend.dto.AcceptOfferResponse;
 import com.barnizgallery.backend.dto.CustomRequestInput;
 import com.barnizgallery.backend.dto.CustomRequestResponse;
+import com.barnizgallery.backend.dto.DeclineRequest;
 import com.barnizgallery.backend.dto.OfferInput;
+import com.barnizgallery.backend.service.ArtisanCustomRequestService;
 import com.barnizgallery.backend.service.CustomOfferService;
 import com.barnizgallery.backend.service.CustomRequestService;
 
@@ -33,10 +35,20 @@ public class CustomRequestController {
 
     private final CustomRequestService requestService;
     private final CustomOfferService offerService;
+    private final ArtisanCustomRequestService artisanService;
 
-    public CustomRequestController(CustomRequestService requestService, CustomOfferService offerService) {
+    public CustomRequestController(CustomRequestService requestService, CustomOfferService offerService,
+            ArtisanCustomRequestService artisanService) {
         this.requestService = requestService;
         this.offerService = offerService;
+        this.artisanService = artisanService;
+    }
+
+    @PostMapping("/{id}/decline")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Approved artisan: decline a request; if it was addressed to them the customer is told")
+    public void decline(@PathVariable Long id, @RequestBody(required = false) DeclineRequest request) {
+        artisanService.decline(id, request == null ? null : request.reason());
     }
 
     @PostMapping("/{id}/offers")

@@ -53,7 +53,8 @@ class PaymentFlowTest {
     private final PaymentStartService starter = new PaymentStartService(orders, obligations, payments, registry,
             settings, clock, "https://front.test/");
     private final PaymentWebhookService webhooks = new PaymentWebhookService(registry, events, payments, clock,
-            new PaymentResultApplier(payments), notifier);
+            new PaymentResultApplier(payments), notifier,
+            mock(CustomOrderProgress.class));
 
     private final Order order = new Order();
     private final PaymentObligation obligation = new PaymentObligation();
