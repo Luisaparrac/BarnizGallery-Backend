@@ -3,6 +3,7 @@ package com.barnizgallery.backend.controller;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,11 +12,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.barnizgallery.backend.dto.PaymentDetailResponse;
 import com.barnizgallery.backend.dto.PaymentResponse;
 import com.barnizgallery.backend.dto.PaymentStartResponse;
 import com.barnizgallery.backend.dto.SimulatedPaymentRequest;
 import com.barnizgallery.backend.dto.StartPaymentRequest;
 import com.barnizgallery.backend.patterns.adapter.WebhookCall;
+import com.barnizgallery.backend.service.PaymentQueryService;
 import com.barnizgallery.backend.service.PaymentSimulationService;
 import com.barnizgallery.backend.service.PaymentStartService;
 import com.barnizgallery.backend.service.PaymentWebhookService;
@@ -35,12 +38,20 @@ public class PaymentController {
     private final PaymentStartService startService;
     private final PaymentWebhookService webhookService;
     private final PaymentSimulationService simulationService;
+    private final PaymentQueryService queryService;
 
     public PaymentController(PaymentStartService startService, PaymentWebhookService webhookService,
-            PaymentSimulationService simulationService) {
+            PaymentSimulationService simulationService, PaymentQueryService queryService) {
+        this.queryService = queryService;
         this.startService = startService;
         this.webhookService = webhookService;
         this.simulationService = simulationService;
+    }
+
+    @GetMapping("/payments/{paymentId}")
+    @Operation(summary = "A payment of an own order (404 for someone else's)")
+    public PaymentDetailResponse findPayment(@PathVariable Long paymentId) {
+        return queryService.mine(paymentId);
     }
 
     @PostMapping("/payments/{paymentId}/simulate")
