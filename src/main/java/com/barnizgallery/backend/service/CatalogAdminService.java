@@ -11,6 +11,7 @@ import com.barnizgallery.backend.entity.CatalogEntry;
 import com.barnizgallery.backend.entity.Color;
 import com.barnizgallery.backend.entity.Motif;
 import com.barnizgallery.backend.entity.Shape;
+import com.barnizgallery.backend.entity.Style;
 import com.barnizgallery.backend.enums.CatalogKind;
 import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.exception.BusinessRuleException;
@@ -20,6 +21,7 @@ import com.barnizgallery.backend.repository.CatalogEntryRepository;
 import com.barnizgallery.backend.repository.ColorRepository;
 import com.barnizgallery.backend.repository.MotifRepository;
 import com.barnizgallery.backend.repository.ShapeRepository;
+import com.barnizgallery.backend.repository.StyleRepository;
 
 /**
  * Administration of the simple catalogs. Entries are created with a unique code and edited by code; the code
@@ -32,12 +34,15 @@ public class CatalogAdminService {
     private final ColorRepository colorRepository;
     private final ShapeRepository shapeRepository;
     private final MotifRepository motifRepository;
+    private final StyleRepository styleRepository;
 
     public CatalogAdminService(ColorRepository colorRepository, ShapeRepository shapeRepository,
-            MotifRepository motifRepository) {
+            MotifRepository motifRepository,
+            StyleRepository styleRepository) {
         this.colorRepository = colorRepository;
         this.shapeRepository = shapeRepository;
         this.motifRepository = motifRepository;
+        this.styleRepository = styleRepository;
     }
 
     /** Every entry, active or not. */
@@ -87,6 +92,7 @@ public class CatalogAdminService {
             case COLORS -> colorRepository;
             case SHAPES -> shapeRepository;
             case MOTIFS -> motifRepository;
+            case STYLES -> styleRepository;
         };
         return (CatalogEntryRepository<CatalogEntry>) repository;
     }
@@ -96,6 +102,7 @@ public class CatalogAdminService {
             case COLORS -> new Color();
             case SHAPES -> new Shape();
             case MOTIFS -> new Motif();
+            case STYLES -> new Style();
         };
     }
 }
