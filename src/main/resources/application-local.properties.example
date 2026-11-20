@@ -1,6 +1,7 @@
 # Copy this file to application-local.properties (ignored by git) and fill in the values.
 # Run locally with: .\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=local"
 # The database must start as a restore of the v1 backup: Flyway records it as baseline 1 and applies V2.
+# Also set the JWT_SECRET environment variable (at least 32 random bytes) before starting the app.
 spring.datasource.url=jdbc:postgresql://localhost:5432/museo_local
 spring.datasource.username=<USERNAME>
 spring.datasource.password=<PASSWORD>

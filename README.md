@@ -79,6 +79,8 @@ Requirements: Java 21 and a local PostgreSQL 18.
 |---|---|---|
 | `DB_URL` | JDBC URL. On Render use the **internal** URL: `jdbc:postgresql://<INTERNAL_HOST>:5432/museo_hm45` | – |
 | `DB_USERNAME` / `DB_PASSWORD` | Database credentials | – |
+| `JWT_SECRET` | HS256 signing key, at least 32 bytes. **Required**: the app does not start without it | – |
+| `JWT_ACCESS_MINUTES` / `JWT_REFRESH_DAYS` | Lifetime of access tokens (minutes) and refresh tokens (days) | `15` / `7` |
 | `FLYWAY_ENABLED` | Run the Flyway migrations on start (baseline 1 on an existing v1 database, then V2) | `true` |
 | `PORT` | HTTP port (set by Render) | `8080` |
 | `CORS_ALLOWED_ORIGINS` | Comma-separated frontend origins (REST and WebSocket) | `http://localhost:5173,http://localhost:3000` |
