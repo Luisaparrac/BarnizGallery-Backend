@@ -16,6 +16,7 @@ import com.barnizgallery.backend.dto.OrderResponse;
 import com.barnizgallery.backend.dto.OrderStatusChangeResponse;
 import com.barnizgallery.backend.dto.OrderSummaryResponse;
 import com.barnizgallery.backend.service.CheckoutService;
+import com.barnizgallery.backend.service.OrderCancelService;
 import com.barnizgallery.backend.service.OrderQueryService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,8 +33,11 @@ public class OrderController {
 
     private final CheckoutService checkoutService;
     private final OrderQueryService queryService;
+    private final OrderCancelService cancelService;
 
-    public OrderController(CheckoutService checkoutService, OrderQueryService queryService) {
+    public OrderController(CheckoutService checkoutService, OrderQueryService queryService,
+            OrderCancelService cancelService) {
+        this.cancelService = cancelService;
         this.checkoutService = checkoutService;
         this.queryService = queryService;
     }
@@ -42,6 +46,12 @@ public class OrderController {
     @Operation(summary = "The buyer's orders, newest first")
     public List<OrderSummaryResponse> mine() {
         return queryService.mine();
+    }
+
+    @PostMapping("/{orderId}/cancel")
+    @Operation(summary = "Cancel an own order waiting for payment; the reserved stock is released (409 otherwise)")
+    public OrderResponse cancel(@PathVariable Long orderId) {
+        return cancelService.cancel(orderId);
     }
 
     @GetMapping("/{orderId}/history")

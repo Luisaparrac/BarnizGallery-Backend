@@ -315,6 +315,7 @@ the artisan) and `ADMIN_APPROVAL` (the administrator's final decision).
 | GET | `/api/orders` | The buyer's orders, newest first |
 | GET | `/api/orders/{orderId}` | An own order with lines (`fulfillmentStatus`, carrier, tracking) and payment obligations |
 | GET | `/api/orders/{orderId}/history` | Status changes recorded by the database (`oldStatus`, `newStatus`, `changedAt`, `note`) |
+| POST | `/api/orders/{orderId}/cancel` | Cancel an own order still `PENDING_PAYMENT` without a payment in progress; the database releases the reservations (409 otherwise) |
 
 Checkout amounts (`OrderBuilder`, Builder pattern): fee per line = line total × `platform.commission_rate`,
 rounded half up to cents; artisan net = line total − fee; total = subtotal + shipping. Shipping comes from
