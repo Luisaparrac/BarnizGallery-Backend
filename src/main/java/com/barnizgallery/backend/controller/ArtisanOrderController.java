@@ -3,14 +3,19 @@ package com.barnizgallery.backend.controller;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.barnizgallery.backend.dto.ArtisanOrderLineResponse;
+import com.barnizgallery.backend.dto.ShipmentRequest;
 import com.barnizgallery.backend.service.FulfillmentService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 
 /**
  * Paid order lines of the logged-in artisan's store and their shipping. Only for artisans.
@@ -30,5 +35,11 @@ public class ArtisanOrderController {
     @Operation(summary = "Paid lines of the store with the shipping address, newest order first")
     public List<ArtisanOrderLineResponse> lines() {
         return fulfillmentService.lines();
+    }
+
+    @PostMapping("/items/{orderItemId}/ship")
+    @Operation(summary = "Mark a paid line as shipped with carrier and tracking number; the buyer is notified")
+    public ArtisanOrderLineResponse ship(@PathVariable Long orderItemId, @Valid @RequestBody ShipmentRequest request) {
+        return fulfillmentService.ship(orderItemId, request);
     }
 }

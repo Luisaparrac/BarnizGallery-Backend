@@ -8,7 +8,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.barnizgallery.backend.dto.ArtisanOrderLineResponse;
+import com.barnizgallery.backend.dto.ShipmentRequest;
+import com.barnizgallery.backend.entity.Order;
+import com.barnizgallery.backend.entity.OrderItem;
+import com.barnizgallery.backend.enums.ErrorCode;
+import com.barnizgallery.backend.enums.FulfillmentStatus;
 import com.barnizgallery.backend.enums.OrderStatus;
+import com.barnizgallery.backend.exception.BusinessRuleException;
+import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.mapper.OrderMapper;
 import com.barnizgallery.backend.repository.OrderItemRepository;
 
@@ -22,11 +29,50 @@ public class FulfillmentService {
             OrderStatus.SHIPPED, OrderStatus.DELIVERED);
 
     private final OrderItemRepository itemRepository;
-    private final StoreEditorService editorService;
+    static final String ORDER_SHIPPED = "order_shipped";
 
-    public FulfillmentService(OrderItemRepository itemRepository, StoreEditorService editorService) {
+    private final StoreEditorService editorService;
+    private final NotificationService notificationService;
+
+    public FulfillmentService(OrderItemRepository itemRepository, StoreEditorService editorService,
+            NotificationService notificationService) {
         this.itemRepository = itemRepository;
         this.editorService = editorService;
+        this.notificationService = notificationService;
+    }
+
+    /**
+     * Marks a paid line as shipped with its carrier and tracking number. The order goes to {@code en_preparacion}
+     * with its first shipped line and to {@code enviado} when every line is shipped; the buyer is notified.
+     */
+    @Transactional
+    public ArtisanOrderLineResponse ship(Long orderItemId, ShipmentRequest request) {
+        OrderItem item = myLine(orderItemId);
+        if (item.getFulfillmentStatus() != FulfillmentStatus.PENDING) {
+            throw new BusinessRuleException(ErrorCode.FULFILLMENT_STEP_INVALID, item.getFulfillmentStatus());
+        }
+        item.setFulfillmentStatus(FulfillmentStatus.SHIPPED);
+        item.setCarrier(request.carrier().trim());
+        item.setTrackingNumber(request.trackingNumber().trim());
+        Order order = item.getOrder();
+        boolean allShipped = lines(order).stream().allMatch(line -> line.getFulfillmentStatus() != FulfillmentStatus.PENDING);
+        order.setStatus(allShipped ? OrderStatus.SHIPPED : OrderStatus.IN_PREPARATION);
+        notificationService.notify(order.getBuyer(), ORDER_SHIPPED, "/orders/" + order.getOrderId(), null,
+                order.getOrderCode(), item.getCarrier(), item.getTrackingNumber());
+        return OrderMapper.toArtisanLine(item);
+    }
+
+    /** A paid line of the artisan's store (404 otherwise). */
+    OrderItem myLine(Long orderItemId) {
+        Long storeId = editorService.myStore().getStoreId();
+        return itemRepository.findById(orderItemId)
+                .filter(item -> item.getStore().getStoreId().equals(storeId))
+                .filter(item -> TO_FULFIL.contains(item.getOrder().getStatus()))
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.ORDER_ITEM_NOT_FOUND, orderItemId));
+    }
+
+    List<OrderItem> lines(Order order) {
+        return itemRepository.findByOrderOrderIdOrderByOrderItemIdAsc(order.getOrderId());
     }
 
     /** Paid lines of the store (paid, in preparation, shipped or delivered orders), newest order first. */

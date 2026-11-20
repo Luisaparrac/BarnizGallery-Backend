@@ -247,6 +247,7 @@ the artisan) and `ADMIN_APPROVAL` (the administrator's final decision).
 | Method | Path | Description |
 |---|---|---|
 | GET | `/api/artisans/me/orders` | Paid lines of the store (`PAID`, `IN_PREPARATION`, `SHIPPED`, `DELIVERED` orders) with buyer address, amounts and `fulfillmentStatus` |
+| POST | `/api/artisans/me/orders/items/{orderItemId}/ship` | `{ carrier, trackingNumber }`: line `PENDING` → `SHIPPED`; the order goes to `IN_PREPARATION`, and to `SHIPPED` when every line is shipped; the buyer is notified |
 
 ### Cart and orders
 | Method | Path | Description |
