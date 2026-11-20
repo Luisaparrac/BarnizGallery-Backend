@@ -58,7 +58,7 @@ public class LoginService {
         }
         limiter.reset(email, ip);
         if (user.getStatus() == UserStatus.SUSPENDED || user.getStatus() == UserStatus.DELETED) {
-            throw BusinessRuleException.forbidden(ErrorCode.ACCOUNT_SUSPENDED);
+            throw BusinessRuleException.forbidden(ErrorCode.SUSPENDED);
         }
         user.setLastLoginAt(clock.instant());
         return sessionIssuer.open(user);

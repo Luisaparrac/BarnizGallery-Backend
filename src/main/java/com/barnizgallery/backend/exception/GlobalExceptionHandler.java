@@ -67,7 +67,7 @@ public class GlobalExceptionHandler {
         if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
             return build(HttpStatus.UNAUTHORIZED, ErrorCode.UNAUTHORIZED, request, null);
         }
-        return build(HttpStatus.FORBIDDEN, ErrorCode.ACCESS_DENIED, request, null);
+        return build(HttpStatus.FORBIDDEN, ErrorCode.FORBIDDEN, request, null);
     }
 
     @ExceptionHandler(NoResourceFoundException.class)

@@ -242,7 +242,8 @@ Public endpoints; every other call sends `Authorization: Bearer <accessToken>`. 
 | Artisan or administrator | Create and edit stores, artworks and photos (an artisan only their own store); suggested prices |
 | Administrator | `/api/admin/**`, masters, creating and closing auctions, any user's data |
 
-A wrong role answers 403 `access_denied`; a missing or expired token answers 401 `unauthorized`.
+A wrong role (or someone else's store) answers 403 `forbidden`, a suspended or deleted account 403 `suspended`, and a
+missing or expired token 401 `unauthorized`. Someone else's order, payment, address or favorite answers 404.
 
 ### Artisan verification (artisans)
 Steps: `EMAIL` (approved by itself when the email is confirmed), `IDENTITY`, `WORKSHOP`, `SAMPLES` (evidence from

@@ -55,8 +55,8 @@ class AccessRulesTest {
         login(7, "ARTISAN");
 
         assertThatCode(() -> ownership.requireStore(own)).doesNotThrowAnyException();
-        assertThatThrownBy(() -> ownership.requireStore(other)).hasMessage("not_owner");
-        assertThatThrownBy(() -> ownership.requireStore(withoutUser)).hasMessage("not_owner");
+        assertThatThrownBy(() -> ownership.requireStore(other)).hasMessage("forbidden");
+        assertThatThrownBy(() -> ownership.requireStore(withoutUser)).hasMessage("forbidden");
 
         login(1, "ADMIN");
         assertThatCode(() -> ownership.requireStore(other)).doesNotThrowAnyException();

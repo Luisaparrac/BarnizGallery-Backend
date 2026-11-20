@@ -28,7 +28,7 @@ public class OwnershipGuard {
         }
         Long userId = currentUser.requireId();
         if (master.getUser() == null || !userId.equals(master.getUser().getUserId())) {
-            throw BusinessRuleException.forbidden(ErrorCode.NOT_OWNER);
+            throw BusinessRuleException.forbidden(ErrorCode.FORBIDDEN);
         }
     }
 

@@ -84,7 +84,7 @@ class LoginServiceTest {
         assertThatThrownBy(() -> service.login(new LoginRequest("user4@test.local", "una-clave-segura"), IP))
                 .isInstanceOfSatisfying(BusinessRuleException.class,
                         ex -> assertThat(ex.getStatus()).isEqualTo(HttpStatus.FORBIDDEN))
-                .hasMessage("account_suspended");
+                .hasMessage("suspended");
     }
 
     private void assertUnauthorized(LoginRequest request) {

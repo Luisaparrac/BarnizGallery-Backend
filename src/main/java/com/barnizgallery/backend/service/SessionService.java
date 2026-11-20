@@ -50,7 +50,7 @@ public class SessionService {
         }
         authTokenService.markUsed(token);
         if (user.getStatus() == UserStatus.SUSPENDED || user.getStatus() == UserStatus.DELETED) {
-            throw BusinessRuleException.forbidden(ErrorCode.ACCOUNT_SUSPENDED);
+            throw BusinessRuleException.forbidden(ErrorCode.SUSPENDED);
         }
         return sessionIssuer.open(user);
     }

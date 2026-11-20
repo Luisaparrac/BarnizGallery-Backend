@@ -98,7 +98,7 @@ class GlobalExceptionHandlerTest {
         try {
             mockMvc.perform(get("/denied"))
                     .andExpect(status().isForbidden())
-                    .andExpect(jsonPath("$.code").value("access_denied"));
+                    .andExpect(jsonPath("$.code").value("forbidden"));
         } finally {
             SecurityContextHolder.clearContext();
         }
