@@ -14,6 +14,8 @@ import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.enums.AuctionStatus;
 import com.barnizgallery.backend.enums.AuthTokenPurpose;
 import com.barnizgallery.backend.enums.BidReviewStatus;
+import com.barnizgallery.backend.enums.CustomRequestStatus;
+import com.barnizgallery.backend.enums.DesignStatus;
 import com.barnizgallery.backend.enums.FulfillmentStatus;
 import com.barnizgallery.backend.enums.InteractionAction;
 import com.barnizgallery.backend.enums.InventoryReservationStatus;
@@ -39,6 +41,12 @@ class EnumConvertersTest {
 
     static Stream<Arguments> mappings() {
         return Stream.of(
+                Arguments.of(new CustomRequestStatusConverter(), CustomRequestStatus.DRAFT, "borrador"),
+                Arguments.of(new CustomRequestStatusConverter(), CustomRequestStatus.OPEN, "abierta"),
+                Arguments.of(new CustomRequestStatusConverter(), CustomRequestStatus.IN_PRODUCTION, "en_produccion"),
+                Arguments.of(new CustomRequestStatusConverter(), CustomRequestStatus.EXPIRED, "vencida"),
+                Arguments.of(new DesignStatusConverter(), DesignStatus.PENDING, "pendiente"),
+                Arguments.of(new DesignStatusConverter(), DesignStatus.FAILED, "fallido"),
                 Arguments.of(new ReportStatusConverter(), ReportStatus.PENDING, "pendiente"),
                 Arguments.of(new ReportStatusConverter(), ReportStatus.RESOLVED, "resuelto"),
                 Arguments.of(new ReportStatusConverter(), ReportStatus.DISMISSED, "descartado"),

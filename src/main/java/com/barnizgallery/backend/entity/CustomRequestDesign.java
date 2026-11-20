@@ -4,7 +4,11 @@ import java.time.Instant;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.barnizgallery.backend.converter.DesignStatusConverter;
+import com.barnizgallery.backend.enums.DesignStatus;
+
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -40,8 +44,9 @@ public class CustomRequestDesign {
     @Column(name = "prompt", nullable = false)
     private String prompt;
 
+    @Convert(converter = DesignStatusConverter.class)
     @Column(name = "status", nullable = false, length = 30)
-    private String status;
+    private DesignStatus status;
 
     @Column(name = "image_url")
     private String imageUrl;
@@ -93,11 +98,11 @@ public class CustomRequestDesign {
         this.prompt = prompt;
     }
 
-    public String getStatus() {
+    public DesignStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(DesignStatus status) {
         this.status = status;
     }
 

@@ -8,7 +8,11 @@ import java.util.Set;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.barnizgallery.backend.converter.CustomRequestStatusConverter;
+import com.barnizgallery.backend.enums.CustomRequestStatus;
+
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -67,8 +71,9 @@ public class CustomRequest {
     @Column(name = "desired_date")
     private Instant desiredDate;
 
+    @Convert(converter = CustomRequestStatusConverter.class)
     @Column(name = "status", nullable = false, length = 30)
-    private String status;
+    private CustomRequestStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "accepted_offer_id")
@@ -181,11 +186,11 @@ public class CustomRequest {
         this.desiredDate = desiredDate;
     }
 
-    public String getStatus() {
+    public CustomRequestStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(CustomRequestStatus status) {
         this.status = status;
     }
 
