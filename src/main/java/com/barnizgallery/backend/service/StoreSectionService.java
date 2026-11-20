@@ -1,6 +1,9 @@
 package com.barnizgallery.backend.service;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +13,7 @@ import com.barnizgallery.backend.dto.StoreSectionResponse;
 import com.barnizgallery.backend.entity.Store;
 import com.barnizgallery.backend.entity.StoreSection;
 import com.barnizgallery.backend.enums.ErrorCode;
+import com.barnizgallery.backend.exception.BusinessRuleException;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.mapper.StoreEditorMapper;
 import com.barnizgallery.backend.repository.StoreSectionRepository;
@@ -47,6 +51,32 @@ public class StoreSectionService {
         StoreSection section = mine(sectionId);
         apply(section, request);
         return StoreEditorMapper.toResponse(section);
+    }
+
+    /** Shows or hides a section; hidden sections stay in the editor but not on the public page. */
+    @Transactional
+    public StoreSectionResponse setVisible(Long sectionId, boolean visible) {
+        StoreSection section = mine(sectionId);
+        section.setVisible(visible);
+        return StoreEditorMapper.toResponse(section);
+    }
+
+    /**
+     * Puts the sections in the given order. The list must name every section of the store exactly once (422
+     * otherwise).
+     */
+    @Transactional
+    public List<StoreSectionResponse> reorder(List<Long> sectionIds) {
+        List<StoreSection> sections = sections(editorService.myStore());
+        Map<Long, StoreSection> byId = new HashMap<>();
+        sections.forEach(section -> byId.put(section.getStoreSectionId(), section));
+        if (sectionIds.size() != sections.size() || !byId.keySet().equals(new HashSet<>(sectionIds))) {
+            throw BusinessRuleException.unprocessable(ErrorCode.SECTION_ORDER_INVALID);
+        }
+        for (int i = 0; i < sectionIds.size(); i++) {
+            byId.get(sectionIds.get(i)).setSortOrder(i);
+        }
+        return sectionIds.stream().map(byId::get).map(StoreEditorMapper::toResponse).toList();
     }
 
     StoreSection mine(Long sectionId) {

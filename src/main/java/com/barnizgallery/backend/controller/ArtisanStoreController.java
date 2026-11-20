@@ -1,5 +1,7 @@
 package com.barnizgallery.backend.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.barnizgallery.backend.dto.CreateStoreRequest;
+import com.barnizgallery.backend.dto.SectionOrderRequest;
+import com.barnizgallery.backend.dto.SectionVisibilityRequest;
 import com.barnizgallery.backend.dto.StoreEditorResponse;
 import com.barnizgallery.backend.dto.StoreSectionRequest;
 import com.barnizgallery.backend.dto.StoreSectionResponse;
@@ -44,6 +48,19 @@ public class ArtisanStoreController {
     @Operation(summary = "Add a visible section at the end of the store page")
     public StoreSectionResponse addSection(@Valid @RequestBody StoreSectionRequest request) {
         return sectionService.add(request);
+    }
+
+    @PatchMapping("/sections/{sectionId}/visibility")
+    @Operation(summary = "Show or hide a section on the public page")
+    public StoreSectionResponse setVisibility(@PathVariable Long sectionId,
+            @Valid @RequestBody SectionVisibilityRequest request) {
+        return sectionService.setVisible(sectionId, request.visible());
+    }
+
+    @PutMapping("/sections/order")
+    @Operation(summary = "Reorder the sections: every section id of the store, once, from top to bottom")
+    public List<StoreSectionResponse> reorderSections(@Valid @RequestBody SectionOrderRequest request) {
+        return sectionService.reorder(request.sectionIds());
     }
 
     @PutMapping("/sections/{sectionId}")
