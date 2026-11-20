@@ -164,6 +164,22 @@ them is `null` the operation answers 409 `setting_not_configured` naming it.
 The v1 contact messages were migrated by the database to conversations and messages. The old
 `/api/contact-messages` endpoints were removed; the conversation endpoints replace them.
 
+### Authentication
+Public endpoints; every other call sends `Authorization: Bearer <accessToken>`. The access token lasts
+`JWT_ACCESS_MINUTES` (15); the refresh token lasts `JWT_REFRESH_DAYS` (7) and works only once.
+
+| Method | Path | Body → answer |
+|---|---|---|
+| POST | `/api/auth/register` | `{ name, email, password (8-72), countryCode?, preferredLanguage? }` → 201 `AuthResponse`; sends the verification email |
+| POST | `/api/auth/login` | `{ email, password }` → `AuthResponse` (401 wrong credentials, 403 suspended, 429 too many failures) |
+| POST | `/api/auth/refresh` | `{ refreshToken }` → new `AuthResponse` (a reused refresh token closes every session) |
+| POST | `/api/auth/logout` | `{ refreshToken }` → 204 |
+| POST | `/api/auth/verify-email` | `{ token }` → `UserResponse`; the account becomes active |
+| POST | `/api/auth/forgot-password` | `{ email }` → 202 (same answer whether the email exists or not) |
+| POST | `/api/auth/reset-password` | `{ token, newPassword }` → 204; users migrated from v1 create their first password this way |
+
+`AuthResponse` = `{ tokenType: "Bearer", accessToken, accessTokenExpiresAt, refreshToken, refreshTokenExpiresAt, user }`.
+
 ### Notifications (logged-in user)
 | Method | Path | Description |
 |---|---|---|
