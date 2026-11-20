@@ -68,9 +68,10 @@ public class ArtworkController {
         return galleryService.artworks(filter);
     }
 
-    @GetMapping("/{id}")
-    public ArtworkDetailResponse findById(@PathVariable Long id) {
-        return artworkService.findById(id);
+    @GetMapping("/{idOrSlug}")
+    @Operation(summary = "Public detail by id or slug; carries the frontend shape (artwork, store, master, favorites)")
+    public ArtworkDetailResponse findById(@PathVariable String idOrSlug) {
+        return artworkService.findByIdOrSlug(idOrSlug);
     }
 
     @GetMapping("/{id}/photos")

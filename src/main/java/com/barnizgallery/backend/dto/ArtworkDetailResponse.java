@@ -34,5 +34,14 @@ public record ArtworkDetailResponse(
         String currency,
         Integer stock,
         List<PhotoResponse> photos,
-        AuctionResponse currentAuction) {
+        AuctionResponse currentAuction,
+        ArtworkDataResponse artwork,
+        String storeSlug,
+        String storeNameEs,
+        String storeNameEn,
+        Long masterId,
+        String masterName,
+        long favoriteCount,
+        Long activeAuctionId,
+        boolean isFavorite) {
 }

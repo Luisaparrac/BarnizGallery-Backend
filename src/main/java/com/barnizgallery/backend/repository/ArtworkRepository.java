@@ -2,6 +2,7 @@ package com.barnizgallery.backend.repository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,6 +21,8 @@ public interface ArtworkRepository extends JpaRepository<Artwork, Long> {
     List<Artwork> findByStoreStoreIdAndDeletedAtIsNullOrderByArtworkIdAsc(Long storeId);
 
     long countByStoreStoreId(Long storeId);
+
+    Optional<Artwork> findFirstBySlugAndDeletedAtIsNull(String slug);
 
     List<Artwork> findByStoreStoreIdAndDeletedAtIsNullAndStatusInOrderByArtworkIdAsc(Long storeId,
             Collection<ArtworkStatus> statuses);

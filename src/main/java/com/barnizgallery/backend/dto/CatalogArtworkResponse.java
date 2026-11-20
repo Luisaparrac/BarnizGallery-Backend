@@ -8,7 +8,8 @@ import com.fasterxml.jackson.annotation.JsonRawValue;
 
 /**
  * An artwork of the public gallery with its store, master, photos ({@code [{photo_id, file_url, alt_es, alt_en}]})
- * and catalog codes.
+ * and catalog codes. {@code artwork} and {@code favoriteCount} are the shape the frontend reads
+ * ({@code ArtworkSummary}).
  */
 public record CatalogArtworkResponse(
         Long artworkId,
@@ -29,5 +30,7 @@ public record CatalogArtworkResponse(
         String masterName,
         @JsonRawValue String photos,
         @JsonRawValue String colorCodes,
-        @JsonRawValue String motifCodes) {
+        @JsonRawValue String motifCodes,
+        ArtworkDataResponse artwork,
+        long favoriteCount) {
 }

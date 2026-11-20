@@ -27,15 +27,19 @@ public final class ArtworkMapper {
                 artwork.getStock());
     }
 
-    public static ArtworkDetailResponse toDetail(Artwork artwork, List<PhotoResponse> photos,
-            AuctionResponse currentAuction) {
+    public static ArtworkDetailResponse toDetail(Artwork artwork, List<Photo> photoRows,
+            AuctionResponse currentAuction, long favoriteCount, boolean favorite) {
+        List<PhotoResponse> photos = photoRows.stream().map(ArtworkMapper::toPhotoResponse).toList();
         return new ArtworkDetailResponse(artwork.getArtworkId(), artwork.getStore().getStoreId(), artwork.getTitleEs(),
                 artwork.getTitleEn(), artwork.getHistoryEs(), artwork.getHistoryEn(), artwork.getTechnique(),
                 artwork.getDimensionsLegacy(), artwork.getWidthCm(), artwork.getHeightCm(), artwork.getDepthCm(),
                 artwork.getWeightG(), colorCodes(artwork), motifCodes(artwork), AiRequestMapper.shapeCode(artwork),
                 AiRequestMapper.styleCode(artwork), artwork.getStatus(),
                 artwork.getSaleMode(), artwork.getPrice(), artwork.getCurrency(), artwork.getStock(), photos,
-                currentAuction);
+                currentAuction, ArtworkDataMapper.toData(artwork, photoRows), artwork.getStore().getSlug(),
+                artwork.getStore().getNameEs(), artwork.getStore().getNameEn(),
+                artwork.getStore().getMaster().getMasterId(), artwork.getStore().getMaster().getName(), favoriteCount,
+                currentAuction == null ? null : currentAuction.auctionId(), favorite);
     }
 
     /**

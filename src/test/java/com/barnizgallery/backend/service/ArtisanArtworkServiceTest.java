@@ -118,7 +118,9 @@ class ArtisanArtworkServiceTest {
     @Test
     void galleryPriceRangeNeedsACurrency() {
         ArtworkCatalogViewRepository catalog = mock(ArtworkCatalogViewRepository.class);
-        GalleryService gallery = new GalleryService(mock(GalleryTreeBuilder.class), catalog);
+        GalleryService gallery = new GalleryService(mock(GalleryTreeBuilder.class), catalog, artworks,
+                mock(com.barnizgallery.backend.repository.PhotoRepository.class),
+                mock(com.barnizgallery.backend.repository.FavoriteRepository.class));
 
         assertThatThrownBy(() -> gallery.artworks(new ArtworkFilter(null, null, null, null, null,
                 BigDecimal.ONE, null, null, null, null))).hasMessage("price_filter_currency_required");

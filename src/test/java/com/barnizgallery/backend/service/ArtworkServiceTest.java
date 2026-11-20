@@ -39,6 +39,10 @@ class ArtworkServiceTest {
     private AuctionResponseAssembler auctionAssembler;
     @Mock
     private ArtworkCatalogViewRepository catalogRepository;
+    @Mock
+    private com.barnizgallery.backend.repository.FavoriteRepository favoriteRepository;
+    @Mock
+    private com.barnizgallery.backend.security.CurrentUser currentUser;
     @InjectMocks
     private ArtworkService artworkService;
 

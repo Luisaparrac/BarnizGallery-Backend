@@ -145,7 +145,7 @@ Dates are ISO-8601 (UTC). Enum values are in English (`EXHIBITED`, `ACTIVE`, `PE
 | GET | `/api/stores` | Published stores of approved masters, newest first, with slug, logo, banner and count of public artworks |
 | GET | `/api/stores/{slug}` | Public page of a published store (approved master): visible sections in order and exhibited or auctioned artworks; 404 otherwise |
 | GET | `/api/artworks?color=&motif=&shape=&style=&currency=&minPrice=&maxPrice=&store=&page=&size=` | Public gallery (view `v_artwork_catalog`): exhibited or auctioned artworks of published stores of approved masters, newest first; codes of the catalogs, store slug; a price range needs `currency` (422) |
-| GET | `/api/artworks/{id}` | Artwork + photos + current auction (404 unless it is in the public gallery) |
+| GET | `/api/artworks/{idOrSlug}` | Artwork + photos + current auction by id or slug (404 unless it is in the public gallery); also carries the frontend shape: `artwork`, `storeSlug`, `storeNameEs/En`, `masterId`, `masterName`, `favoriteCount`, `activeAuctionId`, `isFavorite` |
 | GET | `/api/artworks/{id}/photos` | Photos |
 | GET | `/api/artworks/{id}/similar` | "Similar artworks": up to 6 public artworks ranked by the AI service (`source: ai`), or by the fixed rules (shared colors and motifs, same shape and style; `source: rules`) when it is off or fails |
 | POST | `/api/artworks/{id}/photos` | Register photo by URL `{ fileUrl, angle?, altEs?, altEn? }` (owner artisan) |
