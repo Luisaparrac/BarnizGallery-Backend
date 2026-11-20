@@ -29,6 +29,7 @@ import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.patterns.adapter.StorageService;
 import com.barnizgallery.backend.patterns.adapter.StoredImage;
 import com.barnizgallery.backend.repository.PhotoRepository;
+import com.barnizgallery.backend.security.OwnershipGuard;
 
 @ExtendWith(MockitoExtension.class)
 class PhotoServiceTest {
@@ -41,6 +42,8 @@ class PhotoServiceTest {
     private StorageService storageService;
     @Mock
     private ImageUploadValidator imageValidator;
+    @Mock
+    private OwnershipGuard ownershipGuard;
     @InjectMocks
     private PhotoService photoService;
 
@@ -75,7 +78,8 @@ class PhotoServiceTest {
 
     @Test
     void deleteExistingPhoto() {
-        Photo photo = new Photo();
+        Photo photo = TestEntities.photo(5, TestEntities.artwork(3, TestEntities.store(1, TestEntities.master(1)),
+                ArtworkStatus.EXHIBITED), "https://img/front.jpg");
         when(photoRepository.findById(5L)).thenReturn(Optional.of(photo));
 
         photoService.delete(5L);
@@ -107,7 +111,8 @@ class PhotoServiceTest {
 
     @Test
     void deletingAnUploadedPhotoDeletesItsFile() {
-        Photo photo = new Photo();
+        Photo photo = TestEntities.photo(5, TestEntities.artwork(3, TestEntities.store(1, TestEntities.master(1)),
+                ArtworkStatus.EXHIBITED), "https://img/front.jpg");
         photo.setStorageKey("museo/artworks/3/abc");
         when(photoRepository.findById(5L)).thenReturn(Optional.of(photo));
         when(storageService.isEnabled()).thenReturn(true);

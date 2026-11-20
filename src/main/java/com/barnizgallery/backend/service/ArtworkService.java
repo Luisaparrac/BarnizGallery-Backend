@@ -21,6 +21,7 @@ import com.barnizgallery.backend.mapper.ArtworkMapper;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.AuctionRepository;
 import com.barnizgallery.backend.repository.PhotoRepository;
+import com.barnizgallery.backend.security.OwnershipGuard;
 
 /**
  * Business logic for artworks. The status of an artwork is never changed here:
@@ -35,10 +36,12 @@ public class ArtworkService {
     private final AuctionResponseAssembler auctionAssembler;
     private final StoreService storeService;
     private final CatalogCodeResolver catalogResolver;
+    private final OwnershipGuard ownershipGuard;
 
     public ArtworkService(ArtworkRepository artworkRepository, PhotoRepository photoRepository,
             AuctionRepository auctionRepository, AuctionResponseAssembler auctionAssembler,
-            StoreService storeService, CatalogCodeResolver catalogResolver) {
+            StoreService storeService, CatalogCodeResolver catalogResolver, OwnershipGuard ownershipGuard) {
+        this.ownershipGuard = ownershipGuard;
         this.artworkRepository = artworkRepository;
         this.photoRepository = photoRepository;
         this.auctionRepository = auctionRepository;
@@ -81,6 +84,7 @@ public class ArtworkService {
     @Transactional
     public ArtworkSummaryResponse create(ArtworkRequest request) {
         Store store = storeService.getStore(request.storeId());
+        ownershipGuard.requireStore(store);
         Artwork artwork = new Artwork();
         artwork.setStore(store);
         artwork.setStatus(ArtworkStatus.EXHIBITED);
@@ -92,8 +96,11 @@ public class ArtworkService {
     @Transactional
     public ArtworkSummaryResponse update(Long artworkId, ArtworkRequest request) {
         Artwork artwork = getArtwork(artworkId);
+        ownershipGuard.requireStore(artwork.getStore());
         if (!artwork.getStore().getStoreId().equals(request.storeId())) {
-            artwork.setStore(storeService.getStore(request.storeId()));
+            Store newStore = storeService.getStore(request.storeId());
+            ownershipGuard.requireStore(newStore);
+            artwork.setStore(newStore);
         }
         ArtworkMapper.apply(request, artwork);
         applyCatalogs(request, artwork);

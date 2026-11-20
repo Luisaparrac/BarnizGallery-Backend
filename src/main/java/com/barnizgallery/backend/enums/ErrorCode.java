@@ -21,6 +21,7 @@ public enum ErrorCode {
     // Authentication and authorization
     UNAUTHORIZED,
     ACCESS_DENIED,
+    NOT_OWNER,
     TOO_MANY_LOGIN_ATTEMPTS,
     EMAIL_ALREADY_REGISTERED,
     INVALID_CREDENTIALS,

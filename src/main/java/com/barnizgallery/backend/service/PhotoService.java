@@ -19,6 +19,7 @@ import com.barnizgallery.backend.mapper.ArtworkMapper;
 import com.barnizgallery.backend.patterns.adapter.StorageService;
 import com.barnizgallery.backend.patterns.adapter.StoredImage;
 import com.barnizgallery.backend.repository.PhotoRepository;
+import com.barnizgallery.backend.security.OwnershipGuard;
 
 /**
  * Business logic for artwork photos. Photos are registered by URL or uploaded to the storage provider
@@ -33,9 +34,11 @@ public class PhotoService {
     private final ArtworkService artworkService;
     private final StorageService storageService;
     private final ImageUploadValidator imageValidator;
+    private final OwnershipGuard ownershipGuard;
 
     public PhotoService(PhotoRepository photoRepository, ArtworkService artworkService,
-            StorageService storageService, ImageUploadValidator imageValidator) {
+            StorageService storageService, ImageUploadValidator imageValidator, OwnershipGuard ownershipGuard) {
+        this.ownershipGuard = ownershipGuard;
         this.photoRepository = photoRepository;
         this.artworkService = artworkService;
         this.storageService = storageService;
@@ -53,6 +56,7 @@ public class PhotoService {
     @Transactional
     public PhotoResponse addByUrl(Long artworkId, PhotoRequest request) {
         Artwork artwork = artworkService.getArtwork(artworkId);
+        ownershipGuard.requireStore(artwork.getStore());
         Photo photo = new Photo();
         photo.setArtwork(artwork);
         photo.setFileUrl(request.fileUrl());
@@ -67,6 +71,7 @@ public class PhotoService {
             throw new FeatureDisabledException(ErrorCode.STORAGE_DISABLED);
         }
         Artwork artwork = artworkService.getArtwork(artworkId);
+        ownershipGuard.requireStore(artwork.getStore());
         imageValidator.validate(file);
         StoredImage image = storageService.upload(file, "artworks/" + artworkId);
         Photo photo = new Photo();
@@ -87,6 +92,7 @@ public class PhotoService {
     public void delete(Long photoId) {
         Photo photo = photoRepository.findById(photoId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.PHOTO_NOT_FOUND, photoId));
+        ownershipGuard.requireStore(photo.getArtwork().getStore());
         photoRepository.delete(photo);
         if (photo.getStorageKey() == null) {
             return;

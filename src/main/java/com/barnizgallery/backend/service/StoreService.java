@@ -23,6 +23,7 @@ import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.StoreArtworkCount;
 import com.barnizgallery.backend.repository.StoreRepository;
 import com.barnizgallery.backend.repository.StoreTemplateRepository;
+import com.barnizgallery.backend.security.OwnershipGuard;
 
 /**
  * Business logic for stores. Each master has at most one store (1:1).
@@ -35,9 +36,11 @@ public class StoreService {
     private final StoreTemplateRepository templateRepository;
     private final ArtworkRepository artworkRepository;
     private final MasterService masterService;
+    private final OwnershipGuard ownershipGuard;
 
     public StoreService(StoreRepository storeRepository, StoreTemplateRepository templateRepository,
-            ArtworkRepository artworkRepository, MasterService masterService) {
+            ArtworkRepository artworkRepository, MasterService masterService, OwnershipGuard ownershipGuard) {
+        this.ownershipGuard = ownershipGuard;
         this.storeRepository = storeRepository;
         this.templateRepository = templateRepository;
         this.artworkRepository = artworkRepository;
@@ -67,6 +70,7 @@ public class StoreService {
     @Transactional
     public StoreSummaryResponse create(StoreRequest request) {
         Master master = masterService.getMaster(request.masterId());
+        ownershipGuard.requireMaster(master);
         if (storeRepository.existsByMasterMasterId(master.getMasterId())) {
             throw new BusinessRuleException(ErrorCode.MASTER_ALREADY_HAS_STORE, master.getMasterId());
         }
@@ -80,8 +84,10 @@ public class StoreService {
     @Transactional
     public StoreSummaryResponse update(Long storeId, StoreRequest request) {
         Store store = getStore(storeId);
+        ownershipGuard.requireStore(store);
         if (!store.getMaster().getMasterId().equals(request.masterId())) {
             Master newMaster = masterService.getMaster(request.masterId());
+            ownershipGuard.requireMaster(newMaster);
             if (storeRepository.existsByMasterMasterId(newMaster.getMasterId())) {
                 throw new BusinessRuleException(ErrorCode.MASTER_ALREADY_HAS_STORE, newMaster.getMasterId());
             }

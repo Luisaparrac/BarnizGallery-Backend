@@ -28,6 +28,7 @@ import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.StoreArtworkCount;
 import com.barnizgallery.backend.repository.StoreRepository;
 import com.barnizgallery.backend.repository.StoreTemplateRepository;
+import com.barnizgallery.backend.security.OwnershipGuard;
 
 @ExtendWith(MockitoExtension.class)
 class StoreServiceTest {
@@ -40,6 +41,8 @@ class StoreServiceTest {
     private ArtworkRepository artworkRepository;
     @Mock
     private MasterService masterService;
+    @Mock
+    private OwnershipGuard ownershipGuard;
     @InjectMocks
     private StoreService storeService;
 

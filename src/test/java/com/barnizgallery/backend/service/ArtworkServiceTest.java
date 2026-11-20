@@ -30,6 +30,7 @@ import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.AuctionRepository;
 import com.barnizgallery.backend.repository.PhotoRepository;
+import com.barnizgallery.backend.security.OwnershipGuard;
 
 @ExtendWith(MockitoExtension.class)
 class ArtworkServiceTest {
@@ -46,6 +47,8 @@ class ArtworkServiceTest {
     private StoreService storeService;
     @Mock
     private CatalogCodeResolver catalogResolver;
+    @Mock
+    private OwnershipGuard ownershipGuard;
     @InjectMocks
     private ArtworkService artworkService;
 
