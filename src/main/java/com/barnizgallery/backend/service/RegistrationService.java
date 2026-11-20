@@ -61,6 +61,16 @@ public class RegistrationService {
     /** Creates the customer, sends the verification email, greets the user and opens a session. */
     @Transactional
     public AuthResponse register(RegisterRequest request) {
+        User saved = createAccount(request, UserRole.CUSTOMER);
+        notificationService.notify(saved, NotificationService.WELCOME, "/stores", null, saved.getName());
+        return sessionIssuer.open(saved);
+    }
+
+    /**
+     * Creates a {@code pendiente} account with this role and sends the email verification link. A used email → 409.
+     */
+    @Transactional
+    public User createAccount(RegisterRequest request, UserRole role) {
         String email = normalizeEmail(request.email());
         if (userRepository.findByEmailIgnoreCase(email).isPresent()) {
             throw new BusinessRuleException(ErrorCode.EMAIL_ALREADY_REGISTERED);
@@ -69,7 +79,7 @@ public class RegistrationService {
         user.setName(request.name().trim());
         user.setEmail(email);
         user.setPasswordHash(encodePassword(request.password()));
-        user.setRole(UserRole.CUSTOMER);
+        user.setRole(role);
         user.setStatus(UserStatus.PENDING);
         user.setCountryCode(request.countryCode());
         user.setPreferredLanguage(request.preferredLanguage() != null ? request.preferredLanguage()
@@ -79,8 +89,7 @@ public class RegistrationService {
         String token = authTokenService.create(saved, AuthTokenPurpose.EMAIL_VERIFICATION,
                 EMAIL_VERIFICATION_VALIDITY);
         emailSender.send(emails.verification(saved, token, EMAIL_VERIFICATION_VALIDITY));
-        notificationService.notify(saved, NotificationService.WELCOME, "/stores", null, saved.getName());
-        return sessionIssuer.open(saved);
+        return saved;
     }
 
     /**

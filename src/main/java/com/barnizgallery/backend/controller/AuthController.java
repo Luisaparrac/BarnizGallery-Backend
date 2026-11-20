@@ -13,10 +13,12 @@ import com.barnizgallery.backend.dto.EmailTokenRequest;
 import com.barnizgallery.backend.dto.ForgotPasswordRequest;
 import com.barnizgallery.backend.dto.LoginRequest;
 import com.barnizgallery.backend.dto.RefreshTokenRequest;
+import com.barnizgallery.backend.dto.RegisterArtisanRequest;
 import com.barnizgallery.backend.dto.RegisterRequest;
 import com.barnizgallery.backend.dto.ResetPasswordRequest;
 import com.barnizgallery.backend.dto.UserResponse;
 import com.barnizgallery.backend.security.ClientIpResolver;
+import com.barnizgallery.backend.service.ArtisanRegistrationService;
 import com.barnizgallery.backend.service.LoginService;
 import com.barnizgallery.backend.service.PasswordResetService;
 import com.barnizgallery.backend.service.RegistrationService;
@@ -41,21 +43,29 @@ public class AuthController {
     private final SessionService sessionService;
     private final PasswordResetService passwordResetService;
     private final ClientIpResolver clientIpResolver;
+    private final ArtisanRegistrationService artisanRegistrationService;
 
     public AuthController(RegistrationService registrationService, LoginService loginService,
             SessionService sessionService, PasswordResetService passwordResetService,
-            ClientIpResolver clientIpResolver) {
+            ClientIpResolver clientIpResolver, ArtisanRegistrationService artisanRegistrationService) {
         this.registrationService = registrationService;
         this.loginService = loginService;
         this.sessionService = sessionService;
         this.passwordResetService = passwordResetService;
         this.clientIpResolver = clientIpResolver;
+        this.artisanRegistrationService = artisanRegistrationService;
     }
 
     @PostMapping("/register")
     @Operation(summary = "Create a customer account (201) and open a session; a verification email is sent")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(registrationService.register(request));
+    }
+
+    @PostMapping("/register-artisan")
+    @Operation(summary = "Create a master artisan account (201) with its master profile and verification steps")
+    public ResponseEntity<AuthResponse> registerArtisan(@Valid @RequestBody RegisterArtisanRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(artisanRegistrationService.register(request));
     }
 
     @PostMapping("/login")
