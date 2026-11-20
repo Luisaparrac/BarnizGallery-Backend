@@ -2,6 +2,8 @@ package com.barnizgallery.backend.patterns.strategy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -60,8 +62,9 @@ class RecommendationStrategiesTest {
         profileStrategy = new ProfileBasedStrategy(tasteProfileRepository, artworkRepository);
         interactionStrategy = new InteractionBasedStrategy(interactionRepository, factoryProvider);
         hybridStrategy = new HybridStrategy(profileStrategy, interactionStrategy, interactionRepository);
-        when(artworkRepository.findAllByOrderByArtworkIdAsc()).thenReturn(List.of(
-                TestEntities.artwork(10, store1, ArtworkStatus.EXHIBITED, "Rojo", "verde"),
+        when(artworkRepository.findByDeletedAtIsNullAndStatusInOrderByArtworkIdAsc(anyCollection(), any()))
+                .thenReturn(List.of(
+                TestEntities.artwork(10, store1, ArtworkStatus.EXHIBITED, "rojo", "verde"),
                 TestEntities.artwork(11, store1, ArtworkStatus.EXHIBITED, "dorado"),
                 TestEntities.artwork(20, store2, ArtworkStatus.EXHIBITED, "azul", "rojo")));
     }
@@ -80,15 +83,16 @@ class RecommendationStrategiesTest {
     }
 
     @Test
-    void profileScoresByProportionOfMatchingColors() {
+    void storeGetsTheScoreOfItsBestMatchingArtwork() {
         givenPreferredColors("rojo", "verde", "dorado", "negro");
 
         List<RecommendationResult> results = profileStrategy.recommend(userEs);
 
+        // store 1: artwork 10 has rojo and verde (2 of 4 colors); store 2: artwork 20 has rojo (1 of 4)
         assertThat(results).extracting(RecommendationResult::storeId).containsExactly(1L, 2L);
-        assertThat(results.get(0).score()).isEqualByComparingTo("75.00");
+        assertThat(results.get(0).score()).isEqualByComparingTo("50.00");
         assertThat(results.get(1).score()).isEqualByComparingTo("25.00");
-        assertThat(results.get(0).reason()).startsWith("Coincide con tus colores preferidos");
+        assertThat(results.get(0).reason()).isEqualTo("Coincide con: colores rojo, verde");
     }
 
     @Test
@@ -100,7 +104,7 @@ class RecommendationStrategiesTest {
         assertThat(results).singleElement().satisfies(r -> {
             assertThat(r.storeId()).isEqualTo(2);
             assertThat(r.score()).isEqualByComparingTo("100");
-            assertThat(r.reason()).isEqualTo("Matches your preferred colors: azul");
+            assertThat(r.reason()).isEqualTo("Matches: colors azul");
         });
     }
 

@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import com.barnizgallery.backend.dto.AiCandidate;
@@ -44,6 +45,8 @@ public class AiServiceStrategy implements RecommendationStrategy {
 
     static final int MAX_RESULTS = 100;
     static final int MAX_CANDIDATES = 2000;
+    /** At most {@value #MAX_CANDIDATES} available artworks are compared. */
+    static final Pageable CANDIDATES = PageRequest.of(0, MAX_CANDIDATES);
     static final int MAX_INTERACTIONS = 1000;
     static final List<ArtworkStatus> AVAILABLE = List.of(ArtworkStatus.EXHIBITED, ArtworkStatus.IN_AUCTION);
 
@@ -75,7 +78,7 @@ public class AiServiceStrategy implements RecommendationStrategy {
             return fallback.recommend(user);
         }
         List<Artwork> available = artworkRepository.findByDeletedAtIsNullAndStatusInOrderByArtworkIdAsc(AVAILABLE,
-                PageRequest.of(0, MAX_CANDIDATES));
+                CANDIDATES);
         if (available.isEmpty()) {
             return fallback.recommend(user);
         }
