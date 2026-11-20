@@ -243,6 +243,12 @@ the artisan) and `ADMIN_APPROVAL` (the administrator's final decision).
 | Method | Path | Description |
 |---|---|---|
 
+### Cart and orders
+| Method | Path | Description |
+|---|---|---|
+| GET / POST | `/api/users/me/addresses` | Shipping addresses; POST `{ recipientName, countryCode, city, addressLine1, contactPhone, administrativeArea?, locality?, addressLine2?, postalCode?, deliveryInstructions? }` |
+| PUT / DELETE | `/api/users/me/addresses/{addressId}` | Replace or delete an own address (orders keep their copy) |
+
 Artwork rules (422): a price needs its currency; an exhibited artwork needs `saleMode`; `SALE` needs
 `price` > 0 and `stock`. The currency cannot change once the artwork has orders or auctions (409, enforced by
 the database).
