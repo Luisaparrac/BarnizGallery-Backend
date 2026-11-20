@@ -12,15 +12,16 @@ import com.barnizgallery.backend.dto.ShipmentRequest;
 import com.barnizgallery.backend.entity.Order;
 import com.barnizgallery.backend.entity.OrderItem;
 import com.barnizgallery.backend.enums.ErrorCode;
-import com.barnizgallery.backend.enums.FulfillmentStatus;
 import com.barnizgallery.backend.enums.OrderStatus;
-import com.barnizgallery.backend.exception.BusinessRuleException;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.mapper.OrderMapper;
+import com.barnizgallery.backend.patterns.templatemethod.DeliverStep;
+import com.barnizgallery.backend.patterns.templatemethod.ShipStep;
 import com.barnizgallery.backend.repository.OrderItemRepository;
 
 /**
- * Shipping of the paid order lines of the logged-in artisan's store. Unpaid orders are not shown.
+ * Shipping of the paid order lines of the logged-in artisan's store. Unpaid orders are not shown. Each step is a
+ * {@link com.barnizgallery.backend.patterns.templatemethod.FulfillmentStep} (Template Method).
  */
 @Service
 public class FulfillmentService {
@@ -48,15 +49,8 @@ public class FulfillmentService {
     @Transactional
     public ArtisanOrderLineResponse ship(Long orderItemId, ShipmentRequest request) {
         OrderItem item = myLine(orderItemId);
-        if (item.getFulfillmentStatus() != FulfillmentStatus.PENDING) {
-            throw new BusinessRuleException(ErrorCode.FULFILLMENT_STEP_INVALID, item.getFulfillmentStatus());
-        }
-        item.setFulfillmentStatus(FulfillmentStatus.SHIPPED);
-        item.setCarrier(request.carrier().trim());
-        item.setTrackingNumber(request.trackingNumber().trim());
         Order order = item.getOrder();
-        boolean allShipped = lines(order).stream().allMatch(line -> line.getFulfillmentStatus() != FulfillmentStatus.PENDING);
-        order.setStatus(allShipped ? OrderStatus.SHIPPED : OrderStatus.IN_PREPARATION);
+        new ShipStep(request.carrier(), request.trackingNumber()).apply(item, lines(order));
         notificationService.notify(order.getBuyer(), ORDER_SHIPPED, "/orders/" + order.getOrderId(), null,
                 order.getOrderCode(), item.getCarrier(), item.getTrackingNumber());
         return OrderMapper.toArtisanLine(item);
@@ -69,14 +63,7 @@ public class FulfillmentService {
     @Transactional
     public ArtisanOrderLineResponse deliver(Long orderItemId) {
         OrderItem item = myLine(orderItemId);
-        if (item.getFulfillmentStatus() != FulfillmentStatus.SHIPPED) {
-            throw new BusinessRuleException(ErrorCode.FULFILLMENT_STEP_INVALID, item.getFulfillmentStatus());
-        }
-        item.setFulfillmentStatus(FulfillmentStatus.DELIVERED);
-        Order order = item.getOrder();
-        if (lines(order).stream().allMatch(line -> line.getFulfillmentStatus() == FulfillmentStatus.DELIVERED)) {
-            order.setStatus(OrderStatus.DELIVERED);
-        }
+        new DeliverStep().apply(item, lines(item.getOrder()));
         return OrderMapper.toArtisanLine(item);
     }
 
