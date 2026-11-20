@@ -1,5 +1,6 @@
 package com.barnizgallery.backend.service;
 
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -9,9 +10,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.barnizgallery.backend.dto.ArtisanVerificationResponse;
+import com.barnizgallery.backend.dto.StepReviewRequest;
 import com.barnizgallery.backend.dto.VerificationStepResponse;
+import com.barnizgallery.backend.entity.MasterVerification;
 import com.barnizgallery.backend.entity.PendingVerificationView;
+import com.barnizgallery.backend.entity.User;
+import com.barnizgallery.backend.enums.ErrorCode;
+import com.barnizgallery.backend.enums.VerificationStepStatus;
+import com.barnizgallery.backend.exception.BusinessRuleException;
+import com.barnizgallery.backend.exception.ResourceNotFoundException;
+import com.barnizgallery.backend.mapper.VerificationMapper;
+import com.barnizgallery.backend.repository.MasterVerificationRepository;
 import com.barnizgallery.backend.repository.PendingVerificationViewRepository;
+import com.barnizgallery.backend.repository.UserRepository;
+import com.barnizgallery.backend.security.CurrentUser;
 
 /**
  * The administrator's side of the artisan verification.
@@ -19,10 +31,54 @@ import com.barnizgallery.backend.repository.PendingVerificationViewRepository;
 @Service
 public class VerificationReviewService {
 
-    private final PendingVerificationViewRepository pendingRepository;
+    public static final String STEP_APPROVED = "verification_step_approved";
+    public static final String STEP_REJECTED = "verification_step_rejected";
 
-    public VerificationReviewService(PendingVerificationViewRepository pendingRepository) {
+    private final PendingVerificationViewRepository pendingRepository;
+    private final MasterVerificationRepository verificationRepository;
+    private final UserRepository userRepository;
+    private final NotificationService notificationService;
+    private final CurrentUser currentUser;
+    private final Clock clock;
+
+    public VerificationReviewService(PendingVerificationViewRepository pendingRepository,
+            MasterVerificationRepository verificationRepository, UserRepository userRepository,
+            NotificationService notificationService, CurrentUser currentUser, Clock clock) {
         this.pendingRepository = pendingRepository;
+        this.verificationRepository = verificationRepository;
+        this.userRepository = userRepository;
+        this.notificationService = notificationService;
+        this.currentUser = currentUser;
+        this.clock = clock;
+    }
+
+    /**
+     * Approves or rejects one step (identity, workshop or samples; the email step approves itself and the final
+     * approval has its own action). The artisan is notified with the notes; a rejected step can be sent again.
+     */
+    @Transactional
+    public VerificationStepResponse review(Long verificationId, StepReviewRequest request) {
+        if (request.decision() != VerificationStepStatus.APPROVED
+                && request.decision() != VerificationStepStatus.REJECTED) {
+            throw BusinessRuleException.unprocessable(ErrorCode.REVIEW_DECISION_INVALID);
+        }
+        MasterVerification step = verificationRepository.findById(verificationId)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.VERIFICATION_STEP_NOT_FOUND, verificationId));
+        if (!ArtisanVerificationService.EVIDENCE_STEPS.contains(step.getStep())) {
+            throw BusinessRuleException.unprocessable(ErrorCode.STEP_WITHOUT_EVIDENCE, step.getStep().getDbValue());
+        }
+        step.setStatus(request.decision());
+        step.setNotes(request.notes());
+        step.setReviewedBy(userRepository.getReferenceById(currentUser.requireId()));
+        step.setReviewedAt(clock.instant());
+
+        User artisan = step.getMaster().getUser();
+        if (artisan != null) {
+            String type = request.decision() == VerificationStepStatus.APPROVED ? STEP_APPROVED : STEP_REJECTED;
+            notificationService.notify(artisan, type, "/artisan/verification",
+                    "{\"step\":\"" + step.getStep().name() + "\"}", request.notes() == null ? "" : request.notes());
+        }
+        return VerificationMapper.toResponse(step);
     }
 
     /**

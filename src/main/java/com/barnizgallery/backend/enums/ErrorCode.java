@@ -87,6 +87,7 @@ public enum ErrorCode {
     VERIFICATION_STEP_NOT_FOUND,
     STEP_WITHOUT_EVIDENCE,
     STEP_ALREADY_APPROVED,
+    REVIEW_DECISION_INVALID,
 
     // Stores and interactions
     MASTER_ALREADY_HAS_STORE,
