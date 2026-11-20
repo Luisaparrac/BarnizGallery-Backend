@@ -12,14 +12,19 @@ import org.springframework.transaction.annotation.Transactional;
 import com.barnizgallery.backend.dto.ArtisanVerificationResponse;
 import com.barnizgallery.backend.dto.StepReviewRequest;
 import com.barnizgallery.backend.dto.VerificationStepResponse;
+import com.barnizgallery.backend.entity.Master;
 import com.barnizgallery.backend.entity.MasterVerification;
 import com.barnizgallery.backend.entity.PendingVerificationView;
 import com.barnizgallery.backend.entity.User;
 import com.barnizgallery.backend.enums.ErrorCode;
+import com.barnizgallery.backend.enums.MasterVerificationStatus;
+import com.barnizgallery.backend.enums.UserStatus;
+import com.barnizgallery.backend.enums.VerificationStep;
 import com.barnizgallery.backend.enums.VerificationStepStatus;
 import com.barnizgallery.backend.exception.BusinessRuleException;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.mapper.VerificationMapper;
+import com.barnizgallery.backend.repository.MasterRepository;
 import com.barnizgallery.backend.repository.MasterVerificationRepository;
 import com.barnizgallery.backend.repository.PendingVerificationViewRepository;
 import com.barnizgallery.backend.repository.UserRepository;
@@ -33,19 +38,23 @@ public class VerificationReviewService {
 
     public static final String STEP_APPROVED = "verification_step_approved";
     public static final String STEP_REJECTED = "verification_step_rejected";
+    public static final String ARTISAN_APPROVED = "artisan_approved";
 
     private final PendingVerificationViewRepository pendingRepository;
     private final MasterVerificationRepository verificationRepository;
+    private final MasterRepository masterRepository;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
     private final CurrentUser currentUser;
     private final Clock clock;
 
     public VerificationReviewService(PendingVerificationViewRepository pendingRepository,
-            MasterVerificationRepository verificationRepository, UserRepository userRepository,
+            MasterVerificationRepository verificationRepository, MasterRepository masterRepository,
+            UserRepository userRepository,
             NotificationService notificationService, CurrentUser currentUser, Clock clock) {
         this.pendingRepository = pendingRepository;
         this.verificationRepository = verificationRepository;
+        this.masterRepository = masterRepository;
         this.userRepository = userRepository;
         this.notificationService = notificationService;
         this.currentUser = currentUser;
@@ -79,6 +88,45 @@ public class VerificationReviewService {
                     "{\"step\":\"" + step.getStep().name() + "\"}", request.notes() == null ? "" : request.notes());
         }
         return VerificationMapper.toResponse(step);
+    }
+
+    /**
+     * Final approval: when the email, identity, workshop and samples steps are approved, the admin approval step
+     * is approved, the master becomes {@code aprobado} (so its store can be published), its account becomes
+     * {@code activo} and the artisan is notified. Otherwise 409 naming the missing steps.
+     */
+    @Transactional
+    public ArtisanVerificationResponse approveArtisan(Long masterId) {
+        Master master = masterRepository.findById(masterId)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.MASTER_NOT_FOUND, masterId));
+        List<MasterVerification> steps = verificationRepository.findByMasterMasterIdOrderByVerificationIdAsc(masterId);
+        List<String> missing = new ArrayList<>();
+        MasterVerification adminStep = null;
+        for (MasterVerification step : steps) {
+            if (step.getStep() == VerificationStep.ADMIN_APPROVAL) {
+                adminStep = step;
+            } else if (step.getStatus() != VerificationStepStatus.APPROVED) {
+                missing.add(step.getStep().name());
+            }
+        }
+        if (adminStep == null || steps.size() < VerificationStep.values().length || !missing.isEmpty()) {
+            throw new BusinessRuleException(ErrorCode.VERIFICATION_INCOMPLETE, String.join(", ", missing));
+        }
+        User admin = userRepository.getReferenceById(currentUser.requireId());
+        adminStep.setStatus(VerificationStepStatus.APPROVED);
+        adminStep.setReviewedBy(admin);
+        adminStep.setReviewedAt(clock.instant());
+        master.setVerificationStatus(MasterVerificationStatus.APPROVED);
+        master.setVerifiedAt(clock.instant());
+        master.setVerifiedBy(admin);
+        User artisan = master.getUser();
+        if (artisan != null) {
+            if (artisan.getStatus() == UserStatus.PENDING) {
+                artisan.setStatus(UserStatus.ACTIVE);
+            }
+            notificationService.notify(artisan, ARTISAN_APPROVED, "/artisan/store", null, master.getName());
+        }
+        return VerificationMapper.toResponse(master, steps);
     }
 
     /**

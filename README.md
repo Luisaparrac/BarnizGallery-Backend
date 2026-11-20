@@ -230,6 +230,7 @@ the artisan) and `ADMIN_APPROVAL` (the administrator's final decision).
 |---|---|---|
 | GET | `/api/admin/verifications` | Masters waiting for a decision with their open steps (view `v_pending_verifications`) |
 | PUT | `/api/admin/verifications/{verificationId}` | `{ decision: APPROVED \| REJECTED, notes? }` for `IDENTITY`, `WORKSHOP` or `SAMPLES`; the artisan is notified |
+| POST | `/api/admin/artisans/{masterId}/approve` | Final approval when the other four steps are approved (409 naming the missing ones): master `APPROVED`, account `ACTIVE`, notification |
 
 ### Notifications (logged-in user)
 | Method | Path | Description |
