@@ -36,7 +36,7 @@ class AuctionObserversTest {
 
     private static AuctionEvent bidEvent(long bidderId, Long previousTopBidderId) {
         BidResponse bid = new BidResponse(10L, 1L, bidderId, "User", new BigDecimal("500"), "USD",
-                LocalDateTime.now());
+                LocalDateTime.now(), 10L, null, null);
         return AuctionEvent.bidPlaced(1L, 7L, bid, previousTopBidderId);
     }
 

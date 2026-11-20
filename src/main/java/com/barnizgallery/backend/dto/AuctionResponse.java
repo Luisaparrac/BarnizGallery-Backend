@@ -19,5 +19,14 @@ public record AuctionResponse(
         LocalDateTime endDate,
         AuctionStatus status,
         BigDecimal highestBid,
-        long bidCount) {
+        long bidCount,
+        Long id,
+        Long storeId,
+        String storeName,
+        String coverUrl,
+        BigDecimal reservePrice,
+        BigDecimal minIncrement,
+        Long highestBidderId,
+        Long winningBidId,
+        Long orderId) {
 }

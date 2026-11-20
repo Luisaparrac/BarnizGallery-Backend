@@ -180,6 +180,7 @@ Dates are ISO-8601 (UTC). Enum values are in English (`EXHIBITED`, `ACTIVE`, `PE
 ### Auctions and bids
 | Method | Path | Description |
 |---|---|---|
+| | | Auctions also carry `id`, `storeId`, `storeName`, `reservePrice`, `minIncrement`, `winningBidId` and `orderId`; bids carry `id`, `reviewStatus`, `reviewReason`, and the bidder name is masked ("A*** C.") |
 | GET | `/api/auctions?status=` | List with highest bid and bid count |
 | GET | `/api/auctions/{id}` | Detail |
 | POST | `/api/auctions` | `{ artworkId, basePrice?, startDate, endDate }` (Builder) |
