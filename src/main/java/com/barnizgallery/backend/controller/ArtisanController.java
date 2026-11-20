@@ -1,6 +1,7 @@
 package com.barnizgallery.backend.controller;
 
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.barnizgallery.backend.dto.ArtisanVerificationResponse;
 import com.barnizgallery.backend.dto.EvidenceRequest;
 import com.barnizgallery.backend.dto.VerificationStepResponse;
 import com.barnizgallery.backend.enums.VerificationStep;
@@ -31,6 +33,12 @@ public class ArtisanController {
 
     public ArtisanController(ArtisanVerificationService verificationService) {
         this.verificationService = verificationService;
+    }
+
+    @GetMapping
+    @Operation(summary = "Overall status and steps of the logged-in artisan's verification")
+    public ArtisanVerificationResponse myVerification() {
+        return verificationService.myVerification();
     }
 
     @PutMapping("/{step}")

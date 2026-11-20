@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.barnizgallery.backend.dto.ArtisanVerificationResponse;
 import com.barnizgallery.backend.dto.VerificationStepResponse;
 import com.barnizgallery.backend.entity.Master;
 import com.barnizgallery.backend.entity.MasterVerification;
@@ -52,6 +53,14 @@ public class ArtisanVerificationService {
         this.storageService = storageService;
         this.imageValidator = imageValidator;
         this.clock = clock;
+    }
+
+    /** Overall status and steps of the logged-in artisan. */
+    @Transactional(readOnly = true)
+    public ArtisanVerificationResponse myVerification() {
+        Master master = myMaster();
+        return VerificationMapper.toResponse(master,
+                verificationRepository.findByMasterMasterIdOrderByVerificationIdAsc(master.getMasterId()));
     }
 
     /**

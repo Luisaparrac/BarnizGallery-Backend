@@ -221,6 +221,7 @@ the artisan) and `ADMIN_APPROVAL` (the administrator's final decision).
 
 | Method | Path | Description |
 |---|---|---|
+| GET | `/api/artisans/me/verification` | `{ masterId, name, verificationStatus, steps: [{ verificationId, step, status, evidenceUrl, notes, reviewedAt }] }` |
 | PUT | `/api/artisans/me/verification/{step}` | `{ evidenceUrl }` (https) for `IDENTITY`, `WORKSHOP` or `SAMPLES` → step `SUBMITTED` |
 | POST | `/api/artisans/me/verification/{step}/evidence` | Multipart `file` (JPEG/PNG/WebP) uploaded to the photo storage (503 while disabled) |
 
