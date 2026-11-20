@@ -116,6 +116,7 @@ Dates are ISO-8601 (UTC). Enum values are in English (`EXHIBITED`, `ACTIVE`, `PE
 | GET | `/api/masters` | Masters |
 | GET | `/api/masters/{id}` | Master + its store |
 | POST / PUT | `/api/masters`, `/api/masters/{id}` | Create / update master |
+| GET | `/api/stores/{slug}` | Public page of a published store (approved master): visible sections in order and exhibited or auctioned artworks; 404 otherwise |
 | GET | `/api/rooms` | Stores with master and artwork count (legacy path) |
 | GET | `/api/rooms/{id}` | Store + artworks (legacy path) |
 | POST / PUT | `/api/rooms`, `/api/rooms/{id}` | Create / update store `{ masterId, templateId, nameEs, nameEn, … }` (one store per master) |
@@ -208,7 +209,7 @@ Public endpoints; every other call sends `Authorization: Bearer <accessToken>`. 
 ### Access by role
 | Who | What |
 |---|---|
-| Anyone | `/api/auth/**`; `GET` of health, gallery, stores (`/api/rooms`), masters, artworks, auctions and catalogs |
+| Anyone | `/api/auth/**`; `GET` of health, gallery, stores (`/api/stores`, `/api/rooms`), masters, artworks, auctions and catalogs |
 | Logged-in user | Their own account (`/api/users/{id}/**` with their id), notifications, interactions and bids in their own name |
 | Artisan or administrator | Create and edit stores, artworks and photos (an artisan only their own store); suggested prices |
 | Administrator | `/api/admin/**`, masters, creating and closing auctions, any user's data |

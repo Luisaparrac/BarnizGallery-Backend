@@ -26,7 +26,6 @@ import com.barnizgallery.backend.repository.TasteProfileRepository;
 @Component
 public class ProfileBasedStrategy implements RecommendationStrategy {
 
-    static final List<ArtworkStatus> AVAILABLE = List.of(ArtworkStatus.EXHIBITED, ArtworkStatus.IN_AUCTION);
 
     private final TasteProfileRepository tasteProfileRepository;
     private final ArtworkRepository artworkRepository;
@@ -71,7 +70,7 @@ public class ProfileBasedStrategy implements RecommendationStrategy {
             return List.of();
         }
         List<ProfileMatch> matches = new ArrayList<>();
-        for (Artwork artwork : artworkRepository.findByDeletedAtIsNullAndStatusInOrderByArtworkIdAsc(AVAILABLE,
+        for (Artwork artwork : artworkRepository.findByDeletedAtIsNullAndStatusInOrderByArtworkIdAsc(ArtworkStatus.PUBLIC,
                 AiServiceStrategy.CANDIDATES)) {
             ProfileMatch match = ProfileMatcher.match(profile.get(), artwork);
             if (match.matchesSomething()) {

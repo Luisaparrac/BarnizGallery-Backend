@@ -9,19 +9,26 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.barnizgallery.backend.dto.ArtworkSummaryResponse;
 import com.barnizgallery.backend.dto.StoreDetailResponse;
+import com.barnizgallery.backend.dto.StorePageResponse;
 import com.barnizgallery.backend.dto.StoreRequest;
+import com.barnizgallery.backend.dto.StoreSectionResponse;
 import com.barnizgallery.backend.dto.StoreSummaryResponse;
 import com.barnizgallery.backend.entity.Master;
 import com.barnizgallery.backend.entity.Store;
 import com.barnizgallery.backend.entity.StoreTemplate;
+import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.enums.ErrorCode;
+import com.barnizgallery.backend.enums.MasterVerificationStatus;
+import com.barnizgallery.backend.enums.StoreStatus;
 import com.barnizgallery.backend.exception.BusinessRuleException;
 import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.mapper.ArtworkMapper;
+import com.barnizgallery.backend.mapper.StoreEditorMapper;
 import com.barnizgallery.backend.mapper.StoreMapper;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.StoreArtworkCount;
 import com.barnizgallery.backend.repository.StoreRepository;
+import com.barnizgallery.backend.repository.StoreSectionRepository;
 import com.barnizgallery.backend.repository.StoreTemplateRepository;
 import com.barnizgallery.backend.security.OwnershipGuard;
 
@@ -35,11 +42,14 @@ public class StoreService {
     private final StoreRepository storeRepository;
     private final StoreTemplateRepository templateRepository;
     private final ArtworkRepository artworkRepository;
+    private final StoreSectionRepository sectionRepository;
     private final MasterService masterService;
     private final OwnershipGuard ownershipGuard;
 
     public StoreService(StoreRepository storeRepository, StoreTemplateRepository templateRepository,
-            ArtworkRepository artworkRepository, MasterService masterService, OwnershipGuard ownershipGuard) {
+            ArtworkRepository artworkRepository, StoreSectionRepository sectionRepository, MasterService masterService,
+            OwnershipGuard ownershipGuard) {
+        this.sectionRepository = sectionRepository;
         this.ownershipGuard = ownershipGuard;
         this.storeRepository = storeRepository;
         this.templateRepository = templateRepository;
@@ -65,6 +75,26 @@ public class StoreService {
                 .map(ArtworkMapper::toSummary)
                 .toList();
         return StoreMapper.toDetail(store, artworks);
+    }
+
+    /**
+     * Public page of a store by its slug. Only published stores of approved masters exist for the public (404
+     * otherwise); hidden sections and artworks that are not exhibited or in auction are left out.
+     */
+    @Transactional(readOnly = true)
+    public StorePageResponse findPublishedBySlug(String slug) {
+        Store store = storeRepository.findBySlugAndStatus(slug, StoreStatus.PUBLISHED, MasterVerificationStatus.APPROVED)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.STORE_NOT_FOUND, slug));
+        List<StoreSectionResponse> sections = sectionRepository
+                .findByStoreStoreIdAndVisibleTrueOrderBySortOrderAscStoreSectionIdAsc(store.getStoreId()).stream()
+                .map(StoreEditorMapper::toResponse)
+                .toList();
+        List<ArtworkSummaryResponse> artworks = artworkRepository
+                .findByStoreStoreIdAndDeletedAtIsNullAndStatusInOrderByArtworkIdAsc(store.getStoreId(),
+                        ArtworkStatus.PUBLIC).stream()
+                .map(ArtworkMapper::toSummary)
+                .toList();
+        return StoreMapper.toPage(store, sections, artworks);
     }
 
     @Transactional

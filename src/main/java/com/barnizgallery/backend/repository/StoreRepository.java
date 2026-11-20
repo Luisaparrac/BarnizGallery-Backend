@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.barnizgallery.backend.entity.Store;
+import com.barnizgallery.backend.enums.MasterVerificationStatus;
+import com.barnizgallery.backend.enums.StoreStatus;
 
 /**
  * Spring Data repository for {@link Store}.
@@ -25,4 +27,9 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
     boolean existsByMasterMasterId(Long masterId);
 
     boolean existsBySlug(String slug);
+
+    /** A store by slug with its master, when it has the given status and its master the given verification. */
+    @Query("select s from Store s join fetch s.master m where s.slug = :slug and s.status = :status "
+            + "and m.verificationStatus = :verification")
+    Optional<Store> findBySlugAndStatus(String slug, StoreStatus status, MasterVerificationStatus verification);
 }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.barnizgallery.backend.entity.Artwork;
 import com.barnizgallery.backend.entity.User;
+import com.barnizgallery.backend.enums.ArtworkStatus;
 import com.barnizgallery.backend.patterns.factorymethod.InteractionFactoryProvider;
 import com.barnizgallery.backend.repository.ArtworkRepository;
 import com.barnizgallery.backend.repository.InteractionRepository;
@@ -82,7 +83,7 @@ public class InteractionBasedStrategy implements RecommendationStrategy {
         }
         List<RecommendationResult> results = new ArrayList<>();
         for (Artwork artwork : artworkRepository.findByDeletedAtIsNullAndStatusInOrderByArtworkIdAsc(
-                ProfileBasedStrategy.AVAILABLE, AiServiceStrategy.CANDIDATES)) {
+                ArtworkStatus.PUBLIC, AiServiceStrategy.CANDIDATES)) {
             RecommendationResult store = byStore.get(artwork.getStore().getStoreId());
             if (store != null) {
                 results.add(RecommendationResult.ofArtwork(artwork.getArtworkId(), store.score().doubleValue(),

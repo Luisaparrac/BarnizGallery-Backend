@@ -25,6 +25,9 @@ public interface ArtworkRepository extends JpaRepository<Artwork, Long> {
 
     long countByStoreStoreId(Long storeId);
 
+    List<Artwork> findByStoreStoreIdAndDeletedAtIsNullAndStatusInOrderByArtworkIdAsc(Long storeId,
+            Collection<ArtworkStatus> statuses);
+
     /** Artworks not deleted with one of the given statuses (the available ones for recommendations). */
     List<Artwork> findByDeletedAtIsNullAndStatusInOrderByArtworkIdAsc(Collection<ArtworkStatus> statuses,
             Pageable page);

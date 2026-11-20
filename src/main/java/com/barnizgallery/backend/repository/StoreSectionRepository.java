@@ -12,4 +12,6 @@ import com.barnizgallery.backend.entity.StoreSection;
 public interface StoreSectionRepository extends JpaRepository<StoreSection, Long> {
 
     List<StoreSection> findByStoreStoreIdOrderBySortOrderAscStoreSectionIdAsc(Long storeId);
+
+    List<StoreSection> findByStoreStoreIdAndVisibleTrueOrderBySortOrderAscStoreSectionIdAsc(Long storeId);
 }

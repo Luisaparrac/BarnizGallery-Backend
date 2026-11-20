@@ -48,7 +48,6 @@ public class AiServiceStrategy implements RecommendationStrategy {
     /** At most {@value #MAX_CANDIDATES} available artworks are compared. */
     static final Pageable CANDIDATES = PageRequest.of(0, MAX_CANDIDATES);
     static final int MAX_INTERACTIONS = 1000;
-    static final List<ArtworkStatus> AVAILABLE = List.of(ArtworkStatus.EXHIBITED, ArtworkStatus.IN_AUCTION);
 
     private static final Logger log = LoggerFactory.getLogger(AiServiceStrategy.class);
 
@@ -77,7 +76,7 @@ public class AiServiceStrategy implements RecommendationStrategy {
         if (!aiService.isAvailable()) {
             return fallback.recommend(user);
         }
-        List<Artwork> available = artworkRepository.findByDeletedAtIsNullAndStatusInOrderByArtworkIdAsc(AVAILABLE,
+        List<Artwork> available = artworkRepository.findByDeletedAtIsNullAndStatusInOrderByArtworkIdAsc(ArtworkStatus.PUBLIC,
                 CANDIDATES);
         if (available.isEmpty()) {
             return fallback.recommend(user);
@@ -97,7 +96,7 @@ public class AiServiceStrategy implements RecommendationStrategy {
         if (!aiService.isAvailable()) {
             return fallback.recommendArtworks(user);
         }
-        List<Artwork> available = artworkRepository.findByDeletedAtIsNullAndStatusInOrderByArtworkIdAsc(AVAILABLE,
+        List<Artwork> available = artworkRepository.findByDeletedAtIsNullAndStatusInOrderByArtworkIdAsc(ArtworkStatus.PUBLIC,
                 CANDIDATES);
         if (available.isEmpty()) {
             return fallback.recommendArtworks(user);
