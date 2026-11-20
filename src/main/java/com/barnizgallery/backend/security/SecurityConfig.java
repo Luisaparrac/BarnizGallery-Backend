@@ -74,7 +74,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/masters/**").hasRole(ADMIN)
                 .requestMatchers(HttpMethod.POST, "/api/auctions", "/api/auctions/*/start", "/api/auctions/*/finish",
                         "/api/auctions/*/cancel").hasRole(ADMIN)
-                .requestMatchers("/api/rooms/**", "/api/artworks/**", "/api/photos/**").hasAnyRole(ADMIN, ARTISAN)
+                .requestMatchers("/api/artworks/**", "/api/photos/**").hasAnyRole(ADMIN, ARTISAN)
                 .anyRequest().authenticated();
     }
 
