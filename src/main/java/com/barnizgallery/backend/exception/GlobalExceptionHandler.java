@@ -10,6 +10,10 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -45,6 +49,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<ErrorResponse> handleApiException(ApiException ex, HttpServletRequest request) {
         return build(ex.getStatus(), ex.getCode(), request, null, ex.getArgs());
+    }
+
+    /**
+     * Denied by {@code @PreAuthorize}: 401 when nobody is logged in, 403 when the logged-in user lacks permission.
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+            return build(HttpStatus.UNAUTHORIZED, ErrorCode.UNAUTHORIZED, request, null);
+        }
+        return build(HttpStatus.FORBIDDEN, ErrorCode.ACCESS_DENIED, request, null);
     }
 
     @ExceptionHandler(NoResourceFoundException.class)

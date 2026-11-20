@@ -8,6 +8,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -80,6 +82,23 @@ class GlobalExceptionHandlerTest {
         mockMvc.perform(get("/disabled"))
                 .andExpect(status().isServiceUnavailable())
                 .andExpect(jsonPath("$.code").value("ai_disabled"));
+    }
+
+    @Test
+    void accessDeniedIs401WithoutLoginAnd403WithLogin() throws Exception {
+        mockMvc.perform(get("/denied"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("unauthorized"));
+
+        SecurityContextHolder.getContext().setAuthentication(
+                new TestingAuthenticationToken("7", null, "ROLE_CUSTOMER"));
+        try {
+            mockMvc.perform(get("/denied"))
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.code").value("access_denied"));
+        } finally {
+            SecurityContextHolder.clearContext();
+        }
     }
 
     @Test

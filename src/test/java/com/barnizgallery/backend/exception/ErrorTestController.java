@@ -3,6 +3,7 @@ package com.barnizgallery.backend.exception;
 import java.math.BigDecimal;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,6 +45,11 @@ public class ErrorTestController {
     @GetMapping("/disabled")
     public void disabled() {
         throw new FeatureDisabledException(ErrorCode.AI_DISABLED);
+    }
+
+    @GetMapping("/denied")
+    public void denied() {
+        throw new AccessDeniedException("denied by a method rule");
     }
 
     @GetMapping("/integrity")
