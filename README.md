@@ -7,7 +7,8 @@ pieces, receive recommendations, take part in live online auctions and contact t
 This repository contains only the backend. The frontend lives in a separate repository and consumes the
 REST API and WebSocket contract described below.
 
-Final project of the Software Design Patterns course. It implements 8 design patterns.
+Final project of the Software Design Patterns course. It implements **12 design patterns** (see
+[Design patterns](#design-patterns)).
 
 ## Stack
 
@@ -32,11 +33,32 @@ HTTP / WebSocket
  service/         business logic and transactions
       │      ╲
       │       patterns/   observer · state · composite · facade · adapter · strategy · builder · factorymethod
+      │                   proxy · decorator · chain · templatemethod
       │
  repository/      Spring Data JPA interfaces
       │
  PostgreSQL (schema museo)
 ```
+
+## Design patterns
+
+The first eight were seen in class; the last four were researched for this project. Every pattern class has a
+short Javadoc that names its role in the pattern.
+
+| # | Pattern | Origin | Where (`src/main/java/com/barnizgallery/backend/…`) | What it does here |
+|---|---|---|---|---|
+| 1 | Adapter | Seen in class | `patterns/adapter/` (`PaymentGateway` → `WompiGateway`, `PayPalGateway`, `SimulatedGateway`; `StorageService` → `CloudinaryStorageService`; `EmailSender` → `BrevoEmailSender`; `AiServiceGateway` → `AiServiceClient`) | One interface per external service; each provider is translated by its adapter, and a disabled adapter keeps the app working without keys |
+| 2 | Builder | Seen in class | `patterns/builder/AuctionBuilder`, `patterns/builder/OrderBuilder` | Builds an auction (base price, dates, currency) and a checkout order with amounts that match the database rules exactly |
+| 3 | Composite | Seen in class | `patterns/composite/` (`GalleryComposite` → `StoreComposite` → `ArtworkLeaf`) | The public gallery as a tree: gallery → published stores → public artworks |
+| 4 | Facade | Seen in class | `patterns/facade/AiFacade` | One entry point for AI features: suggested prices, recommendation strategies and bid review |
+| 5 | Factory Method | Seen in class | `patterns/factorymethod/` (`InteractionFactory` and one factory per action) | Creates each kind of interaction (view, zoom, favorite, add to cart, share, bid, purchase, store visit, custom order) |
+| 6 | Observer | Seen in class | `patterns/observer/` (`AuctionEventPublisher`, `LiveAuctionBroadcaster`, `OutbidNotifier`, `MatchingAuctionNotifier`, `BidInteractionRecorder`) | Auction events reach WebSocket subscribers, notifications and interaction history |
+| 7 | State | Seen in class | `patterns/state/` (`AuctionContext`, `ScheduledState`, `ActiveState`, `FinishedState`, `CancelledState`) | The auction lifecycle: each state decides which transitions and bids are allowed |
+| 8 | Strategy | Seen in class | `patterns/strategy/` (`ProfileBasedStrategy`, `InteractionBasedStrategy`, `HybridStrategy`, `AiStrategy`, `AiServiceStrategy`) | Interchangeable recommendation algorithms chosen per request |
+| 9 | Proxy | Researched | `patterns/proxy/AiServiceProxy` | Stands in front of the AI service client with the same interface: caches answers for 2 minutes and stops calling for 30 s after a server failure, so callers fall back at once |
+| 10 | Decorator | Researched | `patterns/decorator/LoggingPaymentGateway` | Wraps every payment gateway and adds an audit trail in the log (payment references, amounts, webhook events, failures) without changing the gateways |
+| 11 | Chain of Responsibility | Researched | `patterns/chain/` (`CheckoutCheck` → `CartNotEmptyCheck` → `ForSaleCheck` → `StockCheck` → `SingleCurrencyCheck`) | The checkout checks run one after the other; the first broken rule stops the chain with a 409 |
+| 12 | Template Method | Researched | `patterns/templatemethod/` (`FulfillmentStep` → `ShipStep`, `DeliverStep`) | Every shipping step follows the same algorithm (check status → record data → move the line → move the order); subclasses fill in the steps |
 
 Other packages: `entity/` (JPA entities), `enums/` (English enums), `converter/`
 (Spanish DB values ↔ English enums), `dto/` (request and response records), `mapper/`,
@@ -92,12 +114,12 @@ Requirements: Java 21 and a local PostgreSQL 18.
 | `PAYPAL_CLIENT_ID` / `PAYPAL_CLIENT_SECRET` / `PAYPAL_WEBHOOK_ID` | PayPal REST app and webhook for USD payments (empty = PayPal disabled) | – |
 | `PAYPAL_BASE_URL` | PayPal REST API base URL | `https://api-m.sandbox.paypal.com` |
 | `TRUSTED_PROXY_HOPS` | Proxies in front of the app that append to `X-Forwarded-For` (set `1` on Render); used to find the real client IP for the login limit | `0` |
-| `FLYWAY_ENABLED` | Run the Flyway migrations on start (baseline 1 on an existing v1 database, then V2) | `true` |
+| `FLYWAY_ENABLED` | Run the Flyway migrations on start (baseline 1 on an existing v1 database, then V2, V3 and V4) | `true` |
 | `PORT` | HTTP port (set by Render) | `8080` |
 | `CORS_ALLOWED_ORIGINS` | Comma-separated frontend origins (REST and WebSocket) | `http://localhost:5173,http://localhost:3000` |
 | `AUCTION_SCHEDULER_ENABLED` | Run the 60-second auction scheduler | `true` |
 | `AI_PROVIDER` | AI provider (not chosen yet; `none` disables AI) | `none` |
-| `AI_SERVICE_URL` | Base URL of the MUSEO AI service, without a trailing `/` (empty disables it) | – |
+| `AI_SERVICE_URL` | Base URL of the MUSEO AI service, without a trailing `/`, e.g. `https://barnizgallery-ia.onrender.com` (empty disables it) | – |
 | `AI_SERVICE_KEY` | Shared key sent in the `X-API-Key` header to the AI service (empty disables it) | – |
 | `AI_API_KEY` | Not used yet: it will be added together with the adapter when the AI provider is chosen | – |
 | `JAVA_TOOL_OPTIONS` | `-XX:MaxRAMPercentage=75 -XX:+UseSerialGC -Xss512k` (already set in the Dockerfile) | – |
@@ -361,6 +383,8 @@ reconnect (for example with `@stomp/stompjs` `reconnectDelay`) and re-subscribe.
 
 ## Deployment on Render
 
+0. **Database:** create the new database by restoring the v1 backup first. On the first start Flyway makes the
+   baseline in version 1 and applies V2, V3 and V4 (V4 checks that the six v1 masters are there).
 1. Create a **Web Service** from this repository, runtime **Docker**, region **Virginia (US East)**
    (the same region as the database, required for the internal URL).
 2. Set the environment variables above (use the **internal** database URL, without `sslmode`).
@@ -368,6 +392,28 @@ reconnect (for example with `@stomp/stompjs` `reconnectDelay`) and re-subscribe.
 4. Set `TRUSTED_PROXY_HOPS=1`: Render's proxy appends the client address to `X-Forwarded-For`, and only that
    entry is trusted for the login attempt limit (earlier entries can be forged by the client). Check it on the
    first deploy.
+
+### Preparing the demo as administrator
+
+Everything below goes through the API with an administrator token, and every change is written to
+`museo.audit_log` by the database with the administrator's id (`changed_by`). The backend does not change data
+on its own.
+
+1. **Settings** – `GET /api/admin/settings` lists every `app_settings` row. Fill the ones that block features,
+   for example `PUT /api/admin/settings/cart.reservation_minutes` with `{ "value": 15 }` (checkout),
+   `auction.min_increment`, `auction.max_bids_per_minute` and `auction.suspicious_multiplier` (bids), or
+   `shipping.fixed_amount` (the cache is cleared at once).
+2. **Masters** – `GET /api/admin/masters` shows every master with `verificationStatus` and `active`.
+   `POST /api/admin/masters/{masterId}/approve` approves an active master (masters of the V4 roster directly;
+   archived masters answer 409 `master_archived`).
+3. **Stores** – `GET /api/admin/stores` lists every store. `POST /api/admin/stores/{storeId}/publish` with
+   `{ "slug": "granja" }` publishes the store of an active, approved master (the slug is required when the store
+   has none; 409 when the master is not approved or archived).
+4. **Artworks** – `GET /api/admin/artworks?storeId=…` lists the artworks of a store, drafts included.
+   `PATCH /api/admin/artworks/{artworkId}` with `{ "price": 1200000, "currency": "COP", "stock": 1,
+   "saleMode": "SALE", "status": "EXHIBITED" }` completes the sale data. The same rules as for artisans apply
+   (422 for a sale without price or stock); `IN_AUCTION` and `RESERVED` stay managed by auctions and orders.
+5. Check the result as a visitor: `GET /api/stores`, `GET /api/stores/{slug}` and `GET /api/artworks`.
 
 ### First administrator
 
@@ -393,7 +439,7 @@ action changes their status.
 
 | Integration | Status | How to enable |
 |---|---|---|
-| AI service (price suggestions, recommendation strategy `ai-service`) | Enabled when configured | Set `AI_SERVICE_URL` and `AI_SERVICE_KEY` |
+| AI service (price suggestions, recommendation strategy `ai-service`, similar artworks; candidates carry their slug) behind `AiServiceProxy` | Enabled when configured; every feature falls back to the fixed rules if it is off or fails | Set `AI_SERVICE_URL` and `AI_SERVICE_KEY` |
 | AI text model (recommendation strategy `ai`, AI bid review) | Disabled – provider not chosen | When the provider is chosen: add an adapter implementing `AiTextClient`, add the `AI_API_KEY` property, and set `AI_PROVIDER` |
 | Payments (by currency: COP → Wompi, USD → PayPal; simulated gateway for demos) | Each gateway enabled when its keys are set | Set the `WOMPI_*` and `PAYPAL_*` variables; any other currency answers 409 |
 | Photo storage (Cloudinary, JPEG/PNG/WebP up to 5 MB) | Enabled when configured | Set `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY` and `CLOUDINARY_API_SECRET` |
