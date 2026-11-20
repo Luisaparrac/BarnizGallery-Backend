@@ -9,7 +9,8 @@ import java.util.Optional;
  */
 public enum CatalogKind {
 
-    COLORS("colors");
+    COLORS("colors"),
+    SHAPES("shapes");
 
     private final String path;
 

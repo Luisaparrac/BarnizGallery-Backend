@@ -9,6 +9,7 @@ import com.barnizgallery.backend.dto.CatalogEntryRequest;
 import com.barnizgallery.backend.dto.CatalogEntryResponse;
 import com.barnizgallery.backend.entity.CatalogEntry;
 import com.barnizgallery.backend.entity.Color;
+import com.barnizgallery.backend.entity.Shape;
 import com.barnizgallery.backend.enums.CatalogKind;
 import com.barnizgallery.backend.enums.ErrorCode;
 import com.barnizgallery.backend.exception.BusinessRuleException;
@@ -16,6 +17,7 @@ import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.mapper.CatalogMapper;
 import com.barnizgallery.backend.repository.CatalogEntryRepository;
 import com.barnizgallery.backend.repository.ColorRepository;
+import com.barnizgallery.backend.repository.ShapeRepository;
 
 /**
  * Administration of the simple catalogs. Entries are created with a unique code and edited by code; the code
@@ -26,9 +28,11 @@ import com.barnizgallery.backend.repository.ColorRepository;
 public class CatalogAdminService {
 
     private final ColorRepository colorRepository;
+    private final ShapeRepository shapeRepository;
 
-    public CatalogAdminService(ColorRepository colorRepository) {
+    public CatalogAdminService(ColorRepository colorRepository, ShapeRepository shapeRepository) {
         this.colorRepository = colorRepository;
+        this.shapeRepository = shapeRepository;
     }
 
     /** Every entry, active or not. */
@@ -76,6 +80,7 @@ public class CatalogAdminService {
     private CatalogEntryRepository<CatalogEntry> repository(CatalogKind kind) {
         CatalogEntryRepository<? extends CatalogEntry> repository = switch (kind) {
             case COLORS -> colorRepository;
+            case SHAPES -> shapeRepository;
         };
         return (CatalogEntryRepository<CatalogEntry>) repository;
     }
@@ -83,6 +88,7 @@ public class CatalogAdminService {
     private static CatalogEntry newEntry(CatalogKind kind) {
         return switch (kind) {
             case COLORS -> new Color();
+            case SHAPES -> new Shape();
         };
     }
 }
