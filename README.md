@@ -260,6 +260,11 @@ Checkout amounts (`OrderBuilder`, Builder pattern): fee per line = line total ×
 rounded half up to cents; artisan net = line total − fee; total = subtotal + shipping. Shipping comes from
 `shipping.fixed_amount.<CURRENCY>` or, for orders in `currency.default`, from `shipping.fixed_amount`.
 
+### Payments
+| Method | Path | Description |
+|---|---|---|
+| POST | `/api/orders/{orderId}/payments` | `{ obligationId?, simulated? }` → 201 `{ paymentId, gateway, reference, redirectUrl, amount, currency, status }`. Gateway by obligation currency (COP → Wompi, USD → PayPal; other → 409, no credentials → 503); `simulated: true` only while `payments.test_mode` is true. 409 when nothing is pending, the deadline passed or a payment is already pending |
+
 Artwork rules (422): a price needs its currency; an exhibited artwork needs `saleMode`; `SALE` needs
 `price` > 0 and `stock`. The currency cannot change once the artwork has orders or auctions (409, enforced by
 the database).
