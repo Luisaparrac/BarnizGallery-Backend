@@ -81,6 +81,7 @@ Requirements: Java 21 and a local PostgreSQL 18.
 | `DB_USERNAME` / `DB_PASSWORD` | Database credentials | – |
 | `JWT_SECRET` | HS256 signing key, at least 32 bytes. **Required**: the app does not start without it | – |
 | `JWT_ACCESS_MINUTES` / `JWT_REFRESH_DAYS` | Lifetime of access tokens (minutes) and refresh tokens (days) | `15` / `7` |
+| `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` | Cloudinary account for photos (empty = upload disabled) | – |
 | `FLYWAY_ENABLED` | Run the Flyway migrations on start (baseline 1 on an existing v1 database, then V2) | `true` |
 | `PORT` | HTTP port (set by Render) | `8080` |
 | `CORS_ALLOWED_ORIGINS` | Comma-separated frontend origins (REST and WebSocket) | `http://localhost:5173,http://localhost:3000` |
