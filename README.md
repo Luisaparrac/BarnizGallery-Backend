@@ -175,7 +175,7 @@ store templates, each with its `code` and its names in Spanish and English. Requ
 | POST | `/api/admin/catalogs/{catalog}` | `{ code, nameEs, nameEn, sortOrder?, active?, hex? }` → 201 (409 if the code exists) |
 | PUT | `/api/admin/catalogs/{catalog}/{code}` | Edit names, order, extra fields or `active`; the code never changes |
 
-`{catalog}`: `colors`, `shapes`. Entries are never deleted: `active=false` hides them from `/api/catalogs` and from new
+`{catalog}`: `colors`, `shapes`, `motifs`. Entries are never deleted: `active=false` hides them from `/api/catalogs` and from new
 requests.
 
 ### Authentication

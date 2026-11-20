@@ -9,6 +9,7 @@ import com.barnizgallery.backend.dto.CatalogEntryRequest;
 import com.barnizgallery.backend.dto.CatalogEntryResponse;
 import com.barnizgallery.backend.entity.CatalogEntry;
 import com.barnizgallery.backend.entity.Color;
+import com.barnizgallery.backend.entity.Motif;
 import com.barnizgallery.backend.entity.Shape;
 import com.barnizgallery.backend.enums.CatalogKind;
 import com.barnizgallery.backend.enums.ErrorCode;
@@ -17,6 +18,7 @@ import com.barnizgallery.backend.exception.ResourceNotFoundException;
 import com.barnizgallery.backend.mapper.CatalogMapper;
 import com.barnizgallery.backend.repository.CatalogEntryRepository;
 import com.barnizgallery.backend.repository.ColorRepository;
+import com.barnizgallery.backend.repository.MotifRepository;
 import com.barnizgallery.backend.repository.ShapeRepository;
 
 /**
@@ -29,10 +31,13 @@ public class CatalogAdminService {
 
     private final ColorRepository colorRepository;
     private final ShapeRepository shapeRepository;
+    private final MotifRepository motifRepository;
 
-    public CatalogAdminService(ColorRepository colorRepository, ShapeRepository shapeRepository) {
+    public CatalogAdminService(ColorRepository colorRepository, ShapeRepository shapeRepository,
+            MotifRepository motifRepository) {
         this.colorRepository = colorRepository;
         this.shapeRepository = shapeRepository;
+        this.motifRepository = motifRepository;
     }
 
     /** Every entry, active or not. */
@@ -81,6 +86,7 @@ public class CatalogAdminService {
         CatalogEntryRepository<? extends CatalogEntry> repository = switch (kind) {
             case COLORS -> colorRepository;
             case SHAPES -> shapeRepository;
+            case MOTIFS -> motifRepository;
         };
         return (CatalogEntryRepository<CatalogEntry>) repository;
     }
@@ -89,6 +95,7 @@ public class CatalogAdminService {
         return switch (kind) {
             case COLORS -> new Color();
             case SHAPES -> new Shape();
+            case MOTIFS -> new Motif();
         };
     }
 }
