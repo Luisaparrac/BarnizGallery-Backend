@@ -15,6 +15,7 @@ import java.time.ZoneOffset;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.barnizgallery.backend.TestEntities;
@@ -36,7 +37,8 @@ class PasswordResetServiceTest {
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(4);
     private final RegistrationService registration = new RegistrationService(userRepository, encoder, tokens,
             emails, emailSender, mock(NotificationService.class), mock(SessionIssuer.class),
-            Clock.fixed(Instant.parse("2026-11-19T12:00:00Z"), ZoneOffset.UTC));
+            Clock.fixed(Instant.parse("2026-11-19T12:00:00Z"), ZoneOffset.UTC),
+            mock(ApplicationEventPublisher.class));
     private final PasswordResetService service = new PasswordResetService(userRepository, tokens, emails,
             emailSender, registration);
 

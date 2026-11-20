@@ -18,6 +18,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.barnizgallery.backend.TestEntities;
@@ -44,7 +45,7 @@ class RegistrationServiceTest {
     private final NotificationService notifications = mock(NotificationService.class);
     private final SessionIssuer sessions = mock(SessionIssuer.class);
     private final RegistrationService service = new RegistrationService(userRepository, encoder, tokens, emails,
-            emailSender, notifications, sessions, Clock.fixed(NOW, ZoneOffset.UTC));
+            emailSender, notifications, sessions, Clock.fixed(NOW, ZoneOffset.UTC), mock(ApplicationEventPublisher.class));
 
     @BeforeEach
     void setUp() {

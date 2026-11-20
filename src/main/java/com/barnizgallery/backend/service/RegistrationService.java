@@ -5,6 +5,7 @@ import java.time.Clock;
 import java.time.Duration;
 import java.util.Locale;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -44,10 +45,12 @@ public class RegistrationService {
     private final NotificationService notificationService;
     private final SessionIssuer sessionIssuer;
     private final Clock clock;
+    private final ApplicationEventPublisher events;
 
     public RegistrationService(UserRepository userRepository, PasswordEncoder passwordEncoder,
             AuthTokenService authTokenService, AccountEmailFactory emails, EmailSender emailSender,
-            NotificationService notificationService, SessionIssuer sessionIssuer, Clock clock) {
+            NotificationService notificationService, SessionIssuer sessionIssuer, Clock clock,
+            ApplicationEventPublisher events) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authTokenService = authTokenService;
@@ -56,6 +59,7 @@ public class RegistrationService {
         this.notificationService = notificationService;
         this.sessionIssuer = sessionIssuer;
         this.clock = clock;
+        this.events = events;
     }
 
     /** Creates the customer, sends the verification email, greets the user and opens a session. */
@@ -107,12 +111,16 @@ public class RegistrationService {
         return UserMapper.toResponse(user);
     }
 
-    /** Marks the email as verified; a pending account becomes active. Suspended accounts stay suspended. */
+    /**
+     * Marks the email as verified and announces it ({@link EmailVerified}); a pending customer account becomes
+     * active. Suspended accounts stay suspended, and artisans stay pending until an administrator approves them.
+     */
     void confirmEmail(User user) {
         if (user.getEmailVerifiedAt() == null) {
             user.setEmailVerifiedAt(clock.instant());
+            events.publishEvent(new EmailVerified(user));
         }
-        if (user.getStatus() == UserStatus.PENDING) {
+        if (user.getStatus() == UserStatus.PENDING && user.getRole() != UserRole.ARTISAN) {
             user.setStatus(UserStatus.ACTIVE);
         }
     }
