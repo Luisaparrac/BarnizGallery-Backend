@@ -1,0 +1,11 @@
+package com.barnizgallery.backend.dto;
+
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+
+/**
+ * Quantity of an artwork in the cart.
+ */
+public record CartItemRequest(@NotNull @Min(1) @Max(99) Integer quantity) {
+}
