@@ -3,6 +3,7 @@ package com.barnizgallery.backend.service;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +42,29 @@ public class AuthTokenService {
         token.setExpiresAt(expiry(validity));
         repository.save(token);
         return raw;
+    }
+
+    /** The stored token for this raw value and purpose, or empty when it does not exist. */
+    @Transactional(readOnly = true)
+    public Optional<AuthToken> find(String raw, AuthTokenPurpose purpose) {
+        return repository.findByHash(generator.hash(raw), purpose);
+    }
+
+    /** True when the token was never used and has not expired. */
+    public boolean isUsable(AuthToken token) {
+        return token.getUsedAt() == null && clock.instant().isBefore(token.getExpiresAt());
+    }
+
+    @Transactional
+    public void markUsed(AuthToken token) {
+        token.setUsedAt(clock.instant());
+        repository.save(token);
+    }
+
+    /** Revokes every unused token of the user with this purpose (for example all sessions). */
+    @Transactional
+    public void revokeAll(User user, AuthTokenPurpose purpose) {
+        repository.revokeAll(user.getUserId(), purpose, clock.instant());
     }
 
     /** The moment a token created now with this validity expires. */

@@ -25,6 +25,7 @@ public enum ErrorCode {
     EMAIL_ALREADY_REGISTERED,
     INVALID_CREDENTIALS,
     ACCOUNT_SUSPENDED,
+    INVALID_REFRESH_TOKEN,
     PASSWORD_TOO_LONG,
 
     // Missing resources
