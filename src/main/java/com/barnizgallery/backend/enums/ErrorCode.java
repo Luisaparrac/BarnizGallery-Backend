@@ -23,6 +23,8 @@ public enum ErrorCode {
     ACCESS_DENIED,
     TOO_MANY_LOGIN_ATTEMPTS,
     EMAIL_ALREADY_REGISTERED,
+    INVALID_CREDENTIALS,
+    ACCOUNT_SUSPENDED,
     PASSWORD_TOO_LONG,
 
     // Missing resources
