@@ -1,14 +1,10 @@
 package com.barnizgallery.backend.service;
 
 import java.time.LocalDateTime;
-import java.util.Locale;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.barnizgallery.backend.dto.IdentifyUserRequest;
-import com.barnizgallery.backend.dto.IdentifyUserResponse;
 import com.barnizgallery.backend.dto.TasteProfileRequest;
 import com.barnizgallery.backend.dto.TasteProfileResponse;
 import com.barnizgallery.backend.dto.UserPreferencesRequest;
@@ -36,18 +32,6 @@ public class UserService {
         this.userRepository = userRepository;
         this.tasteProfileRepository = tasteProfileRepository;
         this.catalogResolver = catalogResolver;
-    }
-
-    /** Finds the user by email; if it does not exist, creates it. */
-    @Transactional
-    public IdentifyUserResponse identify(IdentifyUserRequest request) {
-        String email = request.email().trim().toLowerCase(Locale.ROOT);
-        Optional<User> existing = userRepository.findByEmailIgnoreCase(email);
-        if (existing.isPresent()) {
-            return new IdentifyUserResponse(UserMapper.toResponse(existing.get()), false);
-        }
-        User created = userRepository.save(UserMapper.toNewUser(request, email));
-        return new IdentifyUserResponse(UserMapper.toResponse(created), true);
     }
 
     @Transactional(readOnly = true)

@@ -1,9 +1,9 @@
 package com.barnizgallery.backend.controller;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -15,8 +15,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.unit.DataSize;
 
 import com.barnizgallery.backend.config.MessageConfig;
-import com.barnizgallery.backend.dto.IdentifyUserRequest;
-import com.barnizgallery.backend.dto.IdentifyUserResponse;
 import com.barnizgallery.backend.dto.UserResponse;
 import com.barnizgallery.backend.enums.Language;
 import com.barnizgallery.backend.enums.UserRole;
@@ -32,11 +30,6 @@ class UserControllerTest {
     private final UserService userService = mock(UserService.class);
     private MockMvc mockMvc;
 
-    private static final String BODY = """
-            {"email":"ana@mail.com","name":"Ana","countryCode":"CO",
-             "preferredLanguage":"ES"}
-            """;
-
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(new UserController(userService))
@@ -46,36 +39,21 @@ class UserControllerTest {
     }
 
     @Test
-    void identifyNewUserReturns201AndIsNewTrue() throws Exception {
-        when(userService.identify(any(IdentifyUserRequest.class))).thenReturn(response(true));
+    void findByIdReturnsTheUser() throws Exception {
+        when(userService.findById(1L)).thenReturn(new UserResponse(1L, "Ana", "ana@mail.com", UserRole.CUSTOMER,
+                UserStatus.ACTIVE, "CO", Language.ES));
 
-        mockMvc.perform(post("/api/users/identify").contentType(MediaType.APPLICATION_JSON).content(BODY))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.isNew").value(true))
-                .andExpect(jsonPath("$.user.email").value("ana@mail.com"));
-    }
-
-    @Test
-    void identifyExistingUserReturns200() throws Exception {
-        when(userService.identify(any(IdentifyUserRequest.class))).thenReturn(response(false));
-
-        mockMvc.perform(post("/api/users/identify").contentType(MediaType.APPLICATION_JSON).content(BODY))
+        mockMvc.perform(get("/api/users/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.isNew").value(false));
+                .andExpect(jsonPath("$.email").value("ana@mail.com"))
+                .andExpect(jsonPath("$.passwordHash").doesNotExist());
     }
 
     @Test
-    void invalidEmailIs400() throws Exception {
-        mockMvc.perform(post("/api/users/identify").contentType(MediaType.APPLICATION_JSON)
-                .content(BODY.replace("ana@mail.com", "not-an-email")))
+    void unknownLanguageIs400() throws Exception {
+        mockMvc.perform(patch("/api/users/1/preferences").contentType(MediaType.APPLICATION_JSON)
+                .content("{\"preferredLanguage\":\"FR\"}"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.fieldErrors[0].field").value("email"));
-    }
-
-    private static IdentifyUserResponse response(boolean isNew) {
-        return new IdentifyUserResponse(
-                new UserResponse(1L, "Ana", "ana@mail.com", UserRole.CUSTOMER, UserStatus.PENDING, "CO",
-                        Language.ES),
-                isNew);
+                .andExpect(jsonPath("$.code").value("malformed_request"));
     }
 }
