@@ -3,6 +3,7 @@ package com.barnizgallery.backend.security;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
@@ -35,7 +36,8 @@ public class AccessTokenService {
     }
 
     public IssuedAccessToken issue(User user) {
-        Instant now = clock.instant();
+        // JWT dates have whole seconds: truncating keeps expiresAt equal to the exp claim.
+        Instant now = clock.instant().truncatedTo(ChronoUnit.SECONDS);
         Instant expiresAt = now.plus(Duration.ofMinutes(properties.accessMinutes()));
         Language language = user.getPreferredLanguage() == null ? Language.ES : user.getPreferredLanguage();
         JwtClaimsSet claims = JwtClaimsSet.builder()
